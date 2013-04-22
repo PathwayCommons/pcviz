@@ -17,3 +17,17 @@
 .pcviz-logo small {
     color: #ECF0F1;
 }
+
+#demo, #demo-source {
+    height: 500px;
+    border: 1px solid #ddd;
+    margin: 1em 0;
+    overflow: hidden !important;
+    border-radius: 0.25em;
+    margin: 0.25em;
+}
+
+#demo {
+    float: left;
+    width: 100%;
+}
