@@ -1,7 +1,12 @@
 # About
 Pathway Commons Network Visualizer, PCViz in short, is a joint project of [Sander Lab - cBio MSKCC](http://cbio.mskcc.org) and [Bader Lab - uToronto](http://baderlab.org).
 
-More details to follow soon...
+# Deploy
+Clone the repository and in the main directory, use the following command:
+
+	mvn clean install tomcat:run
+
+Then point your browser to [http://localhost:8080/pcviz/](http://localhost:8080/pcviz/).
 
 ## Mock-up
 Here is how this web-page should look for the first sprint:

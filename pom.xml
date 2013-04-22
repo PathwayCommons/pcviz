@@ -104,7 +104,4 @@
       </dependency>
 
   </dependencies>
-  <build>
-    <finalName>PCViz</finalName>
-  </build>
 </project>
