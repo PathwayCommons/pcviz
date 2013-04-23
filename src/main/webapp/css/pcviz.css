@@ -50,6 +50,10 @@
     text-decoration: none;
 }
 
+#rightMenuTabs {
+    height: 550px;
+}
+
 .demo-panel-title {
     margin-bottom: 6px;
 }
