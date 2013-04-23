@@ -41,7 +41,7 @@
         </div>
         <div class="row topcontrols">
             <div class="span8"> <!-- genes of interest -->
-                <input name="tagsinput" id="tagsinput" class="tagsinput" value="TP53,MDM2,MDM4" />
+                <input name="tagsinput" id="tagsinput" class="tagsinput" value="TP53,MDM2,MDM4,BRCA1,BRCA2" />
             </div>
             <div class="span4">
                 <ul class="nav nav-tabs" id="rightMenuControls">
@@ -58,7 +58,11 @@
             <div class="span4"> <!-- slider bars -->
                 <div id="rightMenuTabs" class="tab-content">
                     <div class="tab-pane fade active in" id="graph-details">
-                        Click on one of the nodes or edges to get more information...
+                        <p class="help-text palette palette-silver">
+                            Click on one of the nodes or edges to get more information...
+                        </p>
+                        <img src="images/help-left-arrow.png" width="75">
+
                     </div>
                     <div class="tab-pane fade" id="graph-settings">
                         <div class="share">
@@ -111,18 +115,24 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="graph-help">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Aenean a sapien leo. Nunc ornare rutrum ante eget rhoncus.
-                        Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                        Curabitur suscipit, ligula a sollicitudin viverra, eros elit ornare mauris, sed fringilla ipsum erat vitae nibh.
-                        Mauris vulputate enim non dui mattis facilisis.
-                        Ut non lacus augue, id egestas enim.
-                        Etiam pellentesque ante eget arcu pretium semper.
-                        Sed imperdiet venenatis mi, id aliquet lectus feugiat cursus.
-                        Suspendisse potenti. In eget sodales augue.
-                        Fusce massa leo, volutpat a faucibus nec, tristique sit amet velit.
-                        Proin et augue lacus, sit amet accumsan nibh.
-                        Maecenas tincidunt posuere sagittis.
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                            Aenean a sapien leo. Nunc ornare rutrum ante eget rhoncus.
+                            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                            Curabitur suscipit, ligula a sollicitudin viverra, eros elit ornare mauris, sed fringilla ipsum erat vitae nibh.
+                            Mauris vulputate enim non dui mattis facilisis.
+                        </p>
+                        <p>
+                            Ut non lacus augue, id egestas enim.
+                            Etiam pellentesque ante eget arcu pretium semper.
+                            Sed imperdiet venenatis mi, id aliquet lectus feugiat cursus.
+                            Suspendisse potenti. In eget sodales augue.
+                        </p>
+                        <p>
+                            Fusce massa leo, volutpat a faucibus nec, tristique sit amet velit.
+                            Proin et augue lacus, sit amet accumsan nibh.
+                            Maecenas tincidunt posuere sagittis.
+                        </p>
                     </div>
                 </div>
 
@@ -196,10 +206,11 @@
             <div class="span4"> <!-- History -->
                 <h4>History</h4>
                 <ul id="log">
-                    <li>Loaded the graph...</li>
+                    <li>Loaded the graph... <span class="badge badge-info undo">&times;</span></li>
                 </ul>
             </div>
     </div>
+  </div>
 
   <footer>
       <div class="container">

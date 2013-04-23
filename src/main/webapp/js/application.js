@@ -15,7 +15,7 @@ $(document).ready(function() {
     $("[data-toggle=tooltip]").tooltip("show");
 
     // Init tags input
-    $("#tagsinput").tagsInput();
+    //$("#tagsinput").tagsInput();
 
     // Init jQuery UI slider
     $("#slider").slider({
