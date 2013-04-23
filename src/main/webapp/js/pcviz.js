@@ -41,6 +41,8 @@ $(document).ready(function() {
         var demoNodes = [];
         var demoEdges = [];
 
+        // TODO: Instead of random graphs, generate graphs from the PC2 web service
+
         for (var i = 0; i < nodeCount; i++) {
             demoNodes.push({
                 data: {
@@ -73,12 +75,11 @@ $(document).ready(function() {
         }
 
         $('#demo').cytoscape({
-            elements: { // TODO specify some elements like http://cytoscapeweb.cytoscape.org/demos/simple
+            elements: {
                 nodes: demoNodes,
                 edges: demoEdges
             },
 
-            // TODO specify a nice style like http://cytoscapeweb.cytoscape.org/demos/simple
             style: cytoscape.stylesheet()
                 .selector("node")
                 .css({
@@ -132,13 +133,10 @@ $(document).ready(function() {
                     var center = [cy.container().clientWidth / 2, cy.container().clientHeight / 2];
 
                     var angle = i / nodeCount * Math.PI * 2;
-//      	console.log(angle);
                     var radius =
-                        Math.min(cy.container().clientWidth, cy.container().clientHeight) / 2 * 0.6;
-//      	console.log(radius);
+                    Math.min(cy.container().clientWidth, cy.container().clientHeight) / 2 * 0.6;
 
                     var nodePos = [Math.cos(angle) * radius + center[0], Math.sin(angle) * radius + center[1]]
-//  		console.log(nodePos);
                     cy.nodes()[i].position({x: nodePos[0], y : nodePos[1]});
                 }
             }
