@@ -19,7 +19,7 @@
 }
 
 #demo, #demo-source {
-    height: 500px;
+    height: 550px;
     border: 1px solid #ddd;
     margin: 1em 0;
     overflow: hidden !important;
@@ -29,5 +29,35 @@
 
 #demo {
     float: left;
-    width: 100%;
+    width: 99%;
+}
+
+#graph-settings {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.share-label {
+    width: auto;
+}
+
+.ui-slider {
+    margin-bottom: 10px;
+}
+
+#rightMenuControls a {
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.demo-panel-title {
+    margin-bottom: 0px;
+}
+
+.mainview {
+    margin-bottom: 10px;
+}
+
+.tag {
+    text-transform: uppercase;
 }
