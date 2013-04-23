@@ -92,6 +92,10 @@ $(document).ready(function() {
 
                     ready: function(){
                         window.cy = this; // for debugging
+                        // TODO: Why the hell this does not work?
+                        cy.layout({ name: 'arbor'});
+
+                        /*
 
                         var nodeCount = cy.nodes().length;
                         for (var i = 0; i < nodeCount; i++) {
@@ -105,6 +109,7 @@ $(document).ready(function() {
                             var nodePos = [Math.cos(angle) * radius + center[0], Math.sin(angle) * radius + center[1]]
                             cy.nodes()[i].position({x: nodePos[0], y : nodePos[1]});
                         }
+                        */
                     }
 
                 });
