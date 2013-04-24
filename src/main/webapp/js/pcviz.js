@@ -45,6 +45,9 @@ $(document).ready(function() {
                 $("#network-loading").hide();
                 $("#demo").show();
                 $('#demo').cytoscape({
+//	                layout: {name: 'arbor',
+//		                liveUpdate: true
+//		                maxSimulationTime: 2000},
                     elements: data,
                     style: cytoscape.stylesheet()
                         .selector("node")
@@ -93,7 +96,7 @@ $(document).ready(function() {
                     ready: function(){
                         window.cy = this; // for debugging
                         // TODO: Why the hell this does not work?
-                        cy.layout({ name: 'arbor'});
+                        //cy.layout({ name: 'arbor'});
 
                         /*
 
