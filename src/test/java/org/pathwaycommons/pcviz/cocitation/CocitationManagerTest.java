@@ -15,8 +15,7 @@ public class CocitationManagerTest
 	 * Beware! This test first clears the co-citation cache.
 	 */
 	@Test
-	public void testManager()
-	{
+	public void testManager() throws InterruptedException {
 		CocitationManager man = new CocitationManager(1);
 		man.clearCache();
 
@@ -35,6 +34,9 @@ public class CocitationManagerTest
 
 		// re-getting citations should download and stamp again
 		long stamp1 = man.getCacheTimestamp(gene);
+        // If these were run really quick, then the timestamps won't change
+        // so adding a delay between these two calls.
+        Thread.sleep(250);
 		man.getCocitations(gene);
 		long stamp2 = man.getCacheTimestamp(gene);
 
