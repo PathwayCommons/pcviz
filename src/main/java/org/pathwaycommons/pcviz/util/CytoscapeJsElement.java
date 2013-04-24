@@ -1,4 +1,4 @@
-package org.mskcc.cbio.pcviz.util;
+package org.pathwaycommons.pcviz.util;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.mskcc.cbio.pcviz.controller;
+package org.pathwaycommons.pcviz.controller;
 
 import flexjson.JSONSerializer;
 import org.biopax.paxtools.io.SimpleIOHandler;
@@ -13,9 +13,9 @@ import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.XReferrable;
 import org.biopax.paxtools.model.level3.Xref;
-import org.mskcc.cbio.pcviz.util.CytoscapeJsEdge;
-import org.mskcc.cbio.pcviz.util.CytoscapeJsGraph;
-import org.mskcc.cbio.pcviz.util.CytoscapeJsNode;
+import org.pathwaycommons.pcviz.util.CytoscapeJsEdge;
+import org.pathwaycommons.pcviz.util.CytoscapeJsGraph;
+import org.pathwaycommons.pcviz.util.CytoscapeJsNode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
