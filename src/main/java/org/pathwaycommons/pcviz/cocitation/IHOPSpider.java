@@ -36,6 +36,12 @@ public class IHOPSpider
 			String ID = getInternalID(reader, symbol);
 			reader.close();
 
+			if (ID == null)
+			{
+				log.error("Cannot find internal ID of " + symbol + ".");
+				return null;
+			}
+
 			url = getGenePageURL(ID);
 			reader = getReader(url);
 

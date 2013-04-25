@@ -1,4 +1,4 @@
-package org.pathwaycommons.pcviz.util;
+package org.pathwaycommons.pcviz.model;
 
 import java.util.HashMap;
 import java.util.Map;
