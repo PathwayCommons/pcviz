@@ -17,5 +17,13 @@ public class IHOPSpiderTest
 		Map<String,Integer> map = IHOPSpider.parseCocitations("KRAS");
 
 		assertFalse(map.isEmpty());
+
+		map = IHOPSpider.parseCocitations("CDK1");
+
+		assertFalse(map.isEmpty());
+
+		map = IHOPSpider.parseCocitations("MTOR");
+
+		assertFalse(map.isEmpty());
 	}
 }

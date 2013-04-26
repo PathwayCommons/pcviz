@@ -2,15 +2,10 @@ package org.pathwaycommons.pcviz.controller;
 
 import flexjson.JSONSerializer;
 import org.biopax.paxtools.io.SimpleIOHandler;
-import org.biopax.paxtools.io.sif.BinaryInteractionType;
-import org.biopax.paxtools.io.sif.SimpleInteraction;
-import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
-import org.biopax.paxtools.io.sif.level3.ControlRule;
-import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
-import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.XReferrable;
 import org.biopax.paxtools.model.level3.Xref;
+import org.biopax.paxtools.pattern.miner.*;
 import org.pathwaycommons.pcviz.cocitation.CocitationManager;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
@@ -73,31 +68,20 @@ public class NetworkController
 			URL url = new URL(biopaxUrl);
 			URLConnection urlConnection = url.openConnection();
 			Model model = ioHandler.convertFromOWL(urlConnection.getInputStream());
-			SimpleInteractionConverter sic = new SimpleInteractionConverter(
-				new HashMap(),
-				new HashSet<String>(),
-				new ControlRule()
-//                    SimpleInteractionConverter.getRules(BioPAXLevel.L3).toArray(new InteractionRule[]{})
+
+			// the Pattern framework can generate SIF too
+			SIFSearcher searcher = new SIFSearcher(
+				new ControlsStateChangeMiner(),
+				new ControlsStateChangeButIsParticipantMiner(),
+				new ConsecutiveCatalysisMiner(null), // todo pass black list here
+//				new InSameComplexMiner(), // add this line after implementing ranking
+				new DegradesMiner()
 			);
 
-			for (SimpleInteraction simpleInteraction : sic.inferInteractions(model))
+			for (SIFInteraction sif : searcher.searchSIF(model))
 			{
-				BioPAXElement source = simpleInteraction.getSource();
-				BioPAXElement target = simpleInteraction.getTarget();
-
-				if (source instanceof SmallMolecule
-					|| target instanceof SmallMolecule
-					|| simpleInteraction.getType() == BinaryInteractionType.GENERIC_OF
-					|| simpleInteraction.getType() == BinaryInteractionType.COMPONENT_OF)
-					continue;
-
-				if (source instanceof XReferrable && target instanceof XReferrable)
-				{
-					String srcName = extractName((XReferrable) source);
-					String targetName = extractName((XReferrable) target);
-
-					if (srcName == null || targetName == null)
-						continue;
+				String srcName = sif.source;
+				String targetName = sif.target;
 
 					nodeNames.add(srcName);
 					nodeNames.add(targetName);
@@ -110,7 +94,7 @@ public class NetworkController
 
 					edge.getData().put(PropertyKey.CITED.toString(), getCocitations(srcName, targetName));
 					graph.getEdges().add(edge);
-				}
+//				}
 			}
 
 			for (String nodeName : nodeNames)
