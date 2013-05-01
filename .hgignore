@@ -1,0 +1,6 @@
+syntax: glob
+
+target/
+.idea/
+.DS_Store/
+cocitations/

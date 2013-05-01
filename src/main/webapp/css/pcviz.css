@@ -1,0 +1,73 @@
+.todo li {
+    background-color: #ECF0F1;
+}
+
+.todo-name {
+    color: #BDC3C7;
+}
+
+.todo li.todo-done {
+    background-color: #2c3e50;
+}
+
+.pcviz-logo {
+    font-size: 48px;
+}
+
+.pcviz-logo small {
+    color: #ECF0F1;
+}
+
+#demo, #demo-source {
+    height: 550px;
+    border: 1px solid #ddd;
+    margin: 1em 0;
+    overflow: hidden !important;
+    border-radius: 0.25em;
+    margin: 0.25em;
+}
+
+#demo {
+    float: left;
+    width: 99%;
+}
+
+#graph-settings {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.share-label {
+    width: auto;
+}
+
+.ui-slider {
+    margin-bottom: 10px;
+}
+
+#rightMenuControls a {
+    font-size: 16px;
+    text-decoration: none;
+}
+
+#rightMenuTabs {
+    height: 550px;
+}
+
+.demo-panel-title {
+    margin-bottom: 6px;
+}
+
+.mainview {
+    margin-bottom: 10px;
+}
+
+.tag {
+    text-transform: uppercase;
+}
+
+.help-text {
+    margin-top: 50px;
+    margin-bottom: 0px;
+    text-transform: none;
+}
