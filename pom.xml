@@ -54,6 +54,12 @@
 			<name>BioPAX Repository at Sourceforge</name>
 			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
 		</repository>
+		<repository>
+			<id>pattern.repo</id>
+			<name>Repository of BioPAX Pattern Framework</name>
+			<url>http://maven-repo.biopax-pattern.googlecode.com/hg/</url>
+			<snapshots><enabled>true</enabled></snapshots>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -72,14 +78,8 @@
 
 		<dependency>
 			<groupId>org.biopax.paxtools</groupId>
-			<artifactId>paxtools-query</artifactId>
-			<version>${paxtools.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.biopax.paxtools</groupId>
-			<artifactId>sif-converter</artifactId>
-			<version>${paxtools.version}</version>
+			<artifactId>pattern</artifactId>
+			<version>[1,]</version>
 		</dependency>
 
 		<dependency>

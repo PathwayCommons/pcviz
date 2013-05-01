@@ -6,7 +6,9 @@ import org.apache.commons.logging.LogFactory;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +37,12 @@ public class IHOPSpider
 		{
 			String ID = getInternalID(reader, symbol);
 			reader.close();
+
+			if (ID == null)
+			{
+				log.error("Cannot find internal ID of " + symbol + ".");
+				return null;
+			}
 
 			url = getGenePageURL(ID);
 			reader = getReader(url);
@@ -98,24 +106,44 @@ public class IHOPSpider
 	 */
 	private static String getInternalID(BufferedReader reader, String symbol) throws IOException
 	{
+		List<String> ids = new ArrayList<String>();
+
 		for(String line = reader.readLine(); line != null; line = reader.readLine())
 		{
-			if (line.startsWith("<B>" + symbol + "</B>"))
+			if (line.startsWith("<TD nowrap=\"1\""))
 			{
-				reader.readLine();
+				int index = line.indexOf("doaction(null, ");
+				if (index >= 0)
+				{
+					ids.add(line.substring(index + 15, line.lastIndexOf(", 1")));
+				}
+			}
+
+			if (line.equals("<B>" + symbol + "</B>"))
+			{
+				line = reader.readLine();
+
+				if (!line.equals("</SYMBOL>")) continue;
+
 				line = reader.readLine();
 
 				int index = line.indexOf("doaction(null, ");
 
-				if (index < 0)
-				{
-					log.error("iHOP content not as expected. Line = " + line);
-					return null;
-				}
-				else
+				if (index >= 0)
 				{
 					return line.substring(index + 15, line.lastIndexOf(", 1"));
 				}
+			}
+		}
+
+		// check the encountered internal IDs to see if they map to given symbol
+		for (String id : ids)
+		{
+			String sym = getSymbolOfID(id);
+
+			if (sym != null && sym.equals(symbol))
+			{
+				return id;
 			}
 		}
 
@@ -145,4 +173,44 @@ public class IHOPSpider
 		}
 		return map;
 	}
+
+	/**
+	 * Extracts the gene symbol of an internal ID.
+	 * @param ID internal ID
+	 * @return gene symbol
+	 */
+	private static String getSymbolOfID(String ID)
+	{
+		String url = getGenePageURL(ID);
+		BufferedReader reader = getReader(url);
+		try
+		{
+			return parseSymbol(reader);
+		}
+		catch (IOException e)
+		{
+			log.error("Error while extracting gene symbol.", e);
+			return null;
+		}
+	}
+
+	/**
+	 * Gets the gene symbol in the title.
+	 * @param reader reader for the content
+	 * @return gene symbol
+	 */
+	private static String parseSymbol(BufferedReader reader) throws IOException
+	{
+		for(String line = reader.readLine(); line != null; line = reader.readLine())
+		{
+			if (line.startsWith("<title>"))
+			{
+				String symbol = line.substring(line.indexOf("[ ") + 2, line.indexOf(" ]"));
+				return symbol;
+			}
+		}
+		return null;
+	}
+
+
 }
