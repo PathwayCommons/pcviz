@@ -42,9 +42,11 @@ $(document).ready(function() {
         // TODO: change graph type dynamically! (nhood)
         $.getJSON("graph/nhood/" + names,
             function(data) {
-                $("#network-loading").hide();
-                $("#demo").show();
-                $('#demo').cytoscape({
+	            var container = $('#demo');
+	            $("#network-loading").hide();
+	            container.show();
+
+	            var cyOptions = {
 //	                layout: {name: 'arbor',
 //		                liveUpdate: true
 //		                maxSimulationTime: 2000},
@@ -98,8 +100,10 @@ $(document).ready(function() {
                         // TODO: Why the hell this does not work?
                         //cy.layout({ name: 'arbor'});
 
-                        /*
+	                    // add pan zoom control panel
+	                    container.cytoscapePanzoom();
 
+                        /*
                         var nodeCount = cy.nodes().length;
                         for (var i = 0; i < nodeCount; i++) {
 
@@ -114,8 +118,9 @@ $(document).ready(function() {
                         }
                         */
                     }
+                };
 
-                });
+	            container.cy(cyOptions);
         });
     };
 
