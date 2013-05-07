@@ -66,10 +66,15 @@
             <div class="span4"> <!-- slider bars -->
                 <div id="rightMenuTabs" class="tab-content">
                     <div class="tab-pane fade active in" id="graph-details">
-                        <p class="help-text palette palette-silver">
-                            Click on one of the nodes or edges to get more information from BioGene...
-                        </p>
-                        <img src="images/help-left-arrow.png" width="75">
+                        <div id="graph-details-info">
+                            <p class="help-text palette palette-silver">
+                                Click on one of the nodes or edges to get more information from BioGene...
+                            </p>
+                            <img src="images/help-left-arrow.png" width="75">
+                        </div>
+                        <div id="graph-details-content">
+                            <!-- reserved for backbone view -->
+                        </div>
 
                     </div>
                     <div class="tab-pane fade" id="graph-settings">
@@ -266,6 +271,33 @@
       </div>
   </footer>
 
+  <!-- BioGeneView template for backbone.js -->
+  <script type="text/template" id="biogene_template">
+      <div class='node-details-info'>
+          <div class='biogene-info biogene-symbol'><b>Gene Symbol:</b> {{geneSymbol}}</div>
+          <div class='biogene-info biogene-description'><b>Description:</b> {{geneDescription}}</div>
+          <div class='biogene-info biogene-aliases'><b>Aliases:</b> {{geneAliases}}</div>
+          <div class='biogene-info biogene-designations'><b>Designations:</b> {{geneDesignations}}</div>
+          <div class='biogene-info biogene-location'><b>Chromosome Location:</b> {{geneLocation}}</div>
+          <div class='biogene-info biogene-mim'>
+              <b>MIM:</b>
+              <a href='http://omim.org/entry/{{geneMim}}' target='blank'>{{geneMim}}</a>
+          </div>
+          <div class='biogene-info biogene-id'>
+              <b>Gene ID:</b>
+              <a href='http://www.ncbi.nlm.nih.gov/gene?term={{geneId}}' target='blank'>{{geneId}}</a>
+          </div>
+          <div class='biogene-info biogene-uniprot-links'>
+              <b>UniProt ID:</b>
+              <a href='http://www.uniprot.org/uniprot/{{geneUniprotId}}'
+                 target='blank'>{{geneUniprotId}}</a><span class='biogene-uniprot-links-extra'>{{geneUniprotLinks}}</span>
+          </div>
+      </div>
+      <div class='node-details-summary'>
+          <b>Gene Function:</b>
+          {{geneSummary}}
+      </div>
+  </script>
 
     <!-- Load JS here for greater good =============================-->
     <script src="js/jquery-1.8.2.min.js"></script>
@@ -281,6 +313,9 @@
     <script src="js/cytoscape.min.js"></script>
     <script src="js/jquery.cytoscape-panzoom.min.js"></script>
     <script src="js/application.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone-min.js"></script>
+    <script src="js/biogene_view.js"></script>
     <script src="js/pcviz.js"></script>
     <!--[if lt IE 8]>
       <script src="js/icon-font-ie7.js"></script>
