@@ -103,6 +103,55 @@ $(document).ready(function() {
 	                    // add pan zoom control panel
 	                    container.cytoscapePanzoom();
 
+	                    // add click listener on nodes
+	                    cy.on('click', 'node', function(evt){
+		                    var container = "#graph-details-content";
+		                    var info = "#graph-details-info";
+		                    var node = this;
+
+		                    // remove previous content
+		                    $(info).hide();
+		                    $(container).empty();
+		                    $(container).append(
+			                    '<img src="images/loading.gif" alt="loading network...">');
+		                    $(container).show();
+
+		                    // update with new content (from BioGene)
+		                    $.getJSON("biogene/human/" + node.id(), function(queryResult) {
+			                    $(container).empty();
+
+			                    if (queryResult.returnCode != "SUCCESS")
+			                    {
+				                    $(container).append(
+					                    "Error retrieving data: " + queryResult.returnCode);
+			                    }
+			                    else
+			                    {
+				                    if (queryResult.count > 0)
+				                    {
+					                    // generate the view by using backbone
+					                    var biogeneView = new BioGeneView(
+						                    {el: container,
+							                    data: queryResult.geneInfo[0]});
+				                    }
+				                    else
+				                    {
+					                    $(container).append(
+						                    "No additional information available for the selected node.");
+				                    }
+			                    }
+		                    });
+	                    });
+
+	                    // add click listener to core (for background clicks)
+	                    cy.on('click', function(evt){
+		                    // if click on background, hide details
+		                    if( evt.cyTarget === cy ) {
+		                        $("#graph-details-content").hide();
+		                        $("#graph-details-info").show();
+		                    }
+	                    });
+
                         /*
                         var nodeCount = cy.nodes().length;
                         for (var i = 0; i < nodeCount; i++) {
