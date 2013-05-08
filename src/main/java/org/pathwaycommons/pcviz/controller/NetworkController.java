@@ -13,6 +13,7 @@ import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class NetworkController
     @Autowired
 	private CocitationManager cocitMan;
 
-
+    @Cacheable(value = "networkCache")
 	@RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
 	public ResponseEntity<String> getEntityInJson(@PathVariable String type, @PathVariable String genes)
 	{

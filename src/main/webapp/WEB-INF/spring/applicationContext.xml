@@ -3,12 +3,13 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                         http://www.springframework.org/schema/util
                         http://www.springframework.org/schema/util/spring-util-3.1.xsd
                         http://www.springframework.org/schema/context
-                        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+                        http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
 
     <context:property-placeholder location="/WEB-INF/spring/pcviz.properties" />
 
@@ -33,5 +34,17 @@
     <bean class="java.lang.String" id="bioGeneFormat">
         <constructor-arg index="0" value="${biogene.format}"/>
     </bean>
+
+    <cache:annotation-driven />
+
+    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="/WEB-INF/ehcache.xml"/>
+        <property name="shared" value="true"/>
+    </bean>
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="ehcache"/>
+    </bean>
+
+
 
 </beans>
