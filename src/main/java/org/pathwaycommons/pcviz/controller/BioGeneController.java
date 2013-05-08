@@ -48,7 +48,8 @@ public class BioGeneController
 	{
 		StringBuilder urlBuilder = new StringBuilder();
 
-		urlBuilder.append(getBioGeneUrl() + "retrieve.do");
+		urlBuilder.append(getBioGeneUrl());
+        urlBuilder.append("retrieve.do");
 		urlBuilder.append("?query=").append(gene);
 		urlBuilder.append("&org=").append(organism);
 		urlBuilder.append("&format=").append(format);
