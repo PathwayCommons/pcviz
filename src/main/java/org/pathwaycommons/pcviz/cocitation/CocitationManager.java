@@ -20,27 +20,33 @@ public class CocitationManager
 	/**
 	 * Directory for co-citation files. todo use more fancy resource management
 	 */
-	public static final String RESOURCE_DIR = "cocitations";
+	private String resourceDir;
 
 	/**
 	 * Life of cached co-citation data in milliseconds.
 	 */
 	private long shelfLife;
 
+    /**
+     * For crawling the iHop web site and caching the results
+     */
+    private IHOPSpider ihopSpider;
+
 	/**
 	 * Constructor with cache life (in days).
 	 * @param cacheLife life in days
 	 */
-	public CocitationManager(int cacheLife)
+	public CocitationManager(int cacheLife, String resourceDir)
 	{
 		setShelfLife(cacheLife);
+        setResourceDir(resourceDir);
 	}
 
 	/**
 	 * Sets the shelf life of cached co-citations.
 	 * @param days shelf life in days
 	 */
-	public void setShelfLife(int days)
+	public void setShelfLife(long days)
 	{
 		// convert to milliseconds
 		this.shelfLife = days * 1000 * 60 * 60 * 24;
@@ -49,9 +55,9 @@ public class CocitationManager
 	/**
 	 * Creates the resource directory if not exists.
 	 */
-	static
+	private void createResourceDir()
 	{
-		File file = new File(RESOURCE_DIR);
+		File file = new File(getResourceDir());
 
 		if (!file.exists())
 		{
@@ -71,7 +77,7 @@ public class CocitationManager
 
 		try
 		{
-			writer = new BufferedWriter(new FileWriter(RESOURCE_DIR + File.separator + symbol));
+			writer = new BufferedWriter(new FileWriter(getResourceDir() + File.separator + symbol));
 
 			writer.write("" + System.currentTimeMillis());
 
@@ -105,7 +111,7 @@ public class CocitationManager
 
 				long stamp = getCacheTimestamp(symbol);
 
-				if (System.currentTimeMillis() - stamp > shelfLife)
+				if (System.currentTimeMillis() - stamp > getShelfLife())
 				{
 					map = spiderAndCache(symbol);
 				}
@@ -163,7 +169,7 @@ public class CocitationManager
 	private Map<String, Integer> spiderAndCache(String symbol)
 	{
 		Map<String, Integer> map;
-		map = IHOPSpider.parseCocitations(symbol);
+		map = getIhopSpider().parseCocitations(symbol);
 
 		if (map != null)
 		{
@@ -212,7 +218,7 @@ public class CocitationManager
 	 */
 	private String getCachePath(String symbol)
 	{
-		return RESOURCE_DIR + File.separator + symbol;
+		return getResourceDir() + File.separator + symbol;
 	}
 
 	/**
@@ -220,7 +226,7 @@ public class CocitationManager
 	 */
 	protected void clearCache()
 	{
-		File dir = new File(RESOURCE_DIR);
+		File dir = new File(getResourceDir());
 
 		if (dir.exists())
 		{
@@ -230,4 +236,25 @@ public class CocitationManager
 			}
 		}
 	}
+
+    public String getResourceDir() {
+        return resourceDir;
+    }
+
+    public void setResourceDir(String resourceDir) {
+        this.resourceDir = resourceDir;
+        createResourceDir();
+    }
+
+    public long getShelfLife() {
+        return shelfLife;
+    }
+
+    public IHOPSpider getIhopSpider() {
+        return ihopSpider;
+    }
+
+    public void setIhopSpider(IHOPSpider ihopSpider) {
+        this.ihopSpider = ihopSpider;
+    }
 }

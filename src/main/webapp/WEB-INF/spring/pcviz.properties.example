@@ -1,0 +1,14 @@
+# Pathway commons
+pathwaycommons.url=http://webservice.baderlab.org:48080/
+
+# BioGene
+biogene.url=http://cbio.mskcc.org/biogene/
+biogene.format=json
+
+# iHop
+ihop.url=http://www.ihop-net.org/UniPub/iHOP/
+
+# Cocitation manager
+cocitation.shelflife=30
+cocitation.cache.folder=/tmp/cocitations
+cocitation.cache.folder.test=/tmp/cocitations-test
