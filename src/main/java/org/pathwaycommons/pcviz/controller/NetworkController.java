@@ -11,6 +11,8 @@ import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +31,12 @@ import java.util.Map;
 @RequestMapping("/graph")
 public class NetworkController
 {
-	// This should be put in the application context, this is for testing purposes
-	private static String PC2URL = "http://webservice.baderlab.org:48080/graph?";
+    /**
+     * Pathway Commons 2 web service base URL
+     */
+    @Autowired
+    @Qualifier("pathwayCommonsUrl")
+	private String pathwayCommonsUrl;
 
 	/**
 	 * Cache for co-citations.
@@ -41,7 +47,9 @@ public class NetworkController
 	/**
 	 * Accessor for new co-citations.
 	 */
-	private static CocitationManager cocitMan = new CocitationManager(30);
+    @Autowired
+	private CocitationManager cocitMan;
+
 
 	@RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
 	public ResponseEntity<String> getEntityInJson(@PathVariable String type, @PathVariable String genes)
@@ -53,7 +61,7 @@ public class NetworkController
 		CytoscapeJsGraph graph = new CytoscapeJsGraph();
 
 		// TODO: Use cpath2 client for this
-		String biopaxUrl = PC2URL;
+		String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
 		for (String gene : genes.split(","))
 		{
 			biopaxUrl += "source=" + gene + "&";
@@ -83,18 +91,17 @@ public class NetworkController
 				String srcName = sif.source;
 				String targetName = sif.target;
 
-					nodeNames.add(srcName);
-					nodeNames.add(targetName);
+                nodeNames.add(srcName);
+                nodeNames.add(targetName);
 
-					CytoscapeJsEdge edge = new CytoscapeJsEdge();
-					edge.getData().put(PropertyKey.ID.toString(), srcName + targetName);
-					edge.getData().put(PropertyKey.SOURCE.toString(), srcName);
-					edge.getData().put(PropertyKey.TARGET.toString(), targetName);
+                CytoscapeJsEdge edge = new CytoscapeJsEdge();
+                edge.getData().put(PropertyKey.ID.toString(), srcName + targetName);
+                edge.getData().put(PropertyKey.SOURCE.toString(), srcName);
+                edge.getData().put(PropertyKey.TARGET.toString(), targetName);
 
 
-					edge.getData().put(PropertyKey.CITED.toString(), getCocitations(srcName, targetName));
-					graph.getEdges().add(edge);
-//				}
+                edge.getData().put(PropertyKey.CITED.toString(), getCocitations(srcName, targetName));
+                graph.getEdges().add(edge);
 			}
 
 			for (String nodeName : nodeNames)
@@ -181,4 +188,20 @@ public class NetworkController
 		}
 		return cnt;
 	}
+
+    public String getPathwayCommonsUrl() {
+        return pathwayCommonsUrl;
+    }
+
+    public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
+        this.pathwayCommonsUrl = pathwayCommonsUrl;
+    }
+
+    public CocitationManager getCocitMan() {
+        return cocitMan;
+    }
+
+    public void setCocitMan(CocitationManager cocitMan) {
+        this.cocitMan = cocitMan;
+    }
 }

@@ -1,6 +1,8 @@
 package org.pathwaycommons.pcviz.cocitation;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static org.junit.Assert.*;
 
@@ -11,19 +13,18 @@ import java.util.Map;
  */
 public class IHOPSpiderTest
 {
+    protected ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext("classpath*:META-INF/spring/testContext.xml");
+
 	@Test
 	public void spiderTest()
 	{
-		Map<String,Integer> map = IHOPSpider.parseCocitations("KRAS");
-
+        IHOPSpider ihopSpider = (IHOPSpider) context.getBean("iHopSpider");
+        Map<String,Integer> map = ihopSpider.parseCocitations("KRAS");
 		assertFalse(map.isEmpty());
-
-		map = IHOPSpider.parseCocitations("CDK1");
-
+		map = ihopSpider.parseCocitations("CDK1");
 		assertFalse(map.isEmpty());
-
-		map = IHOPSpider.parseCocitations("MTOR");
-
+		map = ihopSpider.parseCocitations("MTOR");
 		assertFalse(map.isEmpty());
 	}
 }

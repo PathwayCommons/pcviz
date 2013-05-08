@@ -23,12 +23,25 @@ public class IHOPSpider
 	 */
 	private static final Log log = LogFactory.getLog(IHOPSpider.class);
 
-	/**
+    /**
+     * Base URL to the iHop web pages
+     */
+    private String iHopURL;
+
+    /**
+     * Initializes the class and sets the required url property
+     * @param iHopURL iHop base URL
+     */
+    public IHOPSpider(String iHopURL) {
+        this.iHopURL = iHopURL;
+    }
+
+    /**
 	 * Gets the co-citation data from the iHOP server.
 	 * @param symbol symbol of the gene of interest
 	 * @return map from co-cited to counts
 	 */
-	public static Map<String, Integer> parseCocitations(String symbol)
+	public Map<String, Integer> parseCocitations(String symbol)
 	{
 		// Find internal ID
 		String url = getGeneSearchURL(symbol);
@@ -61,10 +74,9 @@ public class IHOPSpider
 	 * @param symbol gene symbol of the gene
 	 * @return url
 	 */
-	private static String getGeneSearchURL(String symbol)
+	private String getGeneSearchURL(String symbol)
 	{
-		return "http://www.ihop-net.org/UniPub/iHOP/?field=synonym&ncbi_tax_id=9606&search=" +
-			symbol;
+		return  getiHopURL() + "/?field=synonym&ncbi_tax_id=9606&search=" + symbol;
 	}
 
 	/**
@@ -72,9 +84,9 @@ public class IHOPSpider
 	 * @param internalID internal ID
 	 * @return url
 	 */
-	private static String getGenePageURL(String internalID)
+	private String getGenePageURL(String internalID)
 	{
-		return "http://www.ihop-net.org/UniPub/iHOP/gs/" + internalID + ".html?list=1&page=1";
+		return getiHopURL() +"/gs/" + internalID + ".html?list=1&page=1";
 	}
 
 	/**
@@ -104,7 +116,7 @@ public class IHOPSpider
 	 * @return internal ID
 	 * @throws IOException
 	 */
-	private static String getInternalID(BufferedReader reader, String symbol) throws IOException
+	private String getInternalID(BufferedReader reader, String symbol) throws IOException
 	{
 		List<String> ids = new ArrayList<String>();
 
@@ -157,7 +169,7 @@ public class IHOPSpider
 	 * @param reader reader for the content
 	 * @return map from the co-cited to their counts
 	 */
-	private static Map<String, Integer> parseCocitations(BufferedReader reader) throws IOException
+	private Map<String, Integer> parseCocitations(BufferedReader reader) throws IOException
 	{
 		Map<String, Integer> map = new HashMap<String, Integer>();
 
@@ -179,7 +191,7 @@ public class IHOPSpider
 	 * @param ID internal ID
 	 * @return gene symbol
 	 */
-	private static String getSymbolOfID(String ID)
+	private String getSymbolOfID(String ID)
 	{
 		String url = getGenePageURL(ID);
 		BufferedReader reader = getReader(url);
@@ -199,7 +211,7 @@ public class IHOPSpider
 	 * @param reader reader for the content
 	 * @return gene symbol
 	 */
-	private static String parseSymbol(BufferedReader reader) throws IOException
+	private String parseSymbol(BufferedReader reader) throws IOException
 	{
 		for(String line = reader.readLine(); line != null; line = reader.readLine())
 		{
@@ -212,5 +224,11 @@ public class IHOPSpider
 		return null;
 	}
 
+    public String getiHopURL() {
+        return iHopURL;
+    }
 
+    public void setiHopURL(String iHopURL) {
+        this.iHopURL = iHopURL;
+    }
 }

@@ -1,5 +1,7 @@
 package org.pathwaycommons.pcviz.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,13 @@ import java.net.URLConnection;
 @RequestMapping("/biogene")
 public class BioGeneController
 {
-	public final static String SERVICE_URL = "http://cbio.mskcc.org/biogene/retrieve.do";
-	public final static String DEFAULT_DATA_FORMAT = "json";
+    @Autowired
+    @Qualifier("bioGeneUrl")
+    public String bioGeneUrl;
+
+    @Autowired
+    @Qualifier("bioGeneFormat")
+	public String bioGeneFormat;
 
 	/**
 	 * Requests data from BioGene server.
@@ -35,13 +42,13 @@ public class BioGeneController
 	 * @return          BioGene data in json format
 	 * @throws IOException
 	 */
-	private static String requestData(String gene,
+	private String requestData(String gene,
 			String organism,
 			String format) throws IOException
 	{
 		StringBuilder urlBuilder = new StringBuilder();
 
-		urlBuilder.append(SERVICE_URL);
+		urlBuilder.append(getBioGeneUrl() + "retrieve.do");
 		urlBuilder.append("?query=").append(gene);
 		urlBuilder.append("&org=").append(organism);
 		urlBuilder.append("&format=").append(format);
@@ -77,7 +84,7 @@ public class BioGeneController
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json; charset=utf-8");
 
-		String format = DEFAULT_DATA_FORMAT;
+		String format = getBioGeneFormat();
 		String data = null;
 
 		try
@@ -92,4 +99,20 @@ public class BioGeneController
 
 		return new ResponseEntity<String>(data, headers, status);
 	}
+
+    public String getBioGeneUrl() {
+        return bioGeneUrl;
+    }
+
+    public void setBioGeneUrl(String bioGeneUrl) {
+        this.bioGeneUrl = bioGeneUrl;
+    }
+
+    public String getBioGeneFormat() {
+        return bioGeneFormat;
+    }
+
+    public void setBioGeneFormat(String bioGeneFormat) {
+        this.bioGeneFormat = bioGeneFormat;
+    }
 }
