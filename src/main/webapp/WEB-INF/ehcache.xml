@@ -8,16 +8,29 @@
        diskPersistent="false"
        diskExpiryThreadIntervalSeconds="120"
        memoryStoreEvictionPolicy="LRU"
+       maxElementsInMemory="1000"
        />
 
 <cache name="networkCache"
            eternal="false"
-           timeToIdleSeconds="120"
-           timeToLiveSeconds="120"
+           timeToIdleSeconds="604800"
+           timeToLiveSeconds="604800"
            overflowToDisk="true"
            diskPersistent="false"
-           diskExpiryThreadIntervalSeconds="120"
+           diskExpiryThreadIntervalSeconds="604800"
            memoryStoreEvictionPolicy="LRU"
+           maxElementsInMemory="1000"
+        />
+
+<cache name="bioGeneCache"
+           eternal="false"
+           timeToIdleSeconds="604800"
+           timeToLiveSeconds="604800"
+           overflowToDisk="true"
+           diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="604800"
+           memoryStoreEvictionPolicy="LRU"
+           maxElementsInMemory="1000"
             />
 
 </ehcache>
