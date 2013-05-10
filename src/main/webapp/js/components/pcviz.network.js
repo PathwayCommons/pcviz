@@ -9,6 +9,8 @@ var NetworkView = Backbone.View.extend({
 	detailsContent: "#graph-details-content",
 	// div id for the initial info message of the details tab
 	detailsInfo: "#graph-details-info",
+	// content id for the gene input field
+	tagsInputField: "#tagsinput",
 	// cytoscape web visual style object
 	cyStyle: cytoscape.stylesheet()
 	    .selector("node")
@@ -64,7 +66,9 @@ var NetworkView = Backbone.View.extend({
         container.hide();
         container.html("");
 
-        var names = $("#tagsinput").val().toUpperCase();
+	    // get gene names from the input field
+        var names = $(self.tagsInputField).val().toUpperCase();
+
         // TODO: change graph type dynamically! (nhood)
         $.getJSON("graph/nhood/" + names,
             function(data) {
@@ -136,7 +140,7 @@ var NetworkView = Backbone.View.extend({
 		// remove previous content
 		info.hide();
 		container.empty();
-		container.append(this.loadingImage);
+		container.append(self.loadingImage);
 		container.show();
 
 		// request json data from BioGene service

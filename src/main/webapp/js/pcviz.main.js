@@ -14,7 +14,7 @@
         home: function(actions) {
             (new HomeView()).render();
             (new SettingsView()).render();
-            (new NetworkView).render();
+            (new NetworkView()).render();
         }
     });
 
