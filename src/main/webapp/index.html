@@ -53,7 +53,7 @@
                 <ul class="nav nav-tabs" id="rightMenuControls">
                     <li class="active"><a href="#graph-details" data-toggle="tab"><span class="fui-menu-16"></span> Details</a></li>
                     <li><a href="#graph-settings" data-toggle="tab"><span class="fui-settings-16"></span> Settings</a></li>
-                    <li><a href="#graph-help" data-toggle="tab"><span class="fui-bubble-16"></span> Help</a></li>
+                    <li><a href="#graph-help" data-toggle="tab"><span class="fui-bubble-16"></span> Context</a></li>
                 </ul>
             </div>
         </div>
@@ -73,7 +73,7 @@
 
                 </div>
             </div>
-            <div class="span4"> <!-- slider bars -->
+            <div class="span4"> <!-- slider bars and everything -->
                 <div id="rightMenuTabs" class="tab-content">
                     <div class="tab-pane fade active in" id="graph-details">
                         <div id="graph-details-info">
@@ -144,107 +144,44 @@
                         </select>
                     </div>
                     <div class="tab-pane fade" id="graph-help">
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Aenean a sapien leo. Nunc ornare rutrum ante eget rhoncus.
-                            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                            Curabitur suscipit, ligula a sollicitudin viverra, eros elit ornare mauris, sed fringilla ipsum erat vitae nibh.
-                            Mauris vulputate enim non dui mattis facilisis.
-                        </p>
-                        <p>
-                            Ut non lacus augue, id egestas enim.
-                            Etiam pellentesque ante eget arcu pretium semper.
-                            Sed imperdiet venenatis mi, id aliquet lectus feugiat cursus.
-                            Suspendisse potenti. In eget sodales augue.
-                        </p>
-                        <p>
-                            Fusce massa leo, volutpat a faucibus nec, tristique sit amet velit.
-                            Proin et augue lacus, sit amet accumsan nibh.
-                            Maecenas tincidunt posuere sagittis.
-                        </p>
+                        <div class="todo mrm">
+                            <div class="tile">
+                                <h3 class="tile-title">Cancer type of interest</h3>
+                                <ul>
+                                    <li>
+                                        <div class="todo-icon fui-man-24"></div>
+                                        <div class="todo-content">
+                                            <h4 class="todo-name">
+                                                Glioblastoma
+                                            </h4>
+                                            The Cancer Genome Atlas, Nature 2008
+                                        </div>
+                                    </li>
+
+                                    <li class="todo-done">
+                                        <div class="todo-icon fui-man-24"></div>
+                                        <div class="todo-content">
+                                            <h4 class="todo-name">
+                                                Ovarian Cancer
+                                            </h4>
+                                            The Cancer Genome Atlas, Nature 2011
+                                        </div>
+                                    </li>
+                                </ul>
+                                <br>
+                                <br>
+                                <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-
-
             </div>
         </div>
-        <div class="row bottomcontrols demo-samples">
-            <div class="span4"> <!--  GO terms of interest -->
-                <div class="todo mrm">
-                    <div class="tile">
-                        <h3 class="tile-title">GO terms of interest</h3>
-                        <ul>
-                            <li class="todo-done">
-                                <div class="todo-icon fui-menu-24"></div>
-                                <div class="todo-content">
-                                    <h4 class="todo-name">
-                                        glial cell apoptotic process
-                                    </h4>
-                                    GO:0034349
-                                </div>
-                            </li>
-
-                            <li>
-                                <div class="todo-icon fui-menu-24"></div>
-                                <div class="todo-content">
-                                    <h4 class="todo-name">
-                                        induction of apoptotis
-                                    </h4>
-                                    GO:0006917
-                                </div>
-                            </li>
-                        </ul>
-                        <br>
-                        <br>
-                        <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
-                    </div>
-                </div>
-            </div>
-            <div class="span4"> <!-- Cancer type of interest -->
-                <div class="todo mrm">
-                    <div class="tile">
-                        <h3 class="tile-title">Cancer type of interest</h3>
-                        <ul>
-                            <li>
-                                <div class="todo-icon fui-man-24"></div>
-                                <div class="todo-content">
-                                    <h4 class="todo-name">
-                                        Glioblastoma
-                                    </h4>
-                                    The Cancer Genome Atlas, Nature 2008
-                                </div>
-                            </li>
-
-                            <li class="todo-done">
-                                <div class="todo-icon fui-man-24"></div>
-                                <div class="todo-content">
-                                    <h4 class="todo-name">
-                                        Ovarian Cancer
-                                    </h4>
-                                    The Cancer Genome Atlas, Nature 2011
-                                </div>
-                            </li>
-                        </ul>
-                        <br>
-                        <br>
-                        <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
-                    </div>
-                </div>
-            </div>
-            <div class="span4"> <!-- History -->
-                <h4>History</h4>
-                <ul id="log">
-                    <li>Loaded the graph... <span class="badge badge-info undo">&times;</span></li>
-                </ul>
-            </div>
     </div>
-  </div>
-
   <footer>
       <div class="container">
           <div class="row">
-              <div class="span7">
+              <div class="span8">
                   <h3 class="footer-title">Contact</h3>
                   <p>PCViz is built and maintained by
                       <a href="http://cbio.mskcc.org">Memorial Sloan-Kettering Cancer Center</a> and
@@ -267,7 +204,7 @@
                   </p>
               </div>
 
-              <div class="span5">
+              <div class="span4">
                   <div class="footer-banner">
                       <h3 class="footer-title">PCViz: More</h3>
                       <ul>

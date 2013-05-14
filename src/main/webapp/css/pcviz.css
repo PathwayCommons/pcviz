@@ -46,7 +46,7 @@
 }
 
 #rightMenuControls a {
-    font-size: 16px;
+    font-size: 15px;
     text-decoration: none;
 }
 
@@ -88,4 +88,8 @@
     width: 97%;
     height: 97%;
     border: 1px solid gray;
+}
+
+footer {
+    margin-top: 20px;
 }
