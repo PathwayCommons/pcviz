@@ -71,3 +71,11 @@
     margin-bottom: 0px;
     text-transform: none;
 }
+
+.expand-view {
+    font-size: 120%;
+}
+
+.expand-view i {
+    font-size: 80%;
+}
