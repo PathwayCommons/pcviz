@@ -32,4 +32,8 @@
         <constructor-arg index="0" value="${pathwaycommons.url}"/>
     </bean>
 
+    <bean class="org.pathwaycommons.pcviz.service.GeneNameService" id="geneNameService">
+        <property name="geneResource" value="${hgnc.test.location}"/>
+    </bean>
+
 </beans>
