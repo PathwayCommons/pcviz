@@ -29,7 +29,8 @@ public class GeneNameService {
 
         GeneValidation geneValidation = new GeneValidation();
         geneValidation.setQuery(name);
-        geneValidation.getMatches().addAll(geneMaps.get(name.toUpperCase()));
+        HashSet<String> names = geneMaps.get(name.toUpperCase());
+        if(names != null) geneValidation.getMatches().addAll(names);
 
         return geneValidation;
     }

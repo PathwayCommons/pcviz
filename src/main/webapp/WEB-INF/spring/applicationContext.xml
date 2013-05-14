@@ -50,4 +50,8 @@
         <property name="cacheManager" ref="ehcache"/>
     </bean>
 
+    <bean class="org.pathwaycommons.pcviz.service.GeneNameService" id="geneNameService">
+        <property name="geneResource" value="${hgnc.location}"/>
+    </bean>
+
 </beans>
