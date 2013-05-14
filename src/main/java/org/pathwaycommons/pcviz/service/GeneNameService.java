@@ -36,13 +36,14 @@ public class GeneNameService {
 
     private void initializeNameMap() {
         try {
+            geneMaps = new HashMap<String, HashSet<String>>();
             Scanner scanner = new Scanner(getGeneResource().getInputStream());
             // Skip the first (header) line
             scanner.nextLine();
 
             while(scanner.hasNext()) {
                 String line = scanner.nextLine();
-                String[] tokens = line.split("\t");
+                String[] tokens = line.split("\t", -1);
                 assert tokens.length == 2;
 
                 String primaryName = tokens[0].trim().toUpperCase();

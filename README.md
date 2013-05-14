@@ -4,7 +4,7 @@ Pathway Commons Network Visualizer, PCViz in short, is a joint project of [Sande
 # Deploy
 Clone the repository and in the main directory, use the following command to copy/edit the configuration file:
 
-	cp -f src/main/webapp/WEB-INF/spring/pcviz.properties.example src/main/webapp/WEB-INF/spring/pcviz.properties
+	cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties
 
 then use the following command to start the application within a test Tomcat instance:
 
