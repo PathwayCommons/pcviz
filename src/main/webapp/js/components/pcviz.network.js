@@ -1,8 +1,6 @@
 var NetworkView = Backbone.View.extend({
 	// html component for the animated image content
 	loadingImage: '<img src="images/loading.gif" alt="loading network...">',
-	// container id for the cytoscape.js instance (canvas)
-	cyContainer: "#demo",
 	// div id for the initial display before the actual network loaded
 	networkLoading: "#network-loading",
 	// div id for the contents of the details tab
@@ -59,7 +57,7 @@ var NetworkView = Backbone.View.extend({
 	    // 'this' doesn't refer to the actual instance for callback functions
 	    var self = this;
 
-	    var container = $(self.cyContainer);
+	    var container = $(self.el);
 	    var networkLoading = $(self.networkLoading);
 
 	    networkLoading.slideDown();
@@ -104,20 +102,6 @@ var NetworkView = Backbone.View.extend({
                             }
                         });
 
-                        /*
-                         var nodeCount = cy.nodes().length;
-                         for (var i = 0; i < nodeCount; i++) {
-
-                         var center = [cy.container().clientWidth / 2, cy.container().clientHeight / 2];
-
-                         var angle = i / nodeCount * Math.PI * 2;
-                         var radius =
-                         Math.min(cy.container().clientWidth, cy.container().clientHeight) / 2 * 0.6;
-
-                         var nodePos = [Math.cos(angle) * radius + center[0], Math.sin(angle) * radius + center[1]]
-                         cy.nodes()[i].position({x: nodePos[0], y : nodePos[1]});
-                         }
-                         */
                     }
                 };
 
