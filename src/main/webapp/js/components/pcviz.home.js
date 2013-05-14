@@ -3,23 +3,10 @@ var HomeView = Backbone.View.extend({
 
         $("#tagsinput").tagsInput({
             defaultText: "...",
-            onAddTag: function(value) {
-                var notyView = new NotyView({
-                    template: "#noty-newgene-template",
-                    model: { gene: value.toUpperCase() }
-                });
-                notyView.render();
-
+            onAddTag: function() {
 	            (new NetworkView({ el: "#main-network-view" })).render();
             },
-            onRemoveTag: function(value) {
-                var notyView = new NotyView({
-                    template: "#noty-oldgene-template",
-                    model: { gene: value.toUpperCase() }
-                });
-                notyView.render();
-
-                $(".undo").tooltip({ title: "undo this step"});
+            onRemoveTag: function() {
 	            (new NetworkView({ el: "#main-network-view" })).render();
             }
         });

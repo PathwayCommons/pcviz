@@ -60,59 +60,75 @@ var NetworkView = Backbone.View.extend({
 
 	    networkLoading.slideDown();
         container.hide();
-        container.html("");
 
 	    // get gene names from the input field
         var names = $(self.tagsInputField).val().toUpperCase();
 
-        // TODO: change graph type dynamically! (nhood)
-        $.getJSON("graph/nhood/" + names,
-            function(data) {
-	            networkLoading.hide();
-                container.show();
+        // This will run the validation on the side track
+        var geneValidations = new GeneValidations({ genes: names });
+        geneValidations.fetch({
+            success: function() {
+                var geneValidationsView = new GeneValidationsView({ model: geneValidations });
+                geneValidationsView.render();
 
-                var cyOptions = {
-	                // TODO find a better spring layout than arbor
-//	                layout: {name: 'arbor',
-//		                liveUpdate: true
-//		                maxSimulationTime: 2000},
-                    elements: data,
-                    style: self.cyStyle,
-                    ready: function() {
-                        window.cy = this; // for debugging
+                if(geneValidationsView.isAllValid()) {
+                    // TODO: change graph type dynamically! (nhood)
+                    $.getJSON("graph/nhood/" + names,
+                        function(data) {
+                            networkLoading.hide();
+                            container.html("");
+                            container.show();
 
-                        // add pan zoom control panel
-                        container.cytoscapePanzoom();
+                            var cyOptions = {
+                                elements: data,
+                                style: self.cyStyle,
+                                ready: function() {
+                                    window.cy = this; // for debugging
 
-                        // add click listener on nodes
-                        cy.on('click', 'node', function(evt){
-	                        var node = this;
-	                        self.updateNodeDetails(evt, node);
+                                    // add pan zoom control panel
+                                    container.cytoscapePanzoom();
+
+                                    // add click listener on nodes
+                                    cy.on('click', 'node', function(evt){
+                                        var node = this;
+                                        self.updateNodeDetails(evt, node);
+                                    });
+
+                                    // add click listener to core (for background clicks)
+                                    cy.on('click', function(evt) {
+                                        // if click on background, hide details
+                                        if(evt.cyTarget === cy)
+                                        {
+                                            $(self.detailsContent).hide();
+                                            $(self.detailsInfo).show();
+                                        }
+                                    });
+
+                                }
+                            };
+
+                            container.cy(cyOptions);
+
+                            (new NotyView({
+                                template: "#noty-network-loaded-template",
+                                model: {
+                                    nodes: data.nodes.length,
+                                    edges: data.edges.length
+                                }
+                            })).render();
                         });
+                } else {
+                    (new NotyView({
+                        template: "#noty-invalid-symbols-template",
+                        error: true,
+                        model: {}
+                    })).render();
 
-                        // add click listener to core (for background clicks)
-                        cy.on('click', function(evt) {
-                            // if click on background, hide details
-                            if(evt.cyTarget === cy)
-                            {
-                                $(self.detailsContent).hide();
-                                $(self.detailsInfo).show();
-                            }
-                        });
-
-                    }
-                };
-
-                container.cy(cyOptions);
-
-                (new NotyView({
-                    template: "#noty-network-loaded-template",
-                    model: {
-                        nodes: data.nodes.length,
-                        edges: data.edges.length
-                    }
-                })).render();
-            });
+                    networkLoading.hide();
+                    container.show();
+                }
+            }
+        });
 
         return this;
     },

@@ -93,3 +93,11 @@
 footer {
     margin-top: 20px;
 }
+
+.error-tag {
+    background: #e74c3c !important;
+}
+
+.warn-tag {
+    background: #f1c40f !important;
+}

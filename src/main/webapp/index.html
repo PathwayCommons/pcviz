@@ -296,6 +296,14 @@
       Network loaded: {{nodes}} genes and {{edges}} interactions
   </script>
 
+  <script type="text/template" id="noty-invalid-symbols-template">
+      Sorry! We couldn't find some of genes symbols. Network cannot be loaded.
+  </script>
+
+  <script type="text/template" id="noty-semivalid-symbols-template">
+      <b><small>{{query}}</small></b> is a synonym for <b><small>{{synonym}}</small></b>
+  </script>
+
   <!-- Fullscreen Cytoscape.js template -->
   <script type="text/template" id="fullscreen-network-tmpl">
       <div id="fullscreen-network-view">
@@ -334,6 +342,7 @@
   <!-- PCViz and its components -->
   <script src="js/components/pcviz.notification.js"></script>
   <script src="js/components/pcviz.home.js"></script>
+  <script src="js/components/pcviz.validation.js"></script>
   <script src="js/components/pcviz.settings.js"></script>
   <script src="js/components/pcviz.network.js"></script>
   <script src="js/components/pcviz.biogene.js"></script>
