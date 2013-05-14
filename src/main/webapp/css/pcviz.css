@@ -18,7 +18,7 @@
     color: #ECF0F1;
 }
 
-#demo, #demo-source {
+#main-network-view {
     height: 550px;
     border: 1px solid #ddd;
     margin: 1em 0;
@@ -27,7 +27,7 @@
     margin: 0.25em;
 }
 
-#demo {
+#main-network-view {
     float: left;
     width: 99%;
 }
@@ -78,4 +78,14 @@
 
 .expand-view i {
     font-size: 80%;
+}
+
+.ui-cytoscape-panzoom {
+    z-index: 999;
+}
+
+#fullscreen-network-view {
+    width: 97%;
+    height: 97%;
+    border: 1px solid gray;
 }

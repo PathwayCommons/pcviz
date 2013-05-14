@@ -12,13 +12,15 @@
     <link href="css/flat-ui.css" rel="stylesheet">
     <link rel="shortcut icon" href="images/favicon.ico">
 
-    <!-- Loading PCViz -->
-    <link href="css/pcviz.css" rel="stylesheet">
+    <link href="css/jquery.fancybox-1.3.4.css" rel="stylesheet">
+
 
     <!-- Loading cytoscape.js plugins -->
     <link href="css/jquery.cytoscape-panzoom.css" rel="stylesheet">
     <link href="css/font-awesome.css" rel="stylesheet">
 
+      <!-- Loading PCViz; this should always be the last to call! -->
+      <link href="css/pcviz.css" rel="stylesheet">
 
       <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
     <!--[if lt IE 9]>
@@ -62,10 +64,10 @@
                     <img src="images/loading.gif" alt="loading network...">
                 </div>
                 <div id="network-container">
-                    <div id="demo"></div>
+                    <div id="main-network-view"></div>
                     <div class="pull-right">
                         <a href="#" id="full-screen-link" class="expand-view">
-                            expand view <i class="icon-fullscreen"></i>
+                            expand network view <i class="icon-fullscreen"></i>
                         </a>
                     </div>
 
@@ -307,22 +309,38 @@
       </div>
   </script>
 
-    <!-- Load JS here for greater good =============================-->
-    <script src="js/jquery-1.8.2.min.js"></script>
-    <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
-    <script src="js/jquery.dropkick-1.0.0.js"></script>
-    <script src="js/custom_checkbox_and_radio.js"></script>
-    <script src="js/custom_radio.js"></script>
-    <script src="js/jquery.tagsinput.js"></script>
-    <!--<script src="js/bootstrap-tooltip.js"></script>-->
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.placeholder.js"></script>
-    <script src="js/arbor.js"></script>
-    <script src="js/cytoscape.min.js"></script>
-    <script src="js/jquery.cytoscape-panzoom.min.js"></script>
-    <script src="js/application.js"></script>
-    <script src="js/underscore.js"></script>
-    <script src="js/backbone-min.js"></script>
+  <!-- Fullscreen Cytoscape.js template -->
+  <script type="text/template" id="fullscreen-network-tmpl">
+      <div id="fullscreen-network-view">
+
+      </div>
+  </script>
+
+
+
+  <!-- JS libraries -->
+  <script src="js/jquery-1.8.2.min.js"></script>
+  <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
+  <script src="js/jquery.dropkick-1.0.0.js"></script>
+  <script src="js/custom_checkbox_and_radio.js"></script>
+  <script src="js/custom_radio.js"></script>
+  <script src="js/jquery.tagsinput.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.placeholder.js"></script>
+  <script src="js/arbor.js"></script>
+  <script src="js/cytoscape.min.js"></script>
+  <script src="js/jquery.cytoscape-panzoom.min.js"></script>
+  <script src="js/application.js"></script>
+  <script src="js/underscore.js"></script>
+  <script src="js/backbone-min.js"></script>
+  <script src="js/jquery.fancybox-1.3.4.pack.js"></script>
+  <script src="js/jquery.easing-1.3.pack.js"></script>
+  <script src="js/jquery.expander.min.js"></script>
+
+  <!--[if lt IE 8]>
+  <script src="js/icon-font-ie7.js"></script>
+  <script src="js/icon-font-ie7-24.js"></script>
+  <![endif]-->
 
   <!-- PCViz and its components -->
   <script src="js/components/pcviz.home.js"></script>
@@ -331,9 +349,5 @@
   <script src="js/components/pcviz.biogene.js"></script>
   <script src="js/pcviz.main.js"></script>
 
-  <!--[if lt IE 8]>
-      <script src="js/icon-font-ie7.js"></script>
-      <script src="js/icon-font-ie7-24.js"></script>
-  <![endif]-->
-  </body>
+ </body>
 </html>
