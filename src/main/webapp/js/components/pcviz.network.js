@@ -104,6 +104,14 @@ var NetworkView = Backbone.View.extend({
                 };
 
                 container.cy(cyOptions);
+
+                (new NotyView({
+                    template: "#noty-network-loaded-template",
+                    model: {
+                        nodes: data.nodes.length,
+                        edges: data.edges.length
+                    }
+                })).render();
             });
 
         return this;
