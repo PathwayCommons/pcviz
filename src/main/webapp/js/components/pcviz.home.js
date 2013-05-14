@@ -4,12 +4,21 @@ var HomeView = Backbone.View.extend({
         $("#tagsinput").tagsInput({
             defaultText: "...",
             onAddTag: function(value) {
-                $("#log").prepend("<li>Added a gene: " + value + " <span class='badge badge-info undo'>&times;</span></li>");
-                $(".undo").tooltip({ title: "undo this step"});
+                var notyView = new NotyView({
+                    template: "#noty-newgene-template",
+                    model: { gene: value.toUpperCase() }
+                });
+                notyView.render();
+
 	            (new NetworkView({ el: "#main-network-view" })).render();
             },
             onRemoveTag: function(value) {
-                $("#log").prepend("<li>Removed a gene: " + value + " <span class='badge badge-info undo'>&times;</span></li>");
+                var notyView = new NotyView({
+                    template: "#noty-oldgene-template",
+                    model: { gene: value.toUpperCase() }
+                });
+                notyView.render();
+
                 $(".undo").tooltip({ title: "undo this step"});
 	            (new NetworkView({ el: "#main-network-view" })).render();
             }
