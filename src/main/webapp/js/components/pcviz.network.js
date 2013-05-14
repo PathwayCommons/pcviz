@@ -1,6 +1,4 @@
 var NetworkView = Backbone.View.extend({
-	// html component for the animated image content
-	loadingImage: '<img src="images/loading.gif" alt="loading network...">',
 	// div id for the initial display before the actual network loaded
 	networkLoading: "#network-loading",
 	// div id for the contents of the details tab
@@ -124,7 +122,7 @@ var NetworkView = Backbone.View.extend({
 		// remove previous content
 		info.hide();
 		container.empty();
-		container.append(self.loadingImage);
+		container.append(_.template($("#loading-small-template").html(), {}));
 		container.show();
 
 		// request json data from BioGene service
@@ -134,21 +132,27 @@ var NetworkView = Backbone.View.extend({
 			if (queryResult.returnCode != "SUCCESS")
 			{
 				container.append(
-					"Error retrieving data: " + queryResult.returnCode);
+                    _.template($("#biogene-retrieve-error-template").html(), {
+                        returnCode: queryResult.returnCode
+                    })
+                );
 			}
 			else
 			{
 				if (queryResult.count > 0)
 				{
 					// generate the view by using backbone
-					var biogeneView = new BioGeneView(
-						{el: self.detailsContent,
-							data: queryResult.geneInfo[0]});
+					var biogeneView = new BioGeneView({
+                        el: self.detailsContent,
+                        model: queryResult.geneInfo[0]
+                    });
+                    biogeneView.render();
 				}
 				else
 				{
 					container.append(
-						"No additional information available for the selected node.");
+                        _.template($("#biogene-noinfo-error-template").html(), {})
+                    );
 				}
 			}
 		});

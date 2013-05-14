@@ -1,75 +1,66 @@
 /**
  * Backbone view for the BioGene information.
- *
- * Expected fields for the options object:
- * options.el   target html selector for the content
- * options.data data associated with a single gene
  */
 var BioGeneView = Backbone.View.extend({
-    initialize: function(options){
-        this.render(options);
-    },
-    render: function(options){
+    render: function() {
         // pass variables in using Underscore.js template
-        var variables = { geneSymbol: options.data.geneSymbol,
-            geneDescription: options.data.geneDescription,
-            geneAliases: this.parseDelimitedInfo(options.data.geneAliases, ":", ",", null),
-            geneDesignations: this.parseDelimitedInfo(options.data.geneDesignations, ":", ",", null),
-            geneLocation: options.data.geneLocation,
-            geneMim: options.data.geneMim,
-            geneId: options.data.geneId,
-            geneUniprotId: this.extractFirstUniprotId(options.data.geneUniprotMapping),
-            geneUniprotLinks: this.generateUniprotLinks(options.data.geneUniprotMapping),
-            geneSummary: options.data.geneSummary};
+        var variables = { geneSymbol: this.model.geneSymbol,
+            geneDescription: this.model.geneDescription,
+            geneAliases: this.parseDelimitedInfo(this.model.geneAliases, ":", ",", null),
+            geneDesignations: this.parseDelimitedInfo(this.model.geneDesignations, ":", ",", null),
+            geneLocation: this.model.geneLocation,
+            geneMim: this.model.geneMim,
+            geneId: this.model.geneId,
+            geneUniprotId: this.extractFirstUniprotId(this.model.geneUniprotMapping),
+            geneUniprotLinks: this.generateUniprotLinks(this.model.geneUniprotMapping),
+            geneSummary: this.model.geneSummary};
 
         // compile the template using underscore
-        var template = _.template( $("#biogene_template").html(), variables);
+        var template = _.template( $("#biogene-template").html(), variables);
 
         // load the compiled HTML into the Backbone "el"
         this.$el.html(template);
 
         // format after loading
-        this.format(options, variables);
+        this.format(this.model);
     },
-    format: function(options, variables)
+    format: function()
     {
         // hide rows with undefined data
+        if (this.model.geneSymbol == undefined)
+            this.$el.find(".biogene-symbol").hide();
 
-        if (options.data.geneSymbol == undefined)
-            $(options.el + " .biogene-symbol").hide();
+        if (this.model.geneDescription == undefined)
+            this.$el.find(".biogene-description").hide();
 
-        if (options.data.geneDescription == undefined)
-            $(options.el + " .biogene-description").hide();
+        if (this.model.geneAliases == undefined)
+            this.$el.find(".biogene-aliases").hide();
 
-        if (options.data.geneAliases == undefined)
-            $(options.el + " .biogene-aliases").hide();
+        if (this.model.geneDesignations == undefined)
+            this.$el.find(".biogene-designations").hide();
 
-        if (options.data.geneDesignations == undefined)
-            $(options.el + " .biogene-designations").hide();
+        if (this.model.geneChromosome == undefined)
+            this.$el.find(".biogene-chromosome").hide();
 
-        if (options.data.geneChromosome == undefined)
-            $(options.el + " .biogene-chromosome").hide();
+        if (this.model.geneLocation == undefined)
+            this.$el.find(".biogene-location").hide();
 
-        if (options.data.geneLocation == undefined)
-            $(options.el + " .biogene-location").hide();
+        if (this.model.geneMim == undefined)
+            this.$el.find(".biogene-mim").hide();
 
-        if (options.data.geneMim == undefined)
-            $(options.el + " .biogene-mim").hide();
+        if (this.model.geneId == undefined)
+            this.$el.find(".biogene-id").hide();
 
-        if (options.data.geneId == undefined)
-            $(options.el + " .biogene-id").hide();
+        if (this.model.geneUniprotMapping == undefined)
+            this.$el.find(".biogene-uniprot-links").hide();
 
-        if (options.data.geneUniprotMapping == undefined)
-            $(options.el + " .biogene-uniprot-links").hide();
+        if (this.model.geneSummary == undefined)
+            this.$el.find(".node-details-summary").hide();
 
-        if (options.data.geneSummary == undefined)
-            $(options.el + " .node-details-summary").hide();
-
-        var expanderOpts = {slicePoint: 200, // default is 100
+        var expanderOpts = {slicePoint: 500, // default is 100
             expandPrefix: ' ',
-            expandText: '[...]',
-            //collapseTimer: 5000, // default is 0, so no re-collapsing
-            userCollapseText: '[^]',
+            expandText: ' (...)',
+            userCollapseText: ' (show less)',
             moreClass: 'expander-read-more',
             lessClass: 'expander-read-less',
             detailClass: 'expander-details',
@@ -78,28 +69,14 @@ var BioGeneView = Backbone.View.extend({
             expandEffect: 'fadeIn',
             collapseEffect: 'fadeOut'};
 
-        // TODO add expander library to have this feature
-        // make long texts expandable
-//			$(options.el + " .biogene-description").expander(expanderOpts);
-//			$(options.el + " .biogene-aliases").expander(expanderOpts);
-//			$(options.el + " .biogene-designations").expander(expanderOpts);
-//			$(options.el + " .node-details-summary").expander(expanderOpts);
+        $(".biogene-info .expandable").expander(expanderOpts);
 
-        // note: the first uniprot link has a separate section in the template,
-        // therefore it is not included here. since the expander plugin
-        // has problems with cutting hyperlink elements, there is another
-        // section (span) for all other remaining uniprot links.
-
-        // display only comma (the comma after the first link)
-        // (assuming the first 2 chars of this section is ", ")
         expanderOpts.slicePoint = 2; // show comma and the space
         expanderOpts.widow = 0; // hide everything else in any case
-
-//			$(options.el + " .biogene-uniprot-links-extra").expander(expanderOpts);
     },
     generateUniprotLinks: function(mapping) {
         var formatter = function(id){
-            return '<a href="http://www.uniprot.org/uniprot/' + id + '" target="_blank">' + id + '</a>';
+            return _.template($("#uniprot-link-template").html(), { id: id });
         };
 
         if (mapping == undefined || mapping == null)

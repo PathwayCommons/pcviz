@@ -219,31 +219,69 @@
   </footer>
 
   <!-- BioGeneView template for backbone.js -->
-  <script type="text/template" id="biogene_template">
+  <script type="text/template" id="biogene-template">
       <div class='node-details-info'>
-          <div class='biogene-info biogene-symbol'><b>Gene Symbol:</b> {{geneSymbol}}</div>
-          <div class='biogene-info biogene-description'><b>Description:</b> {{geneDescription}}</div>
-          <div class='biogene-info biogene-aliases'><b>Aliases:</b> {{geneAliases}}</div>
-          <div class='biogene-info biogene-designations'><b>Designations:</b> {{geneDesignations}}</div>
-          <div class='biogene-info biogene-location'><b>Chromosome Location:</b> {{geneLocation}}</div>
-          <div class='biogene-info biogene-mim'>
-              <b>MIM:</b>
-              <a href='http://omim.org/entry/{{geneMim}}' target='blank'>{{geneMim}}</a>
-          </div>
-          <div class='biogene-info biogene-id'>
-              <b>Gene ID:</b>
-              <a href='http://www.ncbi.nlm.nih.gov/gene?term={{geneId}}' target='blank'>{{geneId}}</a>
-          </div>
-          <div class='biogene-info biogene-uniprot-links'>
-              <b>UniProt ID:</b>
-              <a href='http://www.uniprot.org/uniprot/{{geneUniprotId}}'
-                 target='blank'>{{geneUniprotId}}</a><span class='biogene-uniprot-links-extra'>{{geneUniprotLinks}}</span>
-          </div>
+          <h3>
+              {{geneSymbol}}
+          </h3>
+
+          <table class="table table-condensed table-striped">
+              <tr class="biogene-info biogene-description node-details-summary">
+                  <td colspan="2" class="expandable">
+                      {{geneSummary}}
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-aliases">
+                  <th>Aliases</th>
+                  <td>{{geneAliases}}</td>
+              </tr>
+              <tr class="biogene-info biogene-description">
+                  <th>Description</th>
+                  <td class="expandable">{{geneDescription}}</td>
+              </tr>
+              <tr class="biogene-info biogene-location">
+                  <th>Chromosome Location</th>
+                  <td>{{geneLocation}}</td>
+              </tr>
+              <tr class="biogene-info biogene-uniprot-links">
+                  <th>UniProt ID:</th>
+                  <td>
+                      <a href='http://www.uniprot.org/uniprot/{{geneUniprotId}}' target='blank'>
+                          {{geneUniprotId}}
+                      </a>
+                      <span class='biogene-uniprot-links-extra'>
+                          {{geneUniprotLinks}}
+                      </span>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-id">
+                  <th>Gene ID:</th>
+                  <td>
+                      <a href='http://www.ncbi.nlm.nih.gov/gene?term={{geneId}}' target='blank'>{{geneId}}</a>
+                  </td>
+              </tr>
+          </table>
       </div>
-      <div class='node-details-summary'>
-          <b>Gene Function:</b>
-          {{geneSummary}}
-      </div>
+  </script>
+
+  <script type="text/template" id="loading-small-template">
+      <img src="images/loading.gif" alt="loading..." height="17" width="50">
+  </script>
+
+  <script type="text/template" id="loading-large-template">
+      <img src="images/loading.gif" alt="loading..." height="34" width="100">
+  </script>
+
+  <script type="text/template" id="uniprot-link-template">
+      <a href="http://www.uniprot.org/uniprot/{{id}}" target="_blank">{{id}}</a>
+  </script>
+
+  <script type="text/template" id="biogene-retrieve-error-template">
+      Error retrieving data: {{returnCode}}.
+  </script>
+
+  <script type="text/template" id="biogene-noinfo-error-template">
+      No additional information available for the selected node.
   </script>
 
   <!-- Fullscreen Cytoscape.js template -->
