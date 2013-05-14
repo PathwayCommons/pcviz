@@ -10,7 +10,7 @@
                         http://www.springframework.org/schema/cache
                         http://www.springframework.org/schema/cache/spring-cache.xsd">
 
-    <context:property-placeholder location="/WEB-INF/spring/pcviz.properties" />
+    <context:property-placeholder location="classpath:spring/pcviz.properties" />
     <cache:annotation-driven cache-manager="cacheManager"/>
 
     <bean class="org.pathwaycommons.pcviz.cocitation.IHOPSpider" id="iHopSpider">
