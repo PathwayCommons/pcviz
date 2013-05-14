@@ -1,0 +1,19 @@
+# Pathway commons
+pathwaycommons.url=http://webservice.baderlab.org:48080/
+
+# BioGene
+biogene.url=http://cbio.mskcc.org/biogene/
+biogene.format=json
+
+# iHop
+ihop.url=http://www.ihop-net.org/UniPub/iHOP/
+
+# Cocitation manager
+cocitation.shelflife=30
+cocitation.cache.folder=/tmp/cocitations
+cocitation.cache.folder.test=/tmp/cocitations-test
+
+# HGNC util
+#hgnc.location=http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit
+hgnc.location=file:/tmp/hgnc.txt
+hgnc.test.location=classpath:hgnc_test.txt

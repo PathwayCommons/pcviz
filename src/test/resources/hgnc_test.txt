@@ -1,0 +1,10 @@
+Approved Symbol	Synonyms
+A1BG	
+A2M	FWP007, S863-7, CPAMD5
+A2MP1	
+AACP	NATP
+SERPINA3	ACT, alpha-1-antichymotrypsin
+AADAC	DAC, CES5A1
+AAMP	
+AANAT	SNAT
+AARS	

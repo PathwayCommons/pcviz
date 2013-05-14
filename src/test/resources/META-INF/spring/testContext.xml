@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/util
+                        http://www.springframework.org/schema/util/spring-util-3.1.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:property-placeholder location="file:src/main/webapp/WEB-INF/spring/pcviz.properties" />
+
+    <bean class="org.pathwaycommons.pcviz.cocitation.IHOPSpider" id="iHopSpider">
+        <constructor-arg name="iHopURL" value="${ihop.url}"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.cocitation.CocitationManager" id="cocitationManager0">
+        <constructor-arg name="cacheLife" value="0"/>
+        <constructor-arg name="resourceDir" value="${cocitation.cache.folder.test}"/>
+        <property name="ihopSpider" ref="iHopSpider"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.cocitation.CocitationManager" id="cocitationManager1">
+        <constructor-arg name="cacheLife" value="1"/>
+        <constructor-arg name="resourceDir" value="${cocitation.cache.folder.test}"/>
+        <property name="ihopSpider" ref="iHopSpider"/>
+    </bean>
+
+    <bean class="java.lang.String" id="pathwayCommonsUrl">
+        <constructor-arg index="0" value="${pathwaycommons.url}"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.service.GeneNameService" id="geneNameService">
+        <property name="geneResource" value="${hgnc.test.location}"/>
+    </bean>
+
+</beans>
