@@ -12,10 +12,10 @@ var HomeView = Backbone.View.extend({
         $("#tagsinput").tagsInput({
             defaultText: "...",
             onAddTag: function() {
-	            (new NetworkView({ el: "#main-network-view" })).render();
+                window.location.hash = "genes/" + $("input[name='tagsinput']").val();
             },
             onRemoveTag: function() {
-	            (new NetworkView({ el: "#main-network-view" })).render();
+                window.location.hash = "genes/" + $("input[name='tagsinput']").val();
             }
         }).importTags(terms);
 
