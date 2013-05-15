@@ -42,144 +42,8 @@
     </div>
   </div>
 
-    <div class="container">
-        <div class="row topcontrols">
-            <div class="span8">
-                <h3 class="demo-panel-title">Genes of interest</h3>
-            </div>
-        </div>
-        <div class="row topcontrols">
-            <div class="span8"> <!-- genes of interest -->
-                <input name="tagsinput" id="tagsinput" class="tagsinput" minwidth="50" value="BRCA2" />
-            </div>
-            <div class="span4">
-                <ul class="nav nav-tabs" id="rightMenuControls">
-                    <li class="active"><a href="#graph-details" data-toggle="tab"><span class="fui-menu-16"></span> Details</a></li>
-                    <li><a href="#graph-settings" data-toggle="tab"><span class="fui-settings-16"></span> Settings</a></li>
-                    <li><a href="#graph-help" data-toggle="tab"><span class="fui-bubble-16"></span> Context</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="row mainview">
-            <div class="span8">  <!-- cytoscape view -->
-                <div id="network-loading">
-                    <h4>Loading network...</h4>
-                    <img src="images/loading.gif" alt="loading network...">
-                </div>
-                <div id="network-container">
-                    <div id="main-network-view"></div>
-                    <div class="pull-right">
-                        <a href="#" id="full-screen-link" class="expand-view">
-                            expand network view <i class="icon-fullscreen"></i>
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-            <div class="span4"> <!-- slider bars and everything -->
-                <div id="rightMenuTabs" class="tab-content">
-                    <div class="tab-pane fade active in" id="graph-details">
-                        <div id="graph-details-info">
-                            <p class="help-text palette palette-silver">
-                                Click on one of the nodes or edges to get more information from BioGene...
-                            </p>
-                            <img src="images/help-left-arrow.png" width="75">
-                        </div>
-                        <div id="graph-details-content">
-                            <!-- reserved for backbone view -->
-                        </div>
-
-                    </div>
-                    <div class="tab-pane fade" id="graph-settings">
-                        <div class="share">
-                            <ul>
-                                <li>
-                                    <label class="share-label" for="share-toggle2">Detailed processes</label>
-                                    <div class="toggle">
-                                        <label class="toggle-radio" for="share-toggle2">ON</label>
-                                        <input type="radio" name="share-toggles" id="share-toggle2" value="toggle1">
-                                        <label class="toggle-radio" for="share-toggle1">OFF</label>
-                                        <input type="radio" name="share-toggles" id="share-toggle1" value="toggle2" checked="checked">
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <h4 class="demo-panel-title">Number of nodes</h4>
-                        <div id="slider-nodes" class="ui-slider">
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                        </div>
-
-                        <h4 class="demo-panel-title">Weight of genes of interest</h4>
-                        <div id="slider-weight" class="ui-slider">
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                        </div>
-
-                        <h4 class="demo-panel-title">Weight of co-citation</h4>
-                        <div id="slider-cite" class="ui-slider">
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                        </div>
-
-                        <h4 class="demo-panel-title">Weight of GO terms</h4>
-                        <div id="slider-go" class="ui-slider">
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                        </div>
-
-                        <h4 class="demo-panel-title">Weight of cancer alterations</h4>
-                        <div id="slider-cancer" class="ui-slider">
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                            <div class="ui-slider-segment"></div>
-                        </div>
-
-                        <h4 class="demo-panel-title">Graph query type</h4>
-                        <select value="0" class="span3" tabindex="1" name="herolist">
-                            <option selected="selected" value="0">Neighborhood</option>
-                            <option value="1">Paths-between</option>
-                        </select>
-                    </div>
-                    <div class="tab-pane fade" id="graph-help">
-                        <div class="todo mrm">
-                            <div class="tile">
-                                <h3 class="tile-title">Cancer type of interest</h3>
-                                <ul>
-                                    <li>
-                                        <div class="todo-icon fui-man-24"></div>
-                                        <div class="todo-content">
-                                            <h4 class="todo-name">
-                                                Glioblastoma
-                                            </h4>
-                                            The Cancer Genome Atlas, Nature 2008
-                                        </div>
-                                    </li>
-
-                                    <li class="todo-done">
-                                        <div class="todo-icon fui-man-24"></div>
-                                        <div class="todo-content">
-                                            <h4 class="todo-name">
-                                                Ovarian Cancer
-                                            </h4>
-                                            The Cancer Genome Atlas, Nature 2011
-                                        </div>
-                                    </li>
-                                </ul>
-                                <br>
-                                <br>
-                                <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="container" id="main-container">
+        <!-- all the backbone magic will happen here -->
     </div>
   <footer>
       <div class="container">
@@ -220,6 +84,146 @@
           </div>
       </div>
   </footer>
+
+  <script type="text/template" id="main-template">
+      <div class="row topcontrols">
+          <div class="span8">
+              <h3 class="demo-panel-title">Genes of interest</h3>
+          </div>
+      </div>
+      <div class="row topcontrols">
+          <div class="span8"> <!-- genes of interest -->
+              <input name="tagsinput" id="tagsinput" class="tagsinput" value="" />
+          </div>
+          <div class="span4">
+              <ul class="nav nav-tabs" id="rightMenuControls">
+                  <li class="active"><a href="#graph-details" data-toggle="tab"><span class="fui-menu-16"></span> Details</a></li>
+                  <li><a href="#graph-settings" data-toggle="tab"><span class="fui-settings-16"></span> Settings</a></li>
+                  <li><a href="#graph-help" data-toggle="tab"><span class="fui-bubble-16"></span> Context</a></li>
+              </ul>
+          </div>
+      </div>
+      <div class="row mainview">
+          <div class="span8">  <!-- cytoscape view -->
+              <div id="network-loading">
+                  <h4>Loading network...</h4>
+                  <img src="images/loading.gif" alt="loading network...">
+              </div>
+              <div id="network-container">
+                  <div id="main-network-view"></div>
+                  <div class="pull-right">
+                      <a href="#" id="full-screen-link" class="expand-view">
+                          expand network view <i class="icon-fullscreen"></i>
+                      </a>
+                  </div>
+
+              </div>
+          </div>
+          <div class="span4"> <!-- slider bars and everything -->
+              <div id="rightMenuTabs" class="tab-content">
+                  <div class="tab-pane fade active in" id="graph-details">
+                      <div id="graph-details-info">
+                          <p class="help-text palette palette-silver">
+                              Click on one of the nodes or edges to get more information from BioGene...
+                          </p>
+                          <img src="images/help-left-arrow.png" width="75">
+                      </div>
+                      <div id="graph-details-content">
+                          <!-- reserved for backbone view -->
+                      </div>
+
+                  </div>
+                  <div class="tab-pane fade" id="graph-settings">
+                      <div class="share">
+                          <ul>
+                              <li>
+                                  <label class="share-label" for="share-toggle2">Detailed processes</label>
+                                  <div class="toggle">
+                                      <label class="toggle-radio" for="share-toggle2">ON</label>
+                                      <input type="radio" name="share-toggles" id="share-toggle2" value="toggle1">
+                                      <label class="toggle-radio" for="share-toggle1">OFF</label>
+                                      <input type="radio" name="share-toggles" id="share-toggle1" value="toggle2" checked="checked">
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+
+                      <h4 class="demo-panel-title">Number of nodes</h4>
+                      <div id="slider-nodes" class="ui-slider">
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                      </div>
+
+                      <h4 class="demo-panel-title">Weight of genes of interest</h4>
+                      <div id="slider-weight" class="ui-slider">
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                      </div>
+
+                      <h4 class="demo-panel-title">Weight of co-citation</h4>
+                      <div id="slider-cite" class="ui-slider">
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                      </div>
+
+                      <h4 class="demo-panel-title">Weight of GO terms</h4>
+                      <div id="slider-go" class="ui-slider">
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                      </div>
+
+                      <h4 class="demo-panel-title">Weight of cancer alterations</h4>
+                      <div id="slider-cancer" class="ui-slider">
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                          <div class="ui-slider-segment"></div>
+                      </div>
+
+                      <h4 class="demo-panel-title">Graph query type</h4>
+                      <select value="0" class="span3" tabindex="1" name="herolist">
+                          <option selected="selected" value="0">Neighborhood</option>
+                          <option value="1">Paths-between</option>
+                      </select>
+                  </div>
+                  <div class="tab-pane fade" id="graph-help">
+                      <div class="todo mrm">
+                          <div class="tile">
+                              <h3 class="tile-title">Cancer type of interest</h3>
+                              <ul>
+                                  <li>
+                                      <div class="todo-icon fui-man-24"></div>
+                                      <div class="todo-content">
+                                          <h4 class="todo-name">
+                                              Glioblastoma
+                                          </h4>
+                                          The Cancer Genome Atlas, Nature 2008
+                                      </div>
+                                  </li>
+
+                                  <li class="todo-done">
+                                      <div class="todo-icon fui-man-24"></div>
+                                      <div class="todo-content">
+                                          <h4 class="todo-name">
+                                              Ovarian Cancer
+                                          </h4>
+                                          The Cancer Genome Atlas, Nature 2011
+                                      </div>
+                                  </li>
+                              </ul>
+                              <br>
+                              <br>
+                              <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </script>
 
   <!-- BioGeneView template for backbone.js -->
   <script type="text/template" id="biogene-template">
