@@ -1,5 +1,13 @@
 var HomeView = Backbone.View.extend({
+    el: "#main-container",
+    template:_.template($("#main-template").html()),
+
     render: function() {
+        var terms = this.model.terms.replace("<", "").replace(">", "").toUpperCase();
+        this.model.terms = terms;
+
+        $(this.el).html("");
+        $(this.el).html(this.template(this.model));
 
         $("#tagsinput").tagsInput({
             defaultText: "...",
@@ -9,7 +17,7 @@ var HomeView = Backbone.View.extend({
             onRemoveTag: function() {
 	            (new NetworkView({ el: "#main-network-view" })).render();
             }
-        });
+        }).importTags(terms);
 
         $("#full-screen-link").click(function() {
             $.fancybox(
