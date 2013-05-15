@@ -6,7 +6,7 @@ var NetworkView = Backbone.View.extend({
 	// div id for the initial info message of the details tab
 	detailsInfo: "#graph-details-info",
 	// content id for the gene input field
-	tagsInputField: "#tagsinput",
+	tagsInputField: "input[name='tagsinput']",
 	// cytoscape web visual style object
 	cyStyle: cytoscape.stylesheet()
 	    .selector("node")
