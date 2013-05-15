@@ -94,6 +94,12 @@ var NetworkView = Backbone.View.extend({
                                         self.updateNodeDetails(evt, node);
                                     });
 
+                                    // add click listener on nodes, this time for touch devices
+                                    cy.on('touchstart', 'node', function(evt){
+                                        var node = this;
+                                        self.updateNodeDetails(evt, node);
+                                    });
+
                                     // add click listener to core (for background clicks)
                                     cy.on('click', function(evt) {
                                         // if click on background, hide details
@@ -104,6 +110,15 @@ var NetworkView = Backbone.View.extend({
                                         }
                                     });
 
+                                    // add click listener to core (touch devices)
+                                    cy.on('touchstart', function(evt) {
+                                        // if click on background, hide details
+                                        if(evt.cyTarget === cy)
+                                        {
+                                            $(self.detailsContent).hide();
+                                            $(self.detailsInfo).show();
+                                        }
+                                    });
                                 }
                             };
 
