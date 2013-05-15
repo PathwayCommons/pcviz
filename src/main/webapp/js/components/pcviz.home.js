@@ -8,7 +8,9 @@ var HomeView = Backbone.View.extend({
             },
             onRemoveTag: function() {
 	            (new NetworkView({ el: "#main-network-view" })).render();
-            }
+            },
+            autocomplete_url: 'autocomplete/',
+            removeWithBackspace: false
         });
 
         $("#full-screen-link").click(function() {

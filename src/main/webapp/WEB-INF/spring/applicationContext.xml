@@ -10,7 +10,7 @@
                         http://www.springframework.org/schema/cache
                         http://www.springframework.org/schema/cache/spring-cache.xsd">
 
-    <context:property-placeholder location="classpath:spring/pcviz.properties" />
+    <context:property-placeholder location="classpath*:spring/pcviz.properties" />
     <cache:annotation-driven cache-manager="cacheManager"/>
 
     <bean class="org.pathwaycommons.pcviz.cocitation.IHOPSpider" id="iHopSpider">
@@ -52,6 +52,7 @@
 
     <bean class="org.pathwaycommons.pcviz.service.GeneNameService" id="geneNameService">
         <property name="geneResource" value="${hgnc.location}"/>
+        <property name="autoCompleteLimit" value="${autoCompleteResult.limit}"/>
     </bean>
 
 </beans>
