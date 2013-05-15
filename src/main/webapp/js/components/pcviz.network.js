@@ -108,7 +108,11 @@ var NetworkView = Backbone.View.extend({
                                 }
                             };
 
-                            container.cy(cyOptions);
+                            container
+                                .cy(cyOptions)
+                                .zoom(0.90) // This is to get rid of overlapping nodes and panControl
+                                .center()
+                            ;
 
                             (new NotyView({
                                 template: "#noty-network-loaded-template",
