@@ -19,7 +19,7 @@ var HomeView = Backbone.View.extend({
             },
             autocomplete_url: 'autocomplete/',
             removeWithBackspace: false
-        });
+        }).importTags(terms);
 
         $("#full-screen-link").click(function() {
             $.fancybox(
