@@ -10,7 +10,6 @@ var GeneValidations = Backbone.Collection.extend({
 });
 
 var GeneValidationsView = Backbone.View.extend({
-    el: "#tagsinput",
     allValid: true,
     isAllValid: function() {
         return this.allValid
@@ -21,7 +20,7 @@ var GeneValidationsView = Backbone.View.extend({
         _.each(this.model.models, function(aValidation) {
             var inputEl = null;
 
-            $("#tagsinput_tagsinput span.tag span").each(function(index, tag) {
+            $("div.tagsinput span.tag span").each(function(index, tag) {
                 var value = $(tag).html().toUpperCase();
                 if(value.indexOf(aValidation.get("query")) == 0) {
                     inputEl = $(tag).parent();

@@ -123,10 +123,10 @@
 				case 'alert': case 'notification':
 					this.$bar.css({backgroundColor: '#FFF', borderColor: '#CCC', color: '#444'}); break;
 				case 'warning':
-					this.$bar.css({backgroundColor: '#FFEAA8', borderColor: '#FFC237', color: '#826200'});
+					this.$bar.css({backgroundColor: '#f1c40f', borderColor: '#f1c40f', color: '#826200'});
 					this.$buttons.css({borderTop: '1px solid #FFC237'}); break;
 				case 'error':
-					this.$bar.css({backgroundColor: 'red', borderColor: 'darkred', color: '#FFF'});
+					this.$bar.css({backgroundColor: '#e74c3c', borderColor: '#e74c3c', color: '#FFF'});
 					this.$message.css({fontWeight: 'bold'});
 					this.$buttons.css({borderTop: '1px solid darkred'}); break;
 				case 'information':
