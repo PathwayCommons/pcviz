@@ -88,30 +88,16 @@ var NetworkView = Backbone.View.extend({
                                     // add pan zoom control panel
                                     container.cytoscapePanzoom();
 
+                                    // we are gonna use 'tap' to handle events for multiple devices
                                     // add click listener on nodes
-                                    cy.on('click', 'node', function(evt){
+                                    cy.on('tap', 'node', function(evt){
                                         var node = this;
                                         self.updateNodeDetails(evt, node);
                                     });
 
-                                    // add click listener on nodes, this time for touch devices
-                                    cy.on('touchstart', 'node', function(evt){
-                                        var node = this;
-                                        self.updateNodeDetails(evt, node);
-                                    });
 
                                     // add click listener to core (for background clicks)
-                                    cy.on('click', function(evt) {
-                                        // if click on background, hide details
-                                        if(evt.cyTarget === cy)
-                                        {
-                                            $(self.detailsContent).hide();
-                                            $(self.detailsInfo).show();
-                                        }
-                                    });
-
-                                    // add click listener to core (touch devices)
-                                    cy.on('touchstart', function(evt) {
+                                    cy.on('tap', function(evt) {
                                         // if click on background, hide details
                                         if(evt.cyTarget === cy)
                                         {
