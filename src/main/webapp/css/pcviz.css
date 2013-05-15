@@ -101,3 +101,20 @@ footer {
 .warn-tag {
     background: #f1c40f !important;
 }
+
+.ok-tag {
+    background: #1abc9c !important;
+}
+
+/* jQuery fixes */
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+    border: 0;
+    background: #1abc9c;
+    font-weight: bold;
+    color: white;
+}
