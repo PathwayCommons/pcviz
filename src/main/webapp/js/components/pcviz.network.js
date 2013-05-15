@@ -71,67 +71,63 @@ var NetworkView = Backbone.View.extend({
                 var geneValidationsView = new GeneValidationsView({ model: geneValidations });
                 geneValidationsView.render();
 
-                if(geneValidationsView.isAllValid()) {
-                    // TODO: change graph type dynamically! (nhood)
-                    $.getJSON("graph/nhood/" + names,
-                        function(data) {
-                            networkLoading.hide();
-                            container.html("");
-                            container.show();
-
-                            var cyOptions = {
-                                elements: data,
-                                style: self.cyStyle,
-                                ready: function() {
-                                    window.cy = this; // for debugging
-
-                                    // add pan zoom control panel
-                                    container.cytoscapePanzoom();
-
-                                    // we are gonna use 'tap' to handle events for multiple devices
-                                    // add click listener on nodes
-                                    cy.on('tap', 'node', function(evt){
-                                        var node = this;
-                                        self.updateNodeDetails(evt, node);
-                                    });
-
-
-                                    // add click listener to core (for background clicks)
-                                    cy.on('tap', function(evt) {
-                                        // if click on background, hide details
-                                        if(evt.cyTarget === cy)
-                                        {
-                                            $(self.detailsContent).hide();
-                                            $(self.detailsInfo).show();
-                                        }
-                                    });
-
-                                    // This is to get rid of overlapping nodes and panControl
-                                    cy.zoom(0.90).center()
-                                }
-                            };
-
-                            container.cy(cyOptions)
-                            ;
-
-                            (new NotyView({
-                                template: "#noty-network-loaded-template",
-                                model: {
-                                    nodes: data.nodes.length,
-                                    edges: data.edges.length
-                                }
-                            })).render();
-                        });
-                } else {
+                if(!geneValidationsView.isAllValid()) {
                     (new NotyView({
                         template: "#noty-invalid-symbols-template",
                         error: true,
                         model: {}
                     })).render();
-
-                    networkLoading.hide();
-                    container.show();
                 }
+
+                // TODO: change graph type dynamically! (nhood)
+                $.getJSON("graph/nhood/" + names,
+                    function(data) {
+                        networkLoading.hide();
+                        container.html("");
+                        container.show();
+
+                        var cyOptions = {
+                            elements: data,
+                            style: self.cyStyle,
+                            ready: function() {
+                                window.cy = this; // for debugging
+
+                                // add pan zoom control panel
+                                container.cytoscapePanzoom();
+
+                                // we are gonna use 'tap' to handle events for multiple devices
+                                // add click listener on nodes
+                                cy.on('tap', 'node', function(evt){
+                                    var node = this;
+                                    self.updateNodeDetails(evt, node);
+                                });
+
+
+                                // add click listener to core (for background clicks)
+                                cy.on('tap', function(evt) {
+                                    // if click on background, hide details
+                                    if(evt.cyTarget === cy)
+                                    {
+                                        $(self.detailsContent).hide();
+                                        $(self.detailsInfo).show();
+                                    }
+                                });
+
+                                // This is to get rid of overlapping nodes and panControl
+                                cy.zoom(0.90).center()
+                            }
+                        };
+
+                        container.cy(cyOptions);
+
+                        (new NotyView({
+                            template: "#noty-network-loaded-template",
+                            model: {
+                                nodes: data.nodes.length,
+                                edges: data.edges.length
+                            }
+                        })).render();
+                });
             }
         });
 
