@@ -105,13 +105,13 @@ var NetworkView = Backbone.View.extend({
                                             $(self.detailsInfo).show();
                                         }
                                     });
+
+                                    // This is to get rid of overlapping nodes and panControl
+                                    cy.zoom(0.90).center()
                                 }
                             };
 
-                            container
-                                .cy(cyOptions)
-                                .zoom(0.90) // This is to get rid of overlapping nodes and panControl
-                                .center()
+                            container.cy(cyOptions)
                             ;
 
                             (new NotyView({
