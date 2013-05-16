@@ -8,7 +8,8 @@ public enum PropertyKey
 	ID,
 	SOURCE,
 	TARGET,
-	CITED;
+	CITED,
+	PUBMED;
 
 	@Override
 	public String toString()
