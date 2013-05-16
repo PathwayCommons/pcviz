@@ -21,7 +21,9 @@ var HomeView = Backbone.View.extend({
             removeWithBackspace: false
         }).importTags(terms);
 
-        $("#full-screen-link").click(function() {
+        $("#full-screen-link").click(function(e) {
+            e.preventDefault();
+
             $.fancybox(
                 _.template($("#fullscreen-network-tmpl").html(), {}),
                 {
