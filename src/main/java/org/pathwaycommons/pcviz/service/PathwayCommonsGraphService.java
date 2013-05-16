@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -107,6 +108,8 @@ public class PathwayCommonsGraphService {
                 edge.getData().put(PropertyKey.SOURCE.toString(), srcName);
                 edge.getData().put(PropertyKey.TARGET.toString(), targetName);
 
+				edge.getData().put(PropertyKey.PUBMED.toString(),
+					sif.pubmedIDs == null ? Collections.emptyList() : sif.pubmedIDs);
 
                 edge.getData().put(PropertyKey.CITED.toString(), getCocitations(srcName, targetName));
                 graph.getEdges().add(edge);
