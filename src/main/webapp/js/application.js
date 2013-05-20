@@ -23,7 +23,7 @@ $(document).ready(function() {
         max: 5,
         value: 2,
         orientation: "horizontal",
-        range: "min",
+        range: "min"
     });
 
     // JS input/textarea placeholder
