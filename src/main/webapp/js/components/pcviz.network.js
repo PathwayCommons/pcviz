@@ -20,7 +20,9 @@ var NetworkView = Backbone.View.extend({
 	    })
         .selector("[?isseed]")
         .css({
-            "border-width": 5,
+            "border-width": 3,
+            "border-color": "#2980B9",
+            "color": "#2980B9",
             "font-weight": "bold",
             "font-size": "17"
         })
