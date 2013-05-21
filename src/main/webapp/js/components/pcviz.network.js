@@ -20,20 +20,49 @@ var NetworkView = Backbone.View.extend({
 	    })
         .selector("[?isseed]")
         .css({
-            "border-width": 3,
-            "border-color": "#2980B9",
-            "color": "#2980B9",
+            "border-width": 5,
+            "color": "#1abc9c",
             "font-weight": "bold",
             "font-size": "17"
         })
-	    .selector("edge")
+        .selector("edge")
+        .css({
+            "width": "mapData(cited, 20, 100, 0.4, 0.5)",
+            "line-color": "#444"
+        })
+	    .selector("[?isdirected]")
 	    .css({
-	        "width": "mapData(weight, 0, 100, 1, 4)",
-	        "target-arrow-shape": "triangle",
-	        "source-arrow-shape": "circle",
-	        "line-color": "#444"
+	        "target-arrow-shape": "triangle"
 	    })
-	    .selector(":selected")
+        .selector("edge[type='transinhibit']")
+        .css({
+            "line-color": "#E74C3C" // alizarin
+        })
+        .selector("edge[type='state-change']")
+        .css({
+            "line-color": "#2980B9" // belize hole
+        })
+        .selector("edge[type='in-same-complex']")
+        .css({
+            "line-color": "#34495E" // wet asphalt
+        })
+        .selector("edge[type='transactivate']")
+        .css({
+            "line-color": "#16A085" // green see
+        })
+        .selector("edge[type='degrades']")
+        .css({
+            "line-color": "#D35400" // pumpkin
+        })
+        .selector("edge[type='blocks-degradation']")
+        .css({
+            "line-color": "#9B59B6" // amethyst
+        })
+        .selector("edge[type='consecutive-catalysis']")
+        .css({
+            "line-color": "#2ECC71" // emerald
+        })
+        .selector(":selected")
 	    .css({
 	        "background-color": "#000",
 	        "line-color": "#000",
@@ -121,6 +150,11 @@ var NetworkView = Backbone.View.extend({
                                     self.updateNodeDetails(evt, node);
                                 });
 
+                                cy.on('tap', 'edge', function(evt){
+                                    var edge = this;
+                                    self.updateEdgeDetails(evt, edge);
+                                });
+
 
                                 // add click listener to core (for background clicks)
                                 cy.on('tap', function(evt) {
@@ -202,5 +236,24 @@ var NetworkView = Backbone.View.extend({
 				}
 			}
 		});
-	}
+	},
+
+    /**
+     * Updates details tab wrt the given edge.
+     *
+     * @param evt
+     * @param edge
+     */
+    updateEdgeDetails: function(evt, edge) {
+        var self = this;
+        var container = $(self.detailsContent);
+        $(self.detailsInfo).hide();
+
+        container.empty();
+        (new EdgeInfoView({
+            model: edge.data(),
+            el: "#graph-details-content"
+        })).render();
+        container.show();
+    }
 });

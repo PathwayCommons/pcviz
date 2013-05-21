@@ -11,6 +11,8 @@ public enum PropertyKey
 	CITED,
     ISVALID,
     ISSEED,
+    ISDIRECTED,
+    TYPE,
 	PUBMED;
 
 	@Override
