@@ -120,8 +120,10 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.ID, srcName + targetName);
                 edge.setProperty(PropertyKey.SOURCE, srcName);
                 edge.setProperty(PropertyKey.TARGET, targetName);
+                edge.setProperty(PropertyKey.ISDIRECTED, sif.directed);
+                edge.setProperty(PropertyKey.TYPE, sif.type);
 
-				edge.getData().put(PropertyKey.PUBMED.toString(),
+				edge.setProperty(PropertyKey.PUBMED,
 					sif.pubmedIDs == null ? Collections.emptyList() : sif.pubmedIDs);
 
                 edge.setProperty(PropertyKey.CITED, getCocitations(srcName, targetName));
