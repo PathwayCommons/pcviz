@@ -264,6 +264,68 @@
       </div>
   </script>
 
+  <script type="text/template" id="edgeinfo-template">
+      <div class='edge-details-info'>
+          <h3>
+              {{source}} - {{target}}
+          </h3>
+
+          <table class="table table-condensed table-striped">
+              <tr>
+                  <td colspan="2" class="edge-summary">
+                      {{summary}} <small class="badge">{{cited}} co-citations</small>
+                  </td>
+              </tr>
+              <tr>
+                  <th>Type</th>
+                  <td>{{type}}</td>
+              </tr>
+              <tr>
+                  <th>References</th>
+                  <td>
+                      {{pubmed.length}} publication(s)
+                      <ul class="pubmed-list">
+                      </ul>
+                  </td>
+              </tr>
+          </table>
+      </div>
+  </script>
+
+  <script type="text/template" id="pubmed-id-template">
+    <li>
+        <a class="pubmed-link" target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/{{pmid}}">Pubmed: {{pmid}}</a>
+    </li>
+  </script>
+
+  <script type="text/template" id="edge-state-change-template">
+      <span class="gene source-gene">{{source}}</span> changes the state of <span class="gene target-gene">{{target}}</span>.
+  </script>
+
+  <script type="text/template" id="edge-consecutive-catalysis-template">
+      <span class="gene source-gene">{{source}}</span> consecutively catalyzes <span class="gene target-gene">{{target}}</span>.
+  </script>
+
+  <script type="text/template" id="edge-degrades-template">
+      <span class="gene source-gene">{{source}}</span> degrades <span class="gene target-gene">{{target}}</span>.
+  </script>
+
+  <script type="text/template" id="edge-blocks-degradation-template">
+      <span class="gene source-gene">{{source}}</span> blocks the degradation of <span class="gene target-gene">{{target}}</span>.
+  </script>
+
+  <script type="text/template" id="edge-transactivate-template">
+      <span class="gene source-gene">{{source}}</span> trans-activates <span class="gene target-gene">{{target}}</span>.
+  </script>
+
+  <script type="text/template" id="edge-transinhibit-template">
+      <span class="gene source-gene">{{source}}</span> trans-inhibits <span class="gene target-gene">{{target}}</span>.
+  </script>
+
+  <script type="text/template" id="edge-in-same-complex-template">
+      <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>, together, form a complex.
+  </script>
+
   <script type="text/template" id="loading-small-template">
       <img src="images/loading.gif" alt="loading..." height="17" width="50">
   </script>
@@ -344,13 +406,14 @@
   <![endif]-->
 
   <!-- PCViz and its components -->
+  <script src="js/pcviz.main.js"></script>
   <script src="js/components/pcviz.notification.js"></script>
   <script src="js/components/pcviz.home.js"></script>
   <script src="js/components/pcviz.validation.js"></script>
   <script src="js/components/pcviz.settings.js"></script>
   <script src="js/components/pcviz.network.js"></script>
   <script src="js/components/pcviz.biogene.js"></script>
-  <script src="js/pcviz.main.js"></script>
+  <script src="js/components/pcviz.edgeinfo.js"></script>
 
  </body>
 </html>
