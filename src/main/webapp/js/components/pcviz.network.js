@@ -15,8 +15,15 @@ var NetworkView = Backbone.View.extend({
 	        "shape": "data(shape)",
 	        "border-width": 3,
 	        "background-color": "#DDD",
-	        "border-color": "#555"
+	        "border-color": "#555",
+            "font-size": "15"
 	    })
+        .selector("[?isseed]")
+        .css({
+            "border-width": 5,
+            "font-weight": "bold",
+            "font-size": "17"
+        })
 	    .selector("edge")
 	    .css({
 	        "width": "mapData(weight, 0, 100, 1, 4)",
@@ -79,8 +86,18 @@ var NetworkView = Backbone.View.extend({
                     })).render();
                 }
 
+                var networkType = $("#query-type").val();
+
+                if(networkType == "pathsbetween" && names.split(",").length < 2) {
+                    (new NotyView({
+                        template: "#noty-invalid-pathsbetween-template",
+                        error: true,
+                        model: {}
+                    })).render();
+                }
+
                 // TODO: change graph type dynamically! (nhood)
-                $.getJSON("graph/nhood/" + names,
+                $.getJSON("graph/" + networkType + "/" + names,
                     function(data) {
                         networkLoading.hide();
                         container.html("");
@@ -124,10 +141,12 @@ var NetworkView = Backbone.View.extend({
                             template: "#noty-network-loaded-template",
                             model: {
                                 nodes: data.nodes.length,
-                                edges: data.edges.length
+                                edges: data.edges.length,
+                                type: networkType.capitalize()
                             }
                         })).render();
-                });
+
+                    });
             }
         });
 

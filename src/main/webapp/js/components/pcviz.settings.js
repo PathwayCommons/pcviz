@@ -17,6 +17,17 @@ var SettingsView = Backbone.View.extend({
             $(this).tab('show');
         });
 
+        if(this.model.networkType != undefined) {
+            $("#query-type").val(this.model.networkType);
+        }
+
+        $("#query-type").dropkick({
+            change: function(value, label) {
+                var genes = $("input[name='tagsinput']").val();
+                window.location.hash = value + "/" + genes;
+            }
+        });
+
         return this;
     }
 });

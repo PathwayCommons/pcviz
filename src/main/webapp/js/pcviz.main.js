@@ -5,22 +5,26 @@
         interpolate : /\{\{(.+?)\}\}/g
     };
 
+    String.prototype.capitalize = function() {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    };
+
     /* Routers */
     AppRouter = Backbone.Router.extend({
         routes: {
-            "genes/:terms": "gene",
+            ":type/:terms": "gene",
             "*actions": "home"
         },
 
         home: function(actions) {
             (new HomeView({ model: { terms: "BRCA2" }})).render();
-            (new SettingsView()).render();
+            (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         },
 
-        gene: function(terms) {
+        gene: function(type, terms) {
             (new HomeView({ model: { terms: terms }})).render();
-            (new SettingsView()).render();
+            (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         }
     });

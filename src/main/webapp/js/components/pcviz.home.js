@@ -12,10 +12,10 @@ var HomeView = Backbone.View.extend({
         $("#tagsinput").tagsInput({
             defaultText: "...",
             onAddTag: function() {
-                window.location.hash = "genes/" + $("input[name='tagsinput']").val();
+                window.location.hash = $("#query-type").val() + "/" + $("input[name='tagsinput']").val();
             },
             onRemoveTag: function() {
-                window.location.hash = "genes/" + $("input[name='tagsinput']").val();
+                window.location.hash = $("#query-type").val() + "/" + $("input[name='tagsinput']").val();
             },
             autocomplete_url: 'autocomplete/',
             removeWithBackspace: false

@@ -13,4 +13,13 @@ public class CytoscapeJsElement {
     public void setData(Map<String, Object> data) {
         this.data = data;
     }
+
+    public void setProperty(PropertyKey propertyKey, Object value) {
+        getData().put(propertyKey.toString(), value);
+    }
+
+    public Object getProperty(PropertyKey propertyKey) {
+        return getData().get(propertyKey.toString());
+    }
+
 }
