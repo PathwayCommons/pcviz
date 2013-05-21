@@ -1,6 +1,8 @@
 package org.pathwaycommons.pcviz.service;
 
 import flexjson.JSONSerializer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.pattern.miner.*;
@@ -9,16 +11,16 @@ import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class PathwayCommonsGraphService {
+    private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
+
     private String pathwayCommonsUrl;
 
     public String getPathwayCommonsUrl() {
@@ -27,6 +29,16 @@ public class PathwayCommonsGraphService {
 
     public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
+    }
+
+    private GeneNameService geneNameService;
+
+    public GeneNameService getGeneNameService() {
+        return geneNameService;
+    }
+
+    public void setGeneNameService(GeneNameService geneNameService) {
+        this.geneNameService = geneNameService;
     }
 
     /**
@@ -64,20 +76,21 @@ public class PathwayCommonsGraphService {
     }
 
     @Cacheable("networkCache")
-    public String createNetwork(String type, String genes) {
+    public String createNetwork(NETWORK_TYPE type, Collection<String> genes) {
         String networkJson;
         JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
         CytoscapeJsGraph graph = new CytoscapeJsGraph();
 
+        HashSet<String> nodeNames = new HashSet<String>();
+
         // TODO: Use cpath2 client for this
         String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
-        for (String gene : genes.split(","))
+        for (String gene : genes)
         {
             biopaxUrl += "source=" + gene + "&";
+            nodeNames.add(gene);
         }
-        biopaxUrl += "kind=neighborhood";
-
-        HashSet<String> nodeNames = new HashSet<String>();
+        biopaxUrl += "kind=" + type.toString();
 
         SimpleIOHandler ioHandler = new SimpleIOHandler();
         try
@@ -104,29 +117,32 @@ public class PathwayCommonsGraphService {
                 nodeNames.add(targetName);
 
                 CytoscapeJsEdge edge = new CytoscapeJsEdge();
-                edge.getData().put(PropertyKey.ID.toString(), srcName + targetName);
-                edge.getData().put(PropertyKey.SOURCE.toString(), srcName);
-                edge.getData().put(PropertyKey.TARGET.toString(), targetName);
+                edge.setProperty(PropertyKey.ID, srcName + targetName);
+                edge.setProperty(PropertyKey.SOURCE, srcName);
+                edge.setProperty(PropertyKey.TARGET, targetName);
 
 				edge.getData().put(PropertyKey.PUBMED.toString(),
 					sif.pubmedIDs == null ? Collections.emptyList() : sif.pubmedIDs);
 
-                edge.getData().put(PropertyKey.CITED.toString(), getCocitations(srcName, targetName));
+                edge.setProperty(PropertyKey.CITED, getCocitations(srcName, targetName));
                 graph.getEdges().add(edge);
-            }
-
-            for (String nodeName : nodeNames)
-            {
-                CytoscapeJsNode node = new CytoscapeJsNode();
-                node.getData().put(PropertyKey.ID.toString(), nodeName);
-                node.getData().put(PropertyKey.CITED.toString(), getTotalCocitations(nodeName));
-                graph.getNodes().add(node);
             }
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("There was a problem loading the network: " + e.getMessage());
         }
+
+        for (String nodeName : nodeNames)
+        {
+            CytoscapeJsNode node = new CytoscapeJsNode();
+            node.setProperty(PropertyKey.ID, nodeName);
+            node.setProperty(PropertyKey.CITED, getTotalCocitations(nodeName));
+            node.setProperty(PropertyKey.ISVALID, !geneNameService.validate(nodeName).getMatches().isEmpty());
+            node.setProperty(PropertyKey.ISSEED, genes.contains(nodeName));
+            graph.getNodes().add(node);
+        }
+
         networkJson = jsonSerializer.deepSerialize(graph);
         return networkJson;
     }
@@ -181,6 +197,26 @@ public class PathwayCommonsGraphService {
             cnt += i;
         }
         return cnt;
+    }
+
+    public enum NETWORK_TYPE {
+        NEIGHBOORHOOD("neighborhood"),
+        PATHSBETWEEN("pathsbetween");
+
+        private final String name;
+
+        NETWORK_TYPE(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
 }

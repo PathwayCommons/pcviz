@@ -9,6 +9,8 @@ public enum PropertyKey
 	SOURCE,
 	TARGET,
 	CITED,
+    ISVALID,
+    ISSEED,
 	PUBMED;
 
 	@Override

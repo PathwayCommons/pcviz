@@ -34,6 +34,7 @@
     <bean class="org.pathwaycommons.pcviz.service.PathwayCommonsGraphService" id="graphService">
         <property name="cocitMan" ref="cocitationManager"/>
         <property name="pathwayCommonsUrl" value="${pathwaycommons.url}"/>
+        <property name="geneNameService" ref="geneNameService"/>
     </bean>
 
     <bean class="org.pathwaycommons.pcviz.service.BioGeneService" id="bioGeneService">

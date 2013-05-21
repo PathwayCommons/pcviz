@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 @Controller
 @RequestMapping("/graph")
 public class NetworkController
@@ -31,7 +34,15 @@ public class NetworkController
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json; charset=utf-8");
 
-        String networkJson = getPathwayCommonsGraphService().createNetwork(type, genes);
+        type = type.toLowerCase().trim();
+        PathwayCommonsGraphService.NETWORK_TYPE nType = PathwayCommonsGraphService.NETWORK_TYPE.NEIGHBOORHOOD;
+        if(type.equals("pathsbetween")) {
+            nType = PathwayCommonsGraphService.NETWORK_TYPE.PATHSBETWEEN;
+        } // TODO: Should we support commonstream and pathsfromto, too?
+
+        HashSet<String> geneSet = new HashSet<String>();
+        geneSet.addAll(Arrays.asList(genes.split(",")));
+        String networkJson = getPathwayCommonsGraphService().createNetwork(nType, geneSet);
 
 		return new ResponseEntity<String>(
 			networkJson,
