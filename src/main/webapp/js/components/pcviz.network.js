@@ -137,6 +137,7 @@ var NetworkView = Backbone.View.extend({
                         var cyOptions = {
                             elements: data,
                             style: self.cyStyle,
+                            showOverlay: false,
                             ready: function() {
                                 window.cy = this; // for debugging
 
