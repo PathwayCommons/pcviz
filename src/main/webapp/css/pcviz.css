@@ -81,7 +81,7 @@
 }
 
 .ui-cytoscape-panzoom {
-    z-index: 999;
+    z-index: 1000;
 }
 
 #fullscreen-network-view {
