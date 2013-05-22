@@ -1,3 +1,23 @@
+
+/* jquery.cytoscape-panzoom.css */
+
+/**
+ * This file is part of cytoscape.js 2.0.0.
+ * 
+ * Cytoscape.js is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ * 
+ * Cytoscape.js is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * cytoscape.js. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 .ui-cytoscape-panzoom {
 	position: absolute;
 	font-size: 12px;
@@ -146,6 +166,7 @@
 
 .ui-cytoscape-panzoom-slider-handle .icon {
 	margin: 0 4px;
+	line-height: 10px;
 }
 
 .ui-cytoscape-panzoom-no-zoom-tick {
