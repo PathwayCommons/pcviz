@@ -31,7 +31,10 @@ var HomeView = Backbone.View.extend({
                     'width' : '100%',
                     'height' : '100%',
                     'transitionIn' : 'none',
-                    'transitionOut' : 'none'
+                    'transitionOut' : 'none',
+                    'onClosed': function() {
+                        (new NetworkView({ el: "#main-network-view" })).render();
+                    }
                 }
             );
 

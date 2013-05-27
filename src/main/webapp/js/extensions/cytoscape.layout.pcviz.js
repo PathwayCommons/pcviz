@@ -10,7 +10,8 @@
         ready: undefined, // callback on layoutready
         stop: undefined, // callback on layoutstop
         height: undefined,
-        width: undefined
+        width: undefined,
+        fitPadding: 50
     };
 
     function PCVizLayout( options ){
@@ -142,7 +143,7 @@
         }
 
         if( params.fit ){
-            cy.reset();
+            cy.reset().fit();
         }
 
         cy.one("layoutready", params.ready);
