@@ -35,7 +35,13 @@ var HomeView = Backbone.View.extend({
                 }
             );
 
-            (new NetworkView({ el: $("#fullscreen-network-view") })).render();
+            (new NetworkView({
+                el: $("#fullscreen-network-view"),
+                windowSize: {
+                    height: 550,
+                    width: 600
+                }
+            })).render();
         });
 
         return this;

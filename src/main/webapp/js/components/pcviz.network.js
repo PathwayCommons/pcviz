@@ -134,10 +134,19 @@ var NetworkView = Backbone.View.extend({
                         container.html("");
                         container.show();
 
+                        var windowSize = self.options.windowSize;
+                        if(windowSize == undefined)
+                            windowSize = {};
+
                         var cyOptions = {
                             elements: data,
                             style: self.cyStyle,
                             showOverlay: false,
+                            layout: {
+                                name: 'pcviz',
+                                height: windowSize.height,
+                                width: windowSize.width
+                            },
                             ready: function() {
                                 window.cy = this; // for debugging
 
@@ -165,6 +174,13 @@ var NetworkView = Backbone.View.extend({
                                         $(self.detailsContent).hide();
                                         $(self.detailsInfo).show();
                                     }
+                                });
+
+                                // When a node is moved, saved its new location
+                                cy.on('free', 'node', function(evt) {
+                                    var node = this;
+                                    var position = node.position();
+                                    localStorage.setItem(node.id(), JSON.stringify(position));
                                 });
 
                                 // This is to get rid of overlapping nodes and panControl
