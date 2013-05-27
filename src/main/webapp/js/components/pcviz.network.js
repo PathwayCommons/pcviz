@@ -184,7 +184,7 @@ var NetworkView = Backbone.View.extend({
                                 });
 
                                 // This is to get rid of overlapping nodes and panControl
-                                cy.zoom(0.90).center()
+                                cy.zoom(0.90).center();
                             }
                         };
 
