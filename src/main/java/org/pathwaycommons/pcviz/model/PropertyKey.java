@@ -13,6 +13,7 @@ public enum PropertyKey
     ISSEED,
     ISDIRECTED,
     TYPE,
+    IMPORTANCE,
 	PUBMED;
 
 	@Override

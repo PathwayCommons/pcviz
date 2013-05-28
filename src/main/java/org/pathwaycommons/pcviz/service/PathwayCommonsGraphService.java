@@ -142,7 +142,8 @@ public class PathwayCommonsGraphService {
                 boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
                 node.setProperty(PropertyKey.ISVALID, isValid);
                 node.setProperty(PropertyKey.CITED, isValid ? getTotalCocitations(nodeName) : 0);
-                node.setProperty(PropertyKey.ISSEED, genes.contains(nodeName));
+                boolean isSeed = genes.contains(nodeName);
+                node.setProperty(PropertyKey.ISSEED, isSeed);
                 graph.getNodes().add(node);
             }
         }

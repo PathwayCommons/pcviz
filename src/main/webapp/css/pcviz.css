@@ -106,6 +106,60 @@ footer {
     background: #1abc9c !important;
 }
 
+.edge-types {
+    margin-top: -10px;
+    padding-left: 10px;
+    padding-bottom: 10px;
+}
+
+.edge-types-title {
+    margin-bottom: 5px;
+}
+
+.label {
+    text-shadow: none;
+}
+
+.transinhibit {
+    background-color: #E74C3C;
+}
+
+.state-change {
+    background-color: #2980B9;
+}
+
+.in-same-complex {
+    background-color:#34495E;
+}
+
+.transactivate {
+    background-color: #16A085;
+}
+
+.degrades {
+    background-color: #D35400;
+}
+
+.blocks-degradation {
+    background-color: #9B59B6;
+}
+
+.consecutive-catalysis {
+    background-color: #2ECC71;
+}
+
+.itx-removed {
+    background-color: #BDC3C7;
+}
+
+.edge-types .fui-cross-16 {
+    font-size: 8px;
+}
+
+.itx-type-on-off {
+    cursor: pointer;
+}
+
 /* jQuery fixes */
 .ui-state-hover,
 .ui-widget-content .ui-state-hover,

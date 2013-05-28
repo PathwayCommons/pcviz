@@ -206,6 +206,9 @@ var NetworkView = Backbone.View.extend({
 
                                 // This is to get rid of overlapping nodes and panControl
                                 cy.zoom(0.90).center();
+
+                                // Run the ranker on this graph
+                                PCVizRanker(cy);
                             }
                         };
 
@@ -216,7 +219,8 @@ var NetworkView = Backbone.View.extend({
                             model: {
                                 nodes: data.nodes.length,
                                 edges: data.edges.length,
-                                type: networkType.capitalize()
+                                type: networkType.capitalize(),
+                                timeout: 4000
                             }
                         })).render();
 

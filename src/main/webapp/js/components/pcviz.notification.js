@@ -2,7 +2,12 @@ var NotyView = Backbone.View.extend({
     render: function() {
         this.model["theme"] = "pcvizTheme";
         this.model["layout"] = "bottomRight";
-        this.model["timeout"] = 8000;
+
+        if(this.options.timeout != undefined)
+            this.model["timeout"] = this.options.timeout;
+        else
+            this.model["timeout"] = 8000;
+
         this.model["text"] = _.template($(this.options.template).html(), this.model);
 
         if(this.options.warning != undefined && this.options.warning)

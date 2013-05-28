@@ -134,53 +134,52 @@
 
                   </div>
                   <div class="tab-pane fade" id="graph-settings">
-                      <div class="share">
-                          <ul>
-                              <li>
-                                  <label class="share-label" for="share-toggle2">Detailed processes</label>
-                                  <div class="toggle">
-                                      <label class="toggle-radio" for="share-toggle2">ON</label>
-                                      <input type="radio" name="share-toggles" id="share-toggle2" value="toggle1">
-                                      <label class="toggle-radio" for="share-toggle1">OFF</label>
-                                      <input type="radio" name="share-toggles" id="share-toggle1" value="toggle2" checked="checked">
-                                  </div>
-                              </li>
-                          </ul>
+                      <div class="share mrl edge-types">
+                          <h4 class="demo-panel-title edge-types-title">Interaction types</h4>
+                          <table class="table table-condensed">
+                              <tr>
+                                  <td>
+                                      <span class="itx-type-on-off label transinhibit" data-itx-type="transinhibit">transinhibit <span class="fui-cross-16"></span></span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label state-change" data-itx-type="state-change">state change <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <span class="itx-type-on-off label transactivate" data-itx-type="transactivate">transactivate <span class="fui-cross-16"></span></span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label in-same-complex" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <span class="itx-type-on-off label degrades" data-itx-type="degrades">degrades <span class="fui-cross-16"></span></span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label blocks-degradation" data-itx-type="blocks-degradation">blocks degradation <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td colspan="2">
+                                      <span class="itx-type-on-off label consecutive-catalysis" data-itx-type="consecutive-catalysis">consecutive catalysis <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                          </table>
                       </div>
 
                       <h4 class="demo-panel-title">Number of nodes</h4>
-                      <div id="slider-nodes" class="ui-slider">
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                      </div>
-
-                      <h4 class="demo-panel-title">Weight of genes of interest</h4>
-                      <div id="slider-weight" class="ui-slider">
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                      </div>
-
-                      <h4 class="demo-panel-title">Weight of co-citation</h4>
-                      <div id="slider-cite" class="ui-slider">
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                      </div>
-
-                      <h4 class="demo-panel-title">Weight of cancer alterations</h4>
-                      <div id="slider-cancer" class="ui-slider">
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                          <div class="ui-slider-segment"></div>
-                      </div>
+                      <div id="slider-nodes" class="ui-slider" data-default-value="3"></div>
 
                       <h4 class="demo-panel-title">Graph query type</h4>
                       <select value="0" class="span3" tabindex="1" id="query-type" name="herolist">
                           <option selected="selected" value="neighborhood">Neighborhood</option>
                           <option value="pathsbetween">Paths-between</option>
                       </select>
+
+
+
                   </div>
                   <div class="tab-pane fade" id="graph-help">
                       <div class="todo mrm">
@@ -374,6 +373,15 @@
       We couldn't find any genes symbols to query for a network. Please provide a gene symbol.
   </script>
 
+  <script type="text/template" id="noty-edges-shown-template">
+      {{numOfEdges}} interactions of type <b class="{{type}}">{{type}}</b> are added back to the network.
+  </script>
+
+  <script type="text/template" id="noty-edges-hidden-template">
+      {{numOfEdges}} interactions of type <b class="{{type}}">{{type}}</b> are now hidden.
+  </script>
+
+
   <!-- Fullscreen Cytoscape.js template -->
   <script type="text/template" id="fullscreen-network-tmpl">
       <div id="fullscreen-network-view">
@@ -406,7 +414,6 @@
 
   <!--[if lt IE 8]>
   <script src="js/icon-font-ie7.js"></script>
-  <script src="js/icon-font-ie7-24.js"></script>
   <![endif]-->
 
   <!-- PCViz and its components -->
@@ -415,6 +422,7 @@
   <script src="js/components/pcviz.home.js"></script>
   <script src="js/components/pcviz.validation.js"></script>
   <script src="js/components/pcviz.settings.js"></script>
+  <script src="js/components/pcviz.ranker.js"></script>
   <script src="js/components/pcviz.network.js"></script>
   <script src="js/components/pcviz.biogene.js"></script>
   <script src="js/components/pcviz.edgeinfo.js"></script>
