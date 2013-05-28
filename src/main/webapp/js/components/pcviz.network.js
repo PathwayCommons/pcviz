@@ -27,7 +27,7 @@ var NetworkView = Backbone.View.extend({
         })
         .selector("edge")
         .css({
-            "width": "mapData(cited, 20, 100, 0.4, 0.5)",
+            "width": "mapData(cited, 10, 100, 0.4, 0.5)",
             "line-color": "#444"
         })
 	    .selector("[?isdirected]")
@@ -101,6 +101,23 @@ var NetworkView = Backbone.View.extend({
 
 	    // get gene names from the input field
         var names = $(self.tagsInputField).val().toUpperCase();
+
+        if(names.length < 1) {
+            networkLoading.hide();
+            container.html("");
+            container.show();
+            container.cy({
+                showOverlay: false
+            });
+
+            (new NotyView({
+                template: "#noty-empty-network-template",
+                error: true,
+                model: {}
+            })).render();
+
+            return this;
+        }
 
         // This will run the validation on the side track
         var geneValidations = new GeneValidations({ genes: names });
