@@ -13,6 +13,7 @@
     AppRouter = Backbone.Router.extend({
         routes: {
             ":type/:terms": "gene",
+            ":type/": "emptyGene",
             "*actions": "home"
         },
 
@@ -26,6 +27,10 @@
             (new HomeView({ model: { terms: terms }})).render();
             (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
+        },
+
+        emptyGene: function(type) {
+            this.gene(type, "");
         }
     });
 
