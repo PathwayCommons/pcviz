@@ -133,20 +133,23 @@ public class PathwayCommonsGraphService {
         catch (Exception e)
         {
             log.error("There was a problem loading the network: " + e.getMessage());
-        }
-
-        for (String nodeName : nodeNames)
-        {
-            CytoscapeJsNode node = new CytoscapeJsNode();
-            node.setProperty(PropertyKey.ID, nodeName);
-            node.setProperty(PropertyKey.CITED, getTotalCocitations(nodeName));
-            node.setProperty(PropertyKey.ISVALID, !geneNameService.validate(nodeName).getMatches().isEmpty());
-            node.setProperty(PropertyKey.ISSEED, genes.contains(nodeName));
-            graph.getNodes().add(node);
+            e.printStackTrace();
+        } finally {
+            for (String nodeName : nodeNames)
+            {
+                CytoscapeJsNode node = new CytoscapeJsNode();
+                node.setProperty(PropertyKey.ID, nodeName);
+                boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
+                node.setProperty(PropertyKey.ISVALID, isValid);
+                node.setProperty(PropertyKey.CITED, isValid ? getTotalCocitations(nodeName) : 0);
+                node.setProperty(PropertyKey.ISSEED, genes.contains(nodeName));
+                graph.getNodes().add(node);
+            }
         }
 
         networkJson = jsonSerializer.deepSerialize(graph);
         return networkJson;
+
     }
 
     /**

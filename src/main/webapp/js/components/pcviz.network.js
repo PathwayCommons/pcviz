@@ -34,6 +34,10 @@ var NetworkView = Backbone.View.extend({
 	    .css({
 	        "target-arrow-shape": "triangle"
 	    })
+        .selector("[!isvalid]")
+        .css({
+            "color": "#e74c3c"
+        })
         .selector("edge[type='transinhibit']")
         .css({
             "line-color": "#E74C3C" // alizarin
