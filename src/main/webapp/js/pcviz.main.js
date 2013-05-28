@@ -18,7 +18,7 @@
         },
 
         home: function(actions) {
-            (new HomeView({ model: { terms: "BRCA2" }})).render();
+            (new HomeView({ model: { terms: "MDM2" }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         },
