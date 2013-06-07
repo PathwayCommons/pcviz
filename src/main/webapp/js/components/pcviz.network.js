@@ -208,7 +208,7 @@ var NetworkView = Backbone.View.extend({
                                 cy.zoom(0.90).center();
 
                                 // Run the ranker on this graph
-                                PCVizRanker(cy);
+                                cy.rankNodes();
                             }
                         };
 
