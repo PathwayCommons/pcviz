@@ -169,7 +169,7 @@
                           </table>
                       </div>
 
-                      <h4 class="demo-panel-title">Number of genes</h4>
+                      <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</pan></small></h4>
                       <div id="slider-nodes" class="ui-slider" data-default-value="3"></div>
 
                       <h4 class="demo-panel-title">Graph query type</h4>
@@ -327,6 +327,10 @@
 
   <script type="text/template" id="loading-small-template">
       <img src="images/loading.gif" alt="loading..." height="17" width="50">
+  </script>
+
+  <script type="text/template" id="loading-text-template">
+      <span class="loading">loading...</span>
   </script>
 
   <script type="text/template" id="loading-large-template">

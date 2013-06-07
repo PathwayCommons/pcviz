@@ -2,6 +2,7 @@ var SettingsView = Backbone.View.extend({
     render: function() {
         $(".ui-slider").each(function() {
             var sliderVal = $(this).data("default-value");
+            var selfSlider = $(this);
 
             // TODO: Get all these dynamic range values from the Ranker itself
             $(this).slider({
@@ -11,13 +12,19 @@ var SettingsView = Backbone.View.extend({
                 orientation: "horizontal",
                 range: "min",
                 change: function(event, ui) {
+                    selfSlider.slider("disable");
+                    (new FilteringNodesView()).render();
+
                     var val = 4 - ui.value;
 
                     // First stop all animations and clear the queue
                     cy.$("node").stop(true, true);
 
+                    var allNodesLength = cy.nodes().length;
+
                     // Then hide the low importance ones
                     var eles = cy.$("node[importance<=" + val + "][!isseed]");
+                    var visibleNodesLength = allNodesLength - eles.length;
                     eles.animate(
                         {
                             css: {
@@ -27,6 +34,7 @@ var SettingsView = Backbone.View.extend({
                             duration: 700,
                             complete: function() {
                                 eles.hide();
+                                selfSlider.slider("enable");
                             }
                         }
                     );
@@ -40,7 +48,11 @@ var SettingsView = Backbone.View.extend({
                                 'opacity': 1.0
                             }
                         }, {
-                            duration: 700
+                            duration: 700,
+                            complete: function() {
+                                selfSlider.slider("enable");
+                                (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
+                            }
                         }
                     );
                 }
@@ -126,6 +138,23 @@ var BlinkDetailsTabView = Backbone.View.extend({
             detailsMenuItem.fadeTo('slow', 0.2).fadeTo('slow', 1.0);
         }
 
+        return this;
+    }
+});
+
+var NumberOfNodesView = Backbone.View.extend({
+    el: "#number-of-genes-info",
+    render: function() {
+        this.$el.html(this.model.numberOfNodes);
+        return this;
+    }
+});
+
+var FilteringNodesView = Backbone.View.extend({
+    el: "#number-of-genes-info",
+    template: _.template($("#loading-text-template").html()),
+    render: function() {
+        this.$el.html(this.template({}));
         return this;
     }
 });

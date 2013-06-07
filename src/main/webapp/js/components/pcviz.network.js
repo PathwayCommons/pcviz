@@ -209,6 +209,8 @@ var NetworkView = Backbone.View.extend({
 
                                 // Run the ranker on this graph
                                 cy.rankNodes();
+
+                                (new NumberOfNodesView({ model: { numberOfNodes: cy.nodes().length }})).render();
                             }
                         };
 
@@ -223,6 +225,8 @@ var NetworkView = Backbone.View.extend({
                                 timeout: 4000
                             }
                         })).render();
+
+
 
                     });
             }
