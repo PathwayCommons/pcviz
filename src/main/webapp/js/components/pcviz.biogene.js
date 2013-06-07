@@ -23,6 +23,10 @@ var BioGeneView = Backbone.View.extend({
 
         // format after loading
         this.format(this.model);
+
+        (new BlinkDetailsTabView()).render();
+
+        return this;
     },
     format: function()
     {

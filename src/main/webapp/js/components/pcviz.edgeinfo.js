@@ -13,6 +13,8 @@ var EdgeInfoView = Backbone.View.extend({
             })).render();
         });
 
+        (new BlinkDetailsTabView()).render();
+
         return this;
     }
 });

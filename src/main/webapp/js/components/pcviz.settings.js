@@ -115,3 +115,17 @@ var SettingsView = Backbone.View.extend({
         return this;
     }
 });
+
+var BlinkDetailsTabView = Backbone.View.extend({
+    el: "#menu-graph-details",
+
+    render: function() {
+        // If the user is on a different tab, blink this one
+        var detailsMenuItem = this.$el;
+        if(!detailsMenuItem.hasClass("active")) {
+            detailsMenuItem.fadeTo('slow', 0.2).fadeTo('slow', 1.0);
+        }
+
+        return this;
+    }
+});
