@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                        http://www.springframework.org/schema/cache
+                        http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+    <context:property-placeholder location="classpath*:spring/pcviz.properties" />
+    <cache:annotation-driven cache-manager="cacheManager"/>
+
+    <bean class="org.pathwaycommons.pcviz.cocitation.IHOPSpider" id="iHopSpider">
+        <constructor-arg name="iHopURL" value="${ihop.url}"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.cocitation.CocitationManager" id="cocitationManager">
+        <constructor-arg name="cacheLife" value="${cocitation.shelflife}"/>
+        <constructor-arg name="resourceDir" value="${cocitation.cache.folder}"/>
+        <property name="ihopSpider" ref="iHopSpider"/>
+    </bean>
+
+    <bean class="java.lang.String" id="bioGeneUrl">
+        <constructor-arg index="0" value="${biogene.url}"/>
+    </bean>
+
+    <bean class="java.lang.String" id="bioGeneFormat">
+        <constructor-arg index="0" value="${biogene.format}"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.service.PathwayCommonsGraphService" id="graphService">
+        <property name="cocitMan" ref="cocitationManager"/>
+        <property name="pathwayCommonsUrl" value="${pathwaycommons.url}"/>
+        <property name="geneNameService" ref="geneNameService"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.service.BioGeneService" id="bioGeneService">
+        <property name="bioGeneFormat" value="${biogene.format}"/>
+        <property name="bioGeneUrl" value="${biogene.url}"/>
+    </bean>
+
+    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="/WEB-INF/ehcache.xml"/>
+        <property name="shared" value="true"/>
+    </bean>
+
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="ehcache"/>
+    </bean>
+
+    <bean class="org.pathwaycommons.pcviz.service.GeneNameService" id="geneNameService">
+        <property name="geneResource" value="${hgnc.location}"/>
+        <property name="autoCompleteLimit" value="${autoCompleteResult.limit}"/>
+    </bean>
+
+</beans>
