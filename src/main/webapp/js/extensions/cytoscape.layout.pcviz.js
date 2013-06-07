@@ -94,7 +94,6 @@
                     large(lg - 1);
                 }
             } else {
-
                 // if rounding was too low, add rows or columns
                 while( cols * rows < cells ){
                     var sm = small();
@@ -121,9 +120,12 @@
                 }
 
                 var eId = element.id();
-                var savedLocation = localStorage.getItem(eId);
-                if(savedLocation != null) {
-                    return JSON.parse(savedLocation);
+                if(store.enabled) {
+                    var savedLocation = store.get(eId);
+                    if(savedLocation != null) {
+                        return savedLocation;
+                    }
+
                 }
 
                 var x = col * cellWidth + cellWidth/2;
@@ -136,9 +138,10 @@
                 }
 
                 var positions = { x: x, y: y };
-                localStorage.setItem(eId, JSON.stringify(positions));
+                if(store.enabled) {
+                    store.set(eId, positions);
+                }
                 return positions;
-
             });
         }
 
