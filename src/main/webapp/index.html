@@ -169,7 +169,7 @@
                           </table>
                       </div>
 
-                      <h4 class="demo-panel-title">Number of nodes</h4>
+                      <h4 class="demo-panel-title">Number of genes</h4>
                       <div id="slider-nodes" class="ui-slider" data-default-value="3"></div>
 
                       <h4 class="demo-panel-title">Graph query type</h4>
@@ -374,11 +374,11 @@
   </script>
 
   <script type="text/template" id="noty-edges-shown-template">
-      {{numOfEdges}} interactions of type <b class="{{type}}">{{type}}</b> are added back to the network.
+      <b>{{numOfEdges}}</b> interactions of type <b class="noty-itx-type {{type}}">{{type}}</b> are added back to the network.
   </script>
 
   <script type="text/template" id="noty-edges-hidden-template">
-      {{numOfEdges}} interactions of type <b class="{{type}}">{{type}}</b> are now hidden.
+      <b>{{numOfEdges}}</b> interactions of type <b class="noty-itx-type {{type}}">{{type}}</b> are now hidden.
   </script>
 
 

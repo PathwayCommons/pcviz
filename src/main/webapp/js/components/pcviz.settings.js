@@ -14,7 +14,7 @@ var SettingsView = Backbone.View.extend({
                     var val = 4 - ui.value;
 
                     // First stop all animations and clear the queue
-                    cy.$("node").stop().clearQueue();
+                    cy.$("node").stop(true, true);
 
                     // Then hide the low importance ones
                     var eles = cy.$("node[importance<=" + val + "][!isseed]");
@@ -71,11 +71,15 @@ var SettingsView = Backbone.View.extend({
                 edges.animate({
                     css: { 'opacity' : .0 }
                 }, {
-                    duration: 500,
+                    duration: 250,
                     complete: function() {
                         edges.hide();
                     }
                 });
+
+                $(this).find("span")
+                    .removeClass("fui-cross-16")
+                    .addClass("fui-plus-16");
 
                 (new NotyView({
                     template: "#noty-edges-hidden-template",
@@ -89,8 +93,12 @@ var SettingsView = Backbone.View.extend({
                 edges.show().animate({
                     css: { 'opacity' : 1.0 }
                 }, {
-                    duration: 500
+                    duration: 250
                 });
+
+                $(this).find("span")
+                    .removeClass("fui-plus-16")
+                    .addClass("fui-cross-16");
 
                 (new NotyView({
                     template: "#noty-edges-shown-template",

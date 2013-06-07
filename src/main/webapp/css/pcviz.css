@@ -120,6 +120,14 @@ footer {
     text-shadow: none;
 }
 
+.itx-type-on-off {
+    color: #ffffff;
+    padding: 8px;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    font-weight: normal;
+}
+
 .transinhibit {
     background-color: #E74C3C;
 }
@@ -156,8 +164,17 @@ footer {
     font-size: 8px;
 }
 
+.edge-types .fui-plus-16 {
+    font-size: 8px;
+}
+
 .itx-type-on-off {
     cursor: pointer;
+}
+
+.noty-itx-type {
+    padding: 3px;
+    color: #ffffff;
 }
 
 /* jQuery fixes */
