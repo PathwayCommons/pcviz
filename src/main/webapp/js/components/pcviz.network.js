@@ -27,7 +27,7 @@ var NetworkView = Backbone.View.extend({
         })
         .selector("edge")
         .css({
-            "width": "mapData(cited, 10, 100, 0.4, 0.5)",
+            "width": "mapData(cited, 5, 50, 0.4, 0.5)",
             "line-color": "#444"
         })
 	    .selector("[?isdirected]")
