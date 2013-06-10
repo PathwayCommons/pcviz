@@ -70,6 +70,7 @@
     margin-top: 50px;
     margin-bottom: 0px;
     text-transform: none;
+    font-size: 115%;
 }
 
 .expand-view {
@@ -192,4 +193,14 @@ footer {
 
 .ui-widget-header {
     background: #16A085;
+}
+
+.badge, .label {
+    text-shadow: none;
+    line-height: normal;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    padding: 8px;
+    font-weight: normal;
 }
