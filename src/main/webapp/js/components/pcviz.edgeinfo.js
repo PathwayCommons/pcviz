@@ -15,6 +15,10 @@ var EdgeInfoView = Backbone.View.extend({
 
         (new BlinkDetailsTabView()).render();
 
+        $(".type-filter-help").tooltip({
+            placement: 'right'
+        });
+
         return this;
     }
 });
