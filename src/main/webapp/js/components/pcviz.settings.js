@@ -22,10 +22,13 @@ var SettingsView = Backbone.View.extend({
 
                     var allNodesLength = cy.nodes().length;
 
+                    var processedNodes = 0;
+
                     // Then hide the low importance ones
                     var eles = cy.$("node[importance<=" + val + "][!isseed]");
                     var visibleNodesLength = allNodesLength - eles.length;
-                    eles.animate(
+                    eles
+                        .animate(
                         {
                             css: {
                                 'opacity': .0
@@ -33,16 +36,20 @@ var SettingsView = Backbone.View.extend({
                         }, {
                             duration: 700,
                             complete: function() {
-                                eles.hide();
-                                selfSlider.slider("enable");
+                                this.hide();
+                                if(++processedNodes == allNodesLength) {
+                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
+                                    selfSlider.slider("enable");
+                                }
                             }
                         }
                     );
 
                     // Finally show high importance ones
                     var eles2 = cy.$("node[importance>" + val + "]");
-                    eles2.show();
-                    eles2.animate(
+                    eles2
+                        .show()
+                        .animate(
                         {
                             css: {
                                 'opacity': 1.0
@@ -50,8 +57,10 @@ var SettingsView = Backbone.View.extend({
                         }, {
                             duration: 700,
                             complete: function() {
-                                selfSlider.slider("enable");
-                                (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
+                                if(++processedNodes == allNodesLength) {
+                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
+                                    selfSlider.slider("enable");
+                                }
                             }
                         }
                     );
@@ -85,7 +94,7 @@ var SettingsView = Backbone.View.extend({
                 }, {
                     duration: 250,
                     complete: function() {
-                        edges.hide();
+                        this.hide();
                     }
                 });
 
@@ -102,11 +111,13 @@ var SettingsView = Backbone.View.extend({
                 })).render();
 
             } else {
-                edges.show().animate({
-                    css: { 'opacity' : 1.0 }
-                }, {
-                    duration: 250
-                });
+                edges
+                    .show()
+                    .animate({
+                        css: { 'opacity' : 1.0 }
+                    }, {
+                        duration: 250
+                    });
 
                 $(this).find("span")
                     .removeClass("fui-plus-16")
