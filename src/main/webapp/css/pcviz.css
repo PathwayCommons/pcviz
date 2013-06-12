@@ -204,3 +204,8 @@ footer {
     padding: 8px;
     font-weight: normal;
 }
+
+.add-gene-to-network {
+    font-size: 11px;
+    padding: 3px;
+}

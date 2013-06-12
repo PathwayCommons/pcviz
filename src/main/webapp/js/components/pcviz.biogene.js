@@ -26,6 +26,18 @@ var BioGeneView = Backbone.View.extend({
 
         (new BlinkDetailsTabView()).render();
 
+        if(!this.model.isseed) {
+            $(".add-gene-to-network")
+                .click(function(event) {
+                    $("#tagsinput").addTag($(this).data("gene"));
+                })
+                .tooltip({
+                    placement: 'right'
+                });
+        } else {
+            $(".add-gene-to-network").hide();
+        }
+
         return this;
     },
     format: function()

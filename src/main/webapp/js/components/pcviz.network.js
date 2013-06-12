@@ -268,9 +268,12 @@ var NetworkView = Backbone.View.extend({
 				if (queryResult.count > 0)
 				{
 					// generate the view by using backbone
-					var biogeneView = new BioGeneView({
+                    var geneInfo = queryResult.geneInfo[0];
+                    geneInfo["isseed"] = node.data("isseed");
+
+                    var biogeneView = new BioGeneView({
                         el: self.detailsContent,
-                        model: queryResult.geneInfo[0]
+                        model: geneInfo
                     });
                     biogeneView.render();
 				}
