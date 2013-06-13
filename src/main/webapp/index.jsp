@@ -111,12 +111,29 @@
               </div>
               <div id="network-container">
                   <div id="main-network-view"></div>
-                  <div class="pull-right">
-                      <a href="#" id="full-screen-link" class="expand-view">
-                          expand network view <i class="icon-fullscreen"></i>
-                      </a>
+                  <div class="row" id="control-panels">
+                      <div class="span6 offset2">
+                          <div class="btn-toolbar">
+                              <div class="btn-group network-controls">
+                                  <a class="btn" id="download-network" href="#"><i class="icon-download-alt"></i> Download</a>
+                                  <a class="btn" id="refresh-view" href="#"><i class="icon-refresh"></i> Refresh</a>
+                                  <a class="btn" id="full-screen-link" href="#"><i class="icon-resize-full"></i> Full screen</a>
+                              </div>
+                          </div> <!-- /toolbar -->
+                      </div>
                   </div>
 
+                  <div class="row hide" id="extra-download-options">
+                      <div class="span6 offset2">
+                          <div class="share download-options">
+                              <div class="network-controls">
+                                  <a class="btn" id="download-png" href="#">Image (PNG)</a>
+                                  <a class="btn" id="download-sif" href="#">Network (SIF)</a>
+                                  <a class="btn" id="download-biopax" href="#">Network (BioPAX)</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
           </div>
           <div class="span4"> <!-- slider bars and everything -->
@@ -386,6 +403,9 @@
       <b>{{numOfEdges}}</b> interactions of type <b class="noty-itx-type {{type}}">{{type}}</b> are now hidden.
   </script>
 
+  <script type="text/template" id="noty-network-refresh-template">
+      Success! Gene location history is all cleared now.
+  </script>
 
   <!-- Fullscreen Cytoscape.js template -->
   <script type="text/template" id="fullscreen-network-tmpl">
