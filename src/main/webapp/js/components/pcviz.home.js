@@ -47,6 +47,39 @@ var HomeView = Backbone.View.extend({
             })).render();
         });
 
+        $("#refresh-view").click(function(e) {
+            e.preventDefault();
+            store.clear();
+            (new NotyView({
+                template: "#noty-network-refresh-template",
+                model: {}
+            })).render();
+
+            (new NetworkView({ el: "#main-network-view" })).render();
+        });
+
+        $("#download-network").click(function(e) {
+            e.preventDefault();
+            $("#download-network").toggleClass("active");
+            $("#extra-download-options").toggle("slideDown");
+        });
+
+        $("#download-png").click(function(e) {
+            e.preventDefault();
+            $("#download-network").trigger('click');
+
+            var pngContent = cy.png();
+
+            _.each($("#main-network-view canvas"), function(canvas) {
+                if($(canvas).data("id").indexOf("buffer") == 0) {
+                    $(canvas).remove();
+                }
+            });
+
+            window.open(pngContent, "_blank");
+        });
+
+
         return this;
     }
 });

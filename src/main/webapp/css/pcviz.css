@@ -209,3 +209,24 @@ footer {
     font-size: 11px;
     padding: 3px;
 }
+
+.network-controls .btn {
+    background: #bdc3c7;
+    font-size: 16px;
+}
+
+.network-controls .btn:hover {
+    background: #16A085;
+}
+
+.center {
+    text-align: center;
+}
+
+.download-options {
+    padding: 30px
+}
+
+.network-controls .active {
+    background: #16A085;
+}

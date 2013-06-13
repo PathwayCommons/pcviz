@@ -7,6 +7,7 @@ var NetworkView = Backbone.View.extend({
 	detailsInfo: "#graph-details-info",
 	// content id for the gene input field
 	tagsInputField: "input[name='tagsinput']",
+    controlButtonsContainer: "#control-panels",
 	// cytoscape web visual style object
 	cyStyle: cytoscape.stylesheet()
 	    .selector("node")
@@ -99,9 +100,11 @@ var NetworkView = Backbone.View.extend({
 
 	    var container = $(self.el);
 	    var networkLoading = $(self.networkLoading);
+        var controlsContainer = $(self.controlButtonsContainer);
 
 	    networkLoading.slideDown();
         container.hide();
+        controlsContainer.hide();
 
 	    // get gene names from the input field
         var names = $(self.tagsInputField).val().toUpperCase();
@@ -154,6 +157,7 @@ var NetworkView = Backbone.View.extend({
                         networkLoading.hide();
                         container.html("");
                         container.show();
+                        controlsContainer.show();
 
                         var windowSize = self.options.windowSize;
                         if(windowSize == undefined)
