@@ -175,6 +175,9 @@ var NetworkView = Backbone.View.extend({
                             ready: function() {
                                 window.cy = this; // for debugging
 
+                                // We don't need this, so better disable
+                                cy.boxSelectionEnabled(false);
+
                                 // add pan zoom control panel
                                 container.cytoscapePanzoom();
 

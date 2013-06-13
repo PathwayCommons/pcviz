@@ -100,6 +100,10 @@ var HomeView = Backbone.View.extend({
             window.open(url, "_blank");
         });
 
+        $("#pcviz-headline").click(function(e) {
+            window.location.hash = "";
+        });
+
         return this;
     }
 });
