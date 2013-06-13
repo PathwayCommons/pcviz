@@ -9,7 +9,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
     <meta charset="utf-8">
-    <title>Pathway Commmons Network Visualizer</title>
+    <title>PCViz: Pathway Commmons Network Visualizer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- jQuery UI -->
@@ -40,7 +40,7 @@
   <body>
   <div class="palette-silver">
     <div class="container">
-      <div class="pcviz-headline">
+      <div id="pcviz-headline" class="pcviz-headline">
         <h1 class="pcviz-logo">
           PCViz
           <small>Pathway Commons Network Visualizer</small>
@@ -310,6 +310,15 @@
                       {{pubmed.length}} publication(s)
                       <ul class="pubmed-list">
                       </ul>
+                  </td>
+              </tr>
+              <tr>
+                  <td colspan="2">
+                      <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="<%=pcURL%>/graph?source={{source}}&target={{target}}&kind=PATHSFROMTO&format=BIOPAX">
+                          <i class="icon-download-alt"></i>
+                          Download detailed process (BioPAX)
+                      </a>
+
                   </td>
               </tr>
           </table>

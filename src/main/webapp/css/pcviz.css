@@ -130,31 +130,31 @@ footer {
 }
 
 .transinhibit {
-    background-color: #E74C3C;
+    background-color: #E74C3C !important;
 }
 
 .state-change {
-    background-color: #2980B9;
+    background-color: #2980B9 !important;
 }
 
 .in-same-complex {
-    background-color:#34495E;
+    background-color: #34495E !important;
 }
 
 .transactivate {
-    background-color: #16A085;
+    background-color: #16A085 !important;
 }
 
 .degrades {
-    background-color: #D35400;
+    background-color: #D35400 !important;
 }
 
 .blocks-degradation {
-    background-color: #9B59B6;
+    background-color: #9B59B6 !important;
 }
 
 .consecutive-catalysis {
-    background-color: #2ECC71;
+    background-color: #2ECC71 !important;
 }
 
 .itx-removed {
@@ -229,4 +229,13 @@ footer {
 
 .network-controls .active {
     background: #16A085;
+}
+
+.download-detailed {
+    font-size: 15px;
+    padding: 12px;
+}
+
+.pcviz-headline {
+    cursor: pointer;
 }
