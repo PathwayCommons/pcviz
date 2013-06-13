@@ -18,13 +18,14 @@
         },
 
         home: function(actions) {
-            (new HomeView({ model: { terms: "MDM2" }})).render();
+            var networkType = "neighborhood";
+            (new HomeView({ model: { terms: "MDM2", networkType: networkType }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         },
 
         gene: function(type, terms) {
-            (new HomeView({ model: { terms: terms }})).render();
+            (new HomeView({ model: { terms: terms, networkType: type }})).render();
             (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         },

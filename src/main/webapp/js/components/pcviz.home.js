@@ -5,6 +5,7 @@ var HomeView = Backbone.View.extend({
     render: function() {
         var terms = this.model.terms.replace("<", "").replace(">", "").toUpperCase();
         this.model.terms = terms;
+        var kind = this.model.networkType;
 
         $(this.el).html("");
         $(this.el).html(this.template(this.model));
@@ -79,6 +80,25 @@ var HomeView = Backbone.View.extend({
             window.open(pngContent, "_blank");
         });
 
+        $("#download-sif").click(function(e) {
+            e.preventDefault();
+            $("#download-network").trigger('click');
+
+            var url = $(this).data("pcurl") + "/graph?source=" + terms
+                + "&kind=" + kind
+                + "&format=BINARY_SIF";
+            window.open(url, "_blank");
+        });
+
+        $("#download-biopax").click(function(e) {
+            e.preventDefault();
+            $("#download-network").trigger('click');
+
+            var url = $(this).data("pcurl") + "/graph?source=" + terms
+                + "&kind=" + kind
+                + "&format=BIOPAX";
+            window.open(url, "_blank");
+        });
 
         return this;
     }

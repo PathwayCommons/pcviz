@@ -1,3 +1,10 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@page import="org.springframework.web.context.WebApplicationContext"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%
+    WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
+    String pcURL = (String) context.getBean("pathwayCommonsURLStr");
+%>
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -128,8 +135,8 @@
                           <div class="share download-options">
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
-                                  <a class="btn" id="download-sif" href="#">Network (SIF)</a>
-                                  <a class="btn" id="download-biopax" href="#">Network (BioPAX)</a>
+                                  <a class="btn" id="download-sif" data-pcurl="<%=pcURL%>" href="#">Network (SIF)</a>
+                                  <a class="btn" id="download-biopax" data-pcurl="<%=pcURL%>" href="#">Network (BioPAX)</a>
                               </div>
                           </div>
                       </div>
