@@ -194,7 +194,7 @@
                           </table>
                       </div>
 
-                      <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</pan></small></h4>
+                      <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</small></h4>
                       <div id="slider-nodes" class="ui-slider" data-default-value="3"></div>
 
                       <h4 class="demo-panel-title">Graph query type</h4>
@@ -221,7 +221,7 @@
                               </a>
                           </div>
                       </div>
-                      <div id="cancer-context-dialog"></div>
+                      <div id="cancer-context-dialog" class="mdm tile hide"></div>
                   </div>
               </div>
           </div>
@@ -431,7 +431,7 @@
 
   <script type="text/template" id="cancer-context-dialog-tmpl">
       <div class="context-dialog" id="step1">
-          <h4>1) Cancer study</h4>
+          <h4>1) Add new context</h4>
           <select id="cancer-studies-box">
               <option value="none">Select a cancer study</option>
           </select>
@@ -487,6 +487,7 @@
   <script src="js/noty/layouts/bottomRight.js"></script>
   <script src="js/noty/themes/noty.pcviz.theme.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/jquery.scrollTo-1.4.3.1-min.js"></script>
 
   <!--[if lt IE 8]>
   <script src="js/icon-font-ie7.js"></script>
