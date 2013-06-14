@@ -9,6 +9,7 @@ import org.cbio.causality.model.AlterationPack;
 import org.pathwaycommons.pcviz.model.CancerStudyDetails;
 import org.pathwaycommons.pcviz.model.PropertyKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,10 +48,12 @@ public class CancerContextService {
         this.cBioPortalAccessor = cBioPortalAccessor;
     }
 
+    @Cacheable("cancerContextStudiesCache")
     public List<CancerStudy> listAvailableCancers() throws IOException {
         return getcBioPortalAccessor().getCancerStudies();
     }
 
+    @Cacheable("cancerContextDetailsCache")
     public CancerStudyDetails getStudyDetails(String study) throws IOException {
         CancerStudyDetails cancerStudyDetails = new CancerStudyDetails();
 
@@ -87,6 +90,7 @@ public class CancerContextService {
                 || profile.getId().toLowerCase().endsWith("_cna");
     }
 
+    @Cacheable("cancerContextAlterationsCache")
     public HashMap<String, HashMap<String, Double>> loadContext(String studyId, String profiles, String genes) throws IOException {
         HashMap<String, HashMap<String, Double>> context = new HashMap<String, HashMap<String, Double>>();
 
