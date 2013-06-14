@@ -239,3 +239,27 @@ footer {
 .pcviz-headline {
     cursor: pointer;
 }
+
+
+#step1 .dk_options {
+    width: auto;
+    max-height: none;
+}
+
+#step1 .dk_label {
+    padding-right: 15px;
+}
+
+#step1 .dk_options_inner {
+    width: auto;
+    max-height: none;
+}
+
+#step1 .dk_toggle {
+    width: 200px;
+}
+
+#context-load-button {
+    width: 90%;
+    padding: 15px;
+}

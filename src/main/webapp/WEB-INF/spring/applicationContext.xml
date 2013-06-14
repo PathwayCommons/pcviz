@@ -60,4 +60,9 @@
         <constructor-arg index="0" value="${pathwaycommons.url}"/>
     </bean>
 
+    <bean class="org.pathwaycommons.pcviz.service.CancerContextService" id="cancerContextService">
+        <property name="cBioPortalAccessor" ref="cBioPortalAccessor"/>
+    </bean>
+
+    <bean class="org.cbio.causality.data.portal.CBioPortalAccessor" id="cBioPortalAccessor"/>
 </beans>

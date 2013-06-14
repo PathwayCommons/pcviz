@@ -1,4 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@page import="org.springframework.web.context.WebApplicationContext"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%
@@ -209,32 +210,18 @@
                       <div class="todo mrm">
                           <div class="tile">
                               <h3 class="tile-title">Cancer type of interest</h3>
-                              <ul>
-                                  <li>
-                                      <div class="todo-icon fui-man-24"></div>
-                                      <div class="todo-content">
-                                          <h4 class="todo-name">
-                                              Glioblastoma
-                                          </h4>
-                                          The Cancer Genome Atlas, Nature 2008
-                                      </div>
-                                  </li>
+                              <ul id="cancer-context-list">
 
-                                  <li class="todo-done">
-                                      <div class="todo-icon fui-man-24"></div>
-                                      <div class="todo-content">
-                                          <h4 class="todo-name">
-                                              Ovarian Cancer
-                                          </h4>
-                                          The Cancer Genome Atlas, Nature 2011
-                                      </div>
-                                  </li>
+                                  <!-- Cancer Studies -->
                               </ul>
                               <br>
                               <br>
-                              <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
+                              <a class="btn btn-primary btn-large btn-block" href="#" id="add-cancer-study">
+                                  <span class="fui-plus-24"></span> Add
+                              </a>
                           </div>
                       </div>
+                      <div id="cancer-context-dialog"></div>
                   </div>
               </div>
           </div>
@@ -430,6 +417,52 @@
       </div>
   </script>
 
+  <script type="text/template" id="cancer-study-added-tmpl">
+      <li class="todo-done" data-cancer-id="{{studyId}}">
+          <div class="todo-icon fui-man-24"></div>
+          <div class="todo-content">
+              <h4 class="todo-name">
+                  {{studyName}}
+              </h4>
+              {{studyDesc}}
+          </div>
+      </li>
+  </script>
+
+  <script type="text/template" id="cancer-context-dialog-tmpl">
+      <div class="context-dialog" id="step1">
+          <h4>1) Cancer study</h4>
+          <select id="cancer-studies-box">
+              <option value="none">Select a cancer study</option>
+          </select>
+      </div>
+      <div class="context-dialog hide" id="step2">
+          <h4>2) Data types</h4>
+          <label class="checkbox" for="mutation">
+            <input type="checkbox" class="data-type" value="mutation" id="mutation" data-toggle="checkbox">
+              Mutation
+          </label>
+          <label class="checkbox" for="cna">
+              <input type="checkbox" class="data-type" value="cna" id="cna" data-toggle="checkbox">
+              Copy Number Alteration
+          </label>
+          <label class="checkbox" for="exp">
+              <input type="checkbox" class="data-type" value="exp" id="exp" data-toggle="checkbox">
+              Gene Expression
+          </label>
+      </div>
+      <div class="load-context">
+          <a class="btn btn-inverse btn-block disabled" id="context-load-button">
+              <i class="icon-circle-arrow-down"></i>
+              Load context
+          </a>
+      </div>
+
+  </script>
+
+  <script type="text/template" id="cancer-study-select-item-tmpl">
+      <option value="{{studyId}}">{{name}}</option>
+  </script>
 
   <!-- JS libraries -->
   <script src="js/jquery-1.8.2.min.js"></script>
@@ -468,6 +501,7 @@
   <script src="js/components/pcviz.network.js"></script>
   <script src="js/components/pcviz.biogene.js"></script>
   <script src="js/components/pcviz.edgeinfo.js"></script>
+  <script src="js/components/pcviz.cancer.js"></script>
   <script src="js/extensions/cytoscape.layout.pcviz.js"></script>
   <script src="js/extensions/cytoscape.core.rank.js"></script>
 
