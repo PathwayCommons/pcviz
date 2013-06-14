@@ -144,7 +144,9 @@ public class PathwayCommonsGraphService {
                 node.setProperty(PropertyKey.CITED, isValid ? getTotalCocitations(nodeName) : 0);
                 boolean isSeed = genes.contains(nodeName);
                 node.setProperty(PropertyKey.ISSEED, isSeed);
+                node.setProperty(PropertyKey.ALTERED, 0);
                 graph.getNodes().add(node);
+
             }
         }
 

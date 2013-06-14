@@ -62,6 +62,7 @@
 
     <bean class="org.pathwaycommons.pcviz.service.CancerContextService" id="cancerContextService">
         <property name="cBioPortalAccessor" ref="cBioPortalAccessor"/>
+        <property name="dataCacheFolder" value="${cbioportal.cache.folder}"/>
     </bean>
 
     <bean class="org.cbio.causality.data.portal.CBioPortalAccessor" id="cBioPortalAccessor"/>
