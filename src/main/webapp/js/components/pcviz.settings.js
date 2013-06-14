@@ -135,6 +135,12 @@ var SettingsView = Backbone.View.extend({
             $(this).toggleClass("itx-removed");
         });
 
+
+        $("#add-cancer-study").click(function(e) {
+            e.preventDefault();
+            (new CancerContextDialogView()).render();
+        });
+
         return this;
     }
 });
