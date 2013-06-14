@@ -424,7 +424,7 @@
               <h4 class="todo-name">
                   {{studyName}}
               </h4>
-              {{studyDesc}}
+              ({{studyDesc}})
           </div>
       </li>
   </script>
@@ -438,15 +438,15 @@
       </div>
       <div class="context-dialog hide" id="step2">
           <h4>2) Data types</h4>
-          <label class="checkbox" for="mutation">
+          <label class="checkbox" for="mutation" id="label-mutation">
             <input type="checkbox" class="data-type" value="mutation" id="mutation" data-toggle="checkbox">
               Mutation
           </label>
-          <label class="checkbox" for="cna">
+          <label class="checkbox" for="cna" id="label-cna">
               <input type="checkbox" class="data-type" value="cna" id="cna" data-toggle="checkbox">
               Copy Number Alteration
           </label>
-          <label class="checkbox" for="exp">
+          <label class="checkbox" for="exp" id="label-exp">
               <input type="checkbox" class="data-type" value="exp" id="exp" data-toggle="checkbox">
               Gene Expression
           </label>

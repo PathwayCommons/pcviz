@@ -15,7 +15,7 @@ var NetworkView = Backbone.View.extend({
 	        "content": "data(id)",
 	        "shape": "data(shape)",
 	        "border-width": 3,
-	        "background-color": "#DDD",
+	        "background-color": "mapData(altered, 0, 1, #DDDDDD, #C0392B)",
 	        "border-color": "#555",
             "font-size": "15"
 	    })
