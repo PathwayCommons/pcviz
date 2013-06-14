@@ -17,6 +17,8 @@ var CancerContextDialogView = Backbone.View.extend({
         selfEl.show();
         selfEl.html(this.template({}));
 
+        $("#rightMenuTabs").scrollTo("#step1", 750);
+
         $("#context-load-button").hide().click(function(e) {
             if($(this).hasClass("disabled")) return;
 
@@ -33,7 +35,7 @@ var CancerContextDialogView = Backbone.View.extend({
                     studyId: studyId
                 }
             })).render();
-            selfEl.fadeOut().html("").show();
+            selfEl.fadeOut().html("");
         });
 
         var studies = new CancerStudies();
@@ -75,6 +77,7 @@ var CancerContextDialogView = Backbone.View.extend({
             }
         });
 
+
         return this;
     }
 });
@@ -85,7 +88,14 @@ var CancerStudyContextItem = Backbone.View.extend({
 
     render: function() {
         this.$el.append(this.template(this.model));
+        $(".todo li").last().click(function() {
+            $(this).toggleClass("todo-done");
+            console.log("clicked me!")
+        });
 
+        $("#rightMenuTabs").scrollTo("#" + this.model.studyId, 750);
+
+        return this;
     }
 });
 
@@ -95,9 +105,6 @@ var CancerStudySelectItemView = Backbone.View.extend({
 
     render: function() {
         this.$el.append(this.template(this.model.toJSON()));
-        $(".todo li").click(function() {
-            $(this).toggleClass("todo-done");
-        });
         return this;
     }
 });

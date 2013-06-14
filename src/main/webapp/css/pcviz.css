@@ -256,10 +256,16 @@ footer {
 }
 
 #step1 .dk_toggle {
-    width: 200px;
+    width: 190px;
 }
 
 #context-load-button {
     width: 90%;
     padding: 15px;
 }
+
+#cancer-context-dialog {
+    text-align: left;
+    width: 250px;
+}
+
