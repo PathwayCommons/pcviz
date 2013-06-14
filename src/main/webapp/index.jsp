@@ -272,6 +272,11 @@
                   </td>
               </tr>
           </table>
+
+          <h4>Alteration Frequency <small>({{altered}}%)</small></h4>
+          <div class="progress">
+              <div class="bar bar-danger" style="width: {{altered}}%;"></div>
+          </div>
       </div>
   </script>
 
