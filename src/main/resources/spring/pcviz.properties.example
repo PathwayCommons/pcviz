@@ -18,3 +18,7 @@ cocitation.cache.folder.test=/tmp/cocitations-test
 hgnc.location=file:/tmp/hgnc.txt
 hgnc.test.location=classpath:hgnc_test.txt
 autoCompleteResult.limit=10
+
+# CBioPortal
+cbioportal.cache.folder=/tmp/cocitations/portal
+cbioportal.cache.folder.test=/tmp/cocitations/portal-test

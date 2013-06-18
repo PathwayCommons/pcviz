@@ -269,3 +269,46 @@ footer {
     width: 210px;
 }
 
+
+#step1 .dk_options {
+    width: auto;
+    max-height: none;
+}
+
+#step1 .dk_label {
+    padding-right: 15px;
+}
+
+#step1 .dk_options_inner {
+    width: auto;
+    max-height: none;
+}
+
+#step1 .dk_toggle {
+    width: 190px;
+}
+
+#context-load-button {
+    width: 100%;
+    padding: 15px;
+}
+
+#cancer-context-dialog {
+    text-align: left;
+    width: 250px;
+}
+
+#step-loading {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.cbioportal {
+    font-size: 16px;
+    padding: 10px;
+}
+
+.cbioportal i {
+    font-size: 14px;
+}
+

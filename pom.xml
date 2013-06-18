@@ -15,7 +15,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.6.4</slf4j.version>
 		<spring.version>3.1.0.RELEASE</spring.version>
-		<paxtools.version>4.1.6</paxtools.version>
+		<paxtools.version>4.2.0</paxtools.version>
 	</properties>
 
 	<build>
@@ -60,6 +60,14 @@
 			<url>http://maven-repo.biopax-pattern.googlecode.com/hg/</url>
 			<snapshots><enabled>true</enabled></snapshots>
 		</repository>
+        <repository>
+            <id>causality.repo</id>
+            <name>Repository of BioPAX Causality Framework</name>
+            <url>http://cbio.mskcc.org/~ozgun/m2repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 
 	<dependencies>
@@ -76,7 +84,13 @@
 			<version>${paxtools.version}</version>
 		</dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>org.cbio</groupId>
+            <artifactId>causality</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
 			<groupId>org.biopax.paxtools</groupId>
 			<artifactId>pattern</artifactId>
 			<version>[1,]</version>
