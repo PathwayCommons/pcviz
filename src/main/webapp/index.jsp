@@ -415,11 +415,15 @@
   </script>
 
   <script type="text/template" id="edge-degrades-template">
-      <span class="gene source-gene">{{source}}</span> degrades <span class="gene target-gene">{{target}}</span>.
+      <span class="gene source-gene">{{source}}</span>
+      upregulates the degradation of
+      <span class="gene target-gene">{{target}}</span>.
   </script>
 
   <script type="text/template" id="edge-blocks-degradation-template">
-      <span class="gene source-gene">{{source}}</span> blocks the degradation of <span class="gene target-gene">{{target}}</span>.
+      <span class="gene source-gene">{{source}}</span>
+      downregulates the degradation of
+      <span class="gene target-gene">{{target}}</span>.
   </script>
 
   <script type="text/template" id="edge-transactivate-template">
