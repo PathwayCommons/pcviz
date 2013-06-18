@@ -75,7 +75,11 @@ var BioGeneView = Backbone.View.extend({
         if (this.model.geneSummary == undefined)
             this.$el.find(".node-details-summary").hide();
 
-        var expanderOpts = {slicePoint: 300,
+        if($("#cancer-context-list li.todo-done").length == 0) {
+            this.$el.find(".alteration-frequency-info").hide();
+        }
+
+        var expanderOpts = {slicePoint: 200,
             expandPrefix: ' ',
             expandText: ' (...)',
             userCollapseText: ' (show less)',

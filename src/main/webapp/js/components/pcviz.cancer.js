@@ -29,6 +29,8 @@ var CancerContextDialogView = Backbone.View.extend({
         $("#rightMenuTabs").scrollTo("#step1", 750);
         $("#context-load-button").hide();
 
+        $("#step-loading").show();
+
         var studies = new CancerStudies();
         studies.fetch({
             success: function() {
@@ -36,9 +38,13 @@ var CancerContextDialogView = Backbone.View.extend({
                     (new CancerStudySelectItemView({ model: study })).render();
                 });
 
+                $("#step-loading").fadeOut();
+
                 $("#cancer-studies-box").dropkick({
                     change: function(value, label) {
                         if(value != "none") {
+                            $("#step-loading").show();
+                            $("#rightMenuTabs").scrollTo("#step1", 750);
 
                             var selectedStudy;
                             _.each(studies.models, function(study) {
@@ -47,6 +53,8 @@ var CancerContextDialogView = Backbone.View.extend({
 
                             selectedStudy.fetch({
                                 success: function() {
+                                    $("#step-loading").fadeOut();
+
                                     var model = selectedStudy.toJSON();
 
                                     if(!model.hasCNA)
@@ -89,6 +97,9 @@ var CancerContextDialogView = Backbone.View.extend({
                                     $("#context-load-button").unbind("click").click(function(e) {
                                         if($(this).hasClass("disabled")) return;
 
+                                        $("#step-loading").show();
+                                        $(this).addClass("disabled");
+
                                         var profiles = "";
                                         _.each($("#step2 label.checked"), function(label) {
                                             profiles += $(label).attr("for") + ",";
@@ -113,20 +124,29 @@ var CancerContextDialogView = Backbone.View.extend({
                                             success: function() {
                                                 var studyId = selectedStudy.get("cancerStudy").studyId;
                                                 var studyLabel = selectedStudy.get("cancerStudy").name ;
+                                                var numberOfCases = selectedStudy.get("numberOfCases");
                                                 var tokens = studyLabel.split("(");
                                                 var studyName = tokens[0].trim();
                                                 var studyDesc = tokens[1].replace(")", "");
 
-                                                cy.batchData(cancerContext.toJSON());
+                                                // save this data
+                                                store.set(studyId, cancerContext);
 
                                                 (new CancerStudyContextItem({
                                                     model: {
                                                         studyName: studyName,
                                                         studyDesc: studyDesc,
-                                                        studyId: studyId
+                                                        studyId: studyId,
+                                                        numberOfCases: numberOfCases
                                                     }
                                                 })).render();
+
+                                                $("#step-loading").hide();
+                                                $(this).removeClass("disabled");
+
+                                                (new ContextAwareNetworkView()).render();
                                                 selfEl.fadeOut().html("");
+
                                             }
                                         });
                                     });
@@ -154,10 +174,15 @@ var CancerStudyContextItem = Backbone.View.extend({
         this.$el.append(this.template(this.model));
         $(".todo li").last().click(function() {
             $(this).toggleClass("todo-done");
-            console.log("clicked me!")
+            (new ContextAwareNetworkView()).render();
         });
 
         $("#rightMenuTabs").scrollTo("#" + this.model.studyId, 750);
+
+        (new NotyView({
+            template: "#noty-new-study-loaded-template",
+            model: this.model
+        })).render();
 
         return this;
     }
@@ -168,7 +193,68 @@ var CancerStudySelectItemView = Backbone.View.extend({
     template:_.template($("#cancer-study-select-item-tmpl").html()),
 
     render: function() {
-        this.$el.append(this.template(this.model.toJSON()));
+        var modelJSON = this.model.toJSON();
+        this.$el.append(this.template(modelJSON));
+
+        return this;
+    }
+});
+
+var ContextAwareNetworkView = Backbone.View.extend({
+    render: function() {
+        var totalCases = 0;
+        var totalStudies = 0;
+        var avgData = {};
+        var allNames = [];
+        cy.nodes().each(function(i, ele) {
+            var id = ele.id();
+
+            allNames.push(id);
+            avgData[id] = { altered: 0 };
+        });
+
+
+        $("#cancer-context-list li.todo-done").each(function(i, ele) {
+            totalStudies++;
+            var data = store.get($(ele).data("cancer-id"));
+            var numOfCases = $(ele).data("case-size");
+            totalCases += numOfCases;
+
+            for(var j=0; j < allNames.length; j++) {
+                var name = allNames[j];
+                avgData[name].altered += data[name].altered * numOfCases;
+            }
+        });
+
+        for(var i=0; i < allNames.length; i++) {
+            avgData[allNames[i]].altered /= totalCases;
+        }
+
+        if(totalStudies == 1) {
+            (new NotyView({
+                template: "#noty-context-loaded-one-template",
+                model: {
+                    numberOfStudies: totalStudies,
+                    numberOfCases: totalCases
+                }
+            })).render();
+        } else if(totalStudies > 1) {
+            (new NotyView({
+                template: "#noty-context-loaded-template",
+                model: {
+                    numberOfStudies: totalStudies,
+                    numberOfCases: totalCases
+                }
+            })).render();
+        } else {
+            (new NotyView({
+                template: "#noty-no-context-template",
+                model: {}
+            })).render();
+        }
+
+        cy.batchData(avgData);
+
         return this;
     }
 });
