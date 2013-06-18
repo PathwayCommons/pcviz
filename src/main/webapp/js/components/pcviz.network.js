@@ -218,6 +218,26 @@ var NetworkView = Backbone.View.extend({
                                 cy.rankNodes();
 
                                 (new NumberOfNodesView({ model: { numberOfNodes: cy.nodes().length }})).render();
+
+                                var edgeTypes = [
+                                    "consecutive-catalysis",
+                                    "degrades",
+                                    "state-change",
+                                    "blocks-degradation",
+                                    "transinhibit",
+                                    "transactivate",
+                                    "consecutive-analysis",
+                                    "in-same-complex"
+                                ];
+
+                                _.each(edgeTypes, function(type) {
+                                    var numOfEdges = cy.$("edge[type='" + type + "']").length;
+                                    if(numOfEdges > 0) {
+                                        $("#" + type + "-count").text(numOfEdges);
+                                    } else {
+                                        $("#row-" + type).hide();
+                                    }
+                                });
                             }
                         };
 
