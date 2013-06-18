@@ -10,6 +10,7 @@ public enum PropertyKey
 	TARGET,
 	CITED,
     ISVALID,
+    ALTERED,
     ISSEED,
     ISDIRECTED,
     TYPE,

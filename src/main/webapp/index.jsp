@@ -1,4 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@page import="org.springframework.web.context.WebApplicationContext"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%
@@ -258,31 +259,21 @@
                       <div class="todo mrm">
                           <div class="tile">
                               <h3 class="tile-title">Cancer type of interest</h3>
-                              <ul>
-                                  <li>
-                                      <div class="todo-icon fui-man-24"></div>
-                                      <div class="todo-content">
-                                          <h4 class="todo-name">
-                                              Glioblastoma
-                                          </h4>
-                                          The Cancer Genome Atlas, Nature 2008
-                                      </div>
-                                  </li>
+                              <ul id="cancer-context-list">
 
-                                  <li class="todo-done">
-                                      <div class="todo-icon fui-man-24"></div>
-                                      <div class="todo-content">
-                                          <h4 class="todo-name">
-                                              Ovarian Cancer
-                                          </h4>
-                                          The Cancer Genome Atlas, Nature 2011
-                                      </div>
-                                  </li>
+                                  <!-- Cancer Studies -->
                               </ul>
                               <br>
                               <br>
-                              <a class="btn btn-primary btn-large btn-block" href="#"><span class="fui-plus-24"></span> Add</a>
+                              <a class="btn btn-primary btn-large btn-block" href="#" id="add-cancer-study">
+                                  <span class="fui-plus-24"></span> Add
+                              </a>
                           </div>
+                      </div>
+                      <div id="cancer-context-dialog" class="mdm tile hide"></div>
+                      <div id="step-loading" class="hide">
+                          <p>loading...</p>
+                          <img src="images/loading.gif" alt="loading..." height="17" width="50">
                       </div>
                   </div>
               </div>
@@ -334,6 +325,19 @@
                   </td>
               </tr>
           </table>
+
+          <div class="alteration-frequency-info">
+              <hr>
+              <h3>Cancer Context</h3>
+              <h4>Alteration Frequency <small>({{altered}}%)</small></h4>
+              <div class="progress">
+                  <div class="bar bar-danger" style="width: {{altered}}%;"></div>
+              </div>
+
+              <a href="http://www.cbioportal.org/public-portal/cross_cancer.do?tab_index=tab_visualize&clinical_param_selection=null&cancer_study_id=all&genetic_profile_ids_PROFILE_MUTATION_EXTENDED=gbm_tcga_mutations&genetic_profile_ids_PROFILE_COPY_NUMBER_ALTERATION=gbm_tcga_gistic&Z_SCORE_THRESHOLD=2.0&RPPA_SCORE_THRESHOLD=1.0&case_set_id=gbm_tcga_cnaseq&case_ids=&gene_list={{geneSymbol}}&gene_set_choice=user-defined-list&Action=Submit" target="_blank" class="btn btn-inverse btn-block cbioportal">
+                  <i class="icon-share"></i> Run cross-cancer analysis in cBioPortal
+              </a>
+          </div>
       </div>
   </script>
 
@@ -536,6 +540,68 @@
       </div>
   </script>
 
+  <script type="text/template" id="cancer-study-added-tmpl">
+      <li class="todo-done" data-cancer-id="{{studyId}}" data-case-size="{{numberOfCases}}">
+          <div class="todo-icon fui-man-24"></div>
+          <div class="todo-content">
+              <h4 class="todo-name">
+                  {{studyName}}
+              </h4>
+              ({{studyDesc}})
+          </div>
+      </li>
+  </script>
+
+  <script type="text/template" id="cancer-context-dialog-tmpl">
+      <div class="context-dialog" id="step1">
+          <h4>1) Add new context</h4>
+          <select id="cancer-studies-box">
+              <option value="none">Select a cancer study</option>
+          </select>
+      </div>
+      <div class="context-dialog hide" id="step2">
+          <h4>2) Data types</h4>
+          <label class="checkbox" for="mutation" id="label-mutation">
+            <input type="checkbox" class="data-type" value="mutation" id="mutation" data-toggle="checkbox">
+              Mutation
+          </label>
+          <label class="checkbox" for="cna" id="label-cna">
+              <input type="checkbox" class="data-type" value="cna" id="cna" data-toggle="checkbox">
+              Copy Number Alteration
+          </label>
+          <label class="checkbox" for="exp" id="label-exp">
+              <input type="checkbox" class="data-type" value="exp" id="exp" data-toggle="checkbox">
+              Gene Expression
+          </label>
+      </div>
+      <div class="load-context">
+          <a class="btn btn-inverse btn-block disabled" id="context-load-button">
+              <i class="icon-circle-arrow-down"></i>
+              Load context
+          </a>
+      </div>
+  </script>
+
+  <script type="text/template" id="cancer-study-select-item-tmpl">
+      <option value="{{studyId}}">{{name}}</option>
+  </script>
+
+  <script type="text/template" id="noty-context-loaded-template">
+      Cancer context was loaded successfully from {{numberOfStudies}} studies ({{numberOfCases}} cases total).
+  </script>
+
+  <script type="text/template" id="noty-context-loaded-one-template">
+      Cancer context was loaded successfully from {{numberOfStudies}} study ({{numberOfCases}} cases total).
+  </script>
+
+  <script type="text/template" id="noty-no-context-template">
+      There are no active cancer studies left. Cleared cancer context.
+  </script>
+
+  <script type="text/template" id="noty-new-study-loaded-template">
+      Cancer context from <b>{{name}}</b> was loaded successfully ({{numberOfCases}} cases).
+      You can deactivate the context by clicking on the cancer study name on the list.
+  </script>
 
   <!-- JS libraries -->
   <script src="js/jquery-1.8.2.min.js"></script>
@@ -560,6 +626,7 @@
   <script src="js/noty/layouts/bottomRight.js"></script>
   <script src="js/noty/themes/noty.pcviz.theme.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/jquery.scrollTo-1.4.3.1-min.js"></script>
 
   <!--[if lt IE 8]>
   <script src="js/icon-font-ie7.js"></script>
@@ -574,6 +641,7 @@
   <script src="js/components/pcviz.network.js"></script>
   <script src="js/components/pcviz.biogene.js"></script>
   <script src="js/components/pcviz.edgeinfo.js"></script>
+  <script src="js/components/pcviz.cancer.js"></script>
   <script src="js/extensions/cytoscape.layout.pcviz.js"></script>
   <script src="js/extensions/cytoscape.core.rank.js"></script>
 

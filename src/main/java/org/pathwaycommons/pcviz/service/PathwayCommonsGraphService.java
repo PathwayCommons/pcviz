@@ -145,7 +145,9 @@ public class PathwayCommonsGraphService {
                 boolean isSeed = genes.contains(nodeName);
                 node.setProperty(PropertyKey.ISSEED, isSeed);
                 node.setProperty(PropertyKey.RANK, 0);
+                node.setProperty(PropertyKey.ALTERED, 0);
                 graph.getNodes().add(node);
+
             }
         }
 

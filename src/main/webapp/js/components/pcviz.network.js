@@ -15,7 +15,7 @@ var NetworkView = Backbone.View.extend({
 	        "content": "data(id)",
 	        "shape": "data(shape)",
 	        "border-width": 3,
-	        "background-color": "#DDD",
+	        "background-color": "mapData(altered, 0, 1, #DDDDDD, #C0392B)",
 	        "border-color": "#555",
             "font-size": "15"
 	    })
@@ -305,6 +305,7 @@ var NetworkView = Backbone.View.extend({
 					// generate the view by using backbone
                     var geneInfo = queryResult.geneInfo[0];
                     geneInfo["isseed"] = node.data("isseed");
+                    geneInfo["altered"] = parseInt(node.data("altered") * 100);
 
                     var biogeneView = new BioGeneView({
                         el: self.detailsContent,
