@@ -161,39 +161,66 @@
                       <div class="share mrl edge-types">
                           <h4 class="demo-panel-title edge-types-title">Interaction types</h4>
                           <table class="table table-condensed">
-                              <tr>
+                              <tr id="row-state-change">
                                   <td>
-                                      <span class="itx-type-on-off label transinhibit" data-itx-type="transinhibit">transinhibit <span class="fui-cross-16"></span></span>
+                                      <span id="state-change-count">0</span>
                                   </td>
                                   <td>
                                       <span class="itx-type-on-off label state-change" data-itx-type="state-change">state change <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr>
+                              <tr id="row-consecutive-catalysis">
                                   <td>
-                                      <span class="itx-type-on-off label transactivate" data-itx-type="transactivate">transactivate <span class="fui-cross-16"></span></span>
+                                      <span id="consecutive-catalysis-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label consecutive-catalysis" data-itx-type="consecutive-catalysis">consecutive catalysis <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr id="row-in-same-complex">
+                                  <td>
+                                      <span id="in-same-complex-count">0</span>
                                   </td>
                                   <td>
                                       <span class="itx-type-on-off label in-same-complex" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr>
+                              <tr id="row-transactivate">
                                   <td>
-                                      <span class="itx-type-on-off label degrades" data-itx-type="degrades">degrades <span class="fui-cross-16"></span></span>
+                                      <span id="transactivate-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label blocks-degradation" data-itx-type="blocks-degradation">blocks degradation <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label transactivate" data-itx-type="transactivate">expression upregulation <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr>
-                                  <td colspan="2">
-                                      <span class="itx-type-on-off label consecutive-catalysis" data-itx-type="consecutive-catalysis">consecutive catalysis <span class="fui-cross-16"></span></span>
+                              <tr id="row-transinhibit">
+                                  <td>
+                                      <span id="transinhibit-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label transinhibit" data-itx-type="transinhibit">expression upregulation <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr id="row-blocks-degradation">
+                                  <td>
+                                      <span id="blocks-degradation-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label blocks-degradation" data-itx-type="blocks-degradation">degradation upregulation <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr id="row-degrades">
+                                  <td>
+                                      <span id="degrades-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label degrades" data-itx-type="degrades">degradation downregulation  <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                           </table>
                       </div>
 
-                      <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</pan></small></h4>
+                      <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</small></h4>
                       <div id="slider-nodes" class="ui-slider" data-default-value="3"></div>
 
                       <h4 class="demo-panel-title">Graph query type</h4>
@@ -288,6 +315,40 @@
       </div>
   </script>
 
+  <script type="text/template" id="edge-type-text-transinhibit-template">
+      expression downregulation
+  </script>
+
+  <script type="text/template" id="edge-type-text-transactivate-template">
+      expression upregulation
+  </script>
+
+  <script type="text/template" id="edge-type-text-in-same-complex-template">
+      in same complex
+  </script>
+
+  <script type="text/template" id="edge-type-text-degrades-template">
+      degrades
+  </script>
+
+  <script type="text/template" id="edge-type-text-inhibits-degradation-template">
+      inhibits degradation
+  </script>
+
+  <script type="text/template" id="edge-type-text-state-change-template">
+      state change
+  </script>
+
+  <script type="text/template" id="edge-type-text-consecutive-catalysis-template">
+      consecutive catalysis
+  </script>
+
+  <script type="text/template" id="edge-type-example-template">
+      <h5>Example Interaction</h5>
+      <img src="images/types/{{type}}.png"><br>
+      <p>You can filter interactions of any type using the <b>Settings</b> tab above.</p>
+  </script>
+
   <script type="text/template" id="edgeinfo-template">
       <div class='edge-details-info'>
           <h3>
@@ -297,12 +358,24 @@
           <table class="table table-condensed table-striped">
               <tr>
                   <td colspan="2" class="edge-summary">
-                      {{summary}} <small class="badge">{{cited}} co-citations</small>
+                      {{summary}}
+                  </td>
+              </tr>
+              <tr>
+                  <th>Co-citations</th>
+                  <td>
+                      <span class="badge">{{cited}}</span>
                   </td>
               </tr>
               <tr>
                   <th>Interaction Type</th>
-                  <td><span class="{{type}} label noty-itx-type type-filter-help" title="You can filter interactions of any type using the 'Settings' tab above.">{{type}}</span></td>
+                  <td class="type-image">
+                      <span class="label {{type}} type-filter-help" data-edge-type="{{type}}">
+                          <span class="type-actual-text">{{type}}</span>
+                          <i class="icon-question-sign edge-type-help"></i>
+                      </span>
+
+                  </td>
               </tr>
               <tr>
                   <th>References</th>
@@ -336,7 +409,9 @@
   </script>
 
   <script type="text/template" id="edge-consecutive-catalysis-template">
-      <span class="gene source-gene">{{source}}</span> consecutively catalyzes <span class="gene target-gene">{{target}}</span>.
+      <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
+      catalyze two conversions connected via a common molecule,
+      <i>e.g.</i> the first entity produces a substrate that is consumed by the second entity.
   </script>
 
   <script type="text/template" id="edge-degrades-template">
@@ -348,15 +423,20 @@
   </script>
 
   <script type="text/template" id="edge-transactivate-template">
-      <span class="gene source-gene">{{source}}</span> trans-activates <span class="gene target-gene">{{target}}</span>.
+      <span class="gene source-gene">{{source}}</span>
+      upregulates the expression of
+      <span class="gene target-gene">{{target}}</span>.
   </script>
 
   <script type="text/template" id="edge-transinhibit-template">
-      <span class="gene source-gene">{{source}}</span> trans-inhibits <span class="gene target-gene">{{target}}</span>.
+      <span class="gene source-gene">{{source}}</span>
+      downregulates the expression of
+      <span class="gene target-gene">{{target}}</span>.
   </script>
 
   <script type="text/template" id="edge-in-same-complex-template">
-      <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>, together, form a complex.
+      <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
+      are members of the  same complex.
   </script>
 
   <script type="text/template" id="loading-small-template">

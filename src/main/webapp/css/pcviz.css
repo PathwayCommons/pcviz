@@ -109,6 +109,7 @@ footer {
 
 .edge-types {
     margin-top: -10px;
+    margin-right: 0px;
     padding-left: 10px;
     padding-bottom: 10px;
 }
@@ -127,6 +128,7 @@ footer {
     border-radius: 0;
     -moz-border-radius: 0;
     font-weight: normal;
+    margin-left: 10px;
 }
 
 .transinhibit {
@@ -158,7 +160,7 @@ footer {
 }
 
 .itx-removed {
-    background-color: #BDC3C7;
+    background-color: #BDC3C7 !important;
 }
 
 .edge-types .fui-cross-16 {
@@ -239,3 +241,13 @@ footer {
 .pcviz-headline {
     cursor: pointer;
 }
+
+.edge-summary {
+    font-size: 115%;
+    padding: 10px !important;
+}
+
+.type-actual-text {
+    margin-right: 5px;
+}
+
