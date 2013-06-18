@@ -221,15 +221,37 @@
                       </div>
 
                       <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</small></h4>
-                      <div id="slider-nodes" class="ui-slider" data-default-value="3"></div>
+                      <table>
+                          <tr>
+                              <td>
+                                  <a href="#" id="decrease-button" class="slider-control"><i class="icon-minus"></i></a>
+                              </td>
+                              <td colspan='2' class="nodes-slider-container">
+                                  <div id="slider-nodes" class="ui-slider"></div>
+                              </td>
+                              <td>
+                                  <a href="#" id="increase-button" class="slider-control"><i class="icon-plus"></i></a>
+                              </td>
+                          </tr>
+                          <tr id="slider-help-row">
+                              <td></td>
+                              <td>
+                                  <p class="help-slider-text palette palette-silver">
+                                      Slide left to decrease the number of genes
+                                  </p>
+                              </td>
+                              <td>
+                                  <img src="images/help-up-arrow.png" width="90">
+                              </td>
+                              <td></td>
+                          </tr>
+                      </table>
 
                       <h4 class="demo-panel-title">Graph query type</h4>
                       <select value="0" class="span3" tabindex="1" id="query-type" name="herolist">
                           <option selected="selected" value="neighborhood">Neighborhood</option>
                           <option value="pathsbetween">Paths-between</option>
                       </select>
-
-
 
                   </div>
                   <div class="tab-pane fade" id="graph-help">

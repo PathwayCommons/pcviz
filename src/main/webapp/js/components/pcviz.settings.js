@@ -1,73 +1,5 @@
 var SettingsView = Backbone.View.extend({
     render: function() {
-        $(".ui-slider").each(function() {
-            var sliderVal = $(this).data("default-value");
-            var selfSlider = $(this);
-
-            // TODO: Get all these dynamic range values from the Ranker itself
-            $(this).slider({
-                min: 0,
-                max: 3,
-                value: sliderVal,
-                orientation: "horizontal",
-                range: "min",
-                change: function(event, ui) {
-                    selfSlider.slider("disable");
-                    (new FilteringNodesView()).render();
-
-                    var val = 4 - ui.value;
-
-                    // First stop all animations and clear the queue
-                    cy.$("node").stop(true, true);
-
-                    var allNodesLength = cy.nodes().length;
-
-                    var processedNodes = 0;
-
-                    // Then hide the low importance ones
-                    var eles = cy.$("node[importance<=" + val + "][!isseed]");
-                    var visibleNodesLength = allNodesLength - eles.length;
-                    eles
-                        .animate(
-                        {
-                            css: {
-                                'opacity': .0
-                            }
-                        }, {
-                            duration: 700,
-                            complete: function() {
-                                this.hide();
-                                if(++processedNodes == allNodesLength) {
-                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
-                                    selfSlider.slider("enable");
-                                }
-                            }
-                        }
-                    );
-
-                    // Finally show high importance ones
-                    var eles2 = cy.$("node[importance>" + val + "]");
-                    eles2
-                        .show()
-                        .animate(
-                        {
-                            css: {
-                                'opacity': 1.0
-                            }
-                        }, {
-                            duration: 700,
-                            complete: function() {
-                                if(++processedNodes == allNodesLength) {
-                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
-                                    selfSlider.slider("enable");
-                                }
-                            }
-                        }
-                    );
-                }
-            });
-        });
-
         $('#rightMenuControls a').click(function (e) {
             e.preventDefault();
             $(this).tab('show');
@@ -166,6 +98,107 @@ var FilteringNodesView = Backbone.View.extend({
     template: _.template($("#loading-text-template").html()),
     render: function() {
         this.$el.html(this.template({}));
+        return this;
+    }
+});
+
+var NodesSliderView = Backbone.View.extend({
+    el: ".ui-slider",
+    render: function() {
+        var model = this.model;
+
+        this.$el.each(function() {
+            var selfSlider = $(this);
+            var minVal = model.min;
+            var maxVal = model.max;
+
+            // TODO: Get all these dynamic range values from the Ranker itself
+            $(this).slider({
+                min: minVal,
+                max: maxVal,
+                value: maxVal,
+                orientation: "horizontal",
+                range: "min",
+
+                slide: function(event, ui) {
+                    (new NumberOfNodesView({ model: { numberOfNodes: ui.value }})).render();
+                },
+                change: function(event, ui) {
+                    $("#slider-help-row").fadeOut();
+
+                    selfSlider.slider("disable");
+                    (new FilteringNodesView()).render();
+
+                    var val = ui.value;
+
+                    // First stop all animations and clear the queue
+                    cy.$("node").stop(true, true);
+
+                    var allNodesLength = cy.nodes().length;
+
+                    var processedNodes = 0;
+
+                    // Then hide the low importance ones
+                    var eles = cy.$("node[rank>=" + val + "][!isseed]");
+                    var visibleNodesLength = allNodesLength - eles.length;
+                    eles
+                        .animate(
+                        {
+                            css: {
+                                'opacity': .0
+                            }
+                        }, {
+                            duration: 700,
+                            complete: function() {
+                                this.hide();
+                                if(++processedNodes == allNodesLength) {
+                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
+                                    selfSlider.slider("enable");
+                                }
+                            }
+                        }
+                    );
+
+                    // Finally show high importance ones
+                    var eles2 = cy.$("node[rank<" + val + "]");
+                    eles2
+                        .show()
+                        .animate(
+                        {
+                            css: {
+                                'opacity': 1.0
+                            }
+                        }, {
+                            duration: 700,
+                            complete: function() {
+                                if(++processedNodes == allNodesLength) {
+                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
+                                    selfSlider.slider("enable");
+                                }
+                            }
+                        }
+                    );
+                }
+            });
+
+            $("#decrease-button").click(function(e) {
+                e.preventDefault();
+
+                var oldVal = selfSlider.slider("option", "value");
+                var newVal = Math.max(oldVal-1, minVal);
+                selfSlider.slider({value: newVal});
+            });
+
+            $("#increase-button").click(function(e) {
+                e.preventDefault();
+
+                var oldVal = selfSlider.slider("option", "value");
+                var newVal = Math.min(oldVal+1, maxVal);
+                selfSlider.slider({value: newVal});
+            });
+
+        });
+
         return this;
     }
 });

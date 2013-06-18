@@ -4,7 +4,8 @@
         maxScore: 4,
         minScore: 0,
         defaultScore: 2,
-        attrName: 'importance'
+        attrName: 'importance',
+        attrName2: 'rank'
     };
 
     function RankNodes(options) {
@@ -28,6 +29,19 @@
                 pooledData[this.id()] = nodeData;
             }
         );
+
+        var nodes = [];
+        cy.nodes().each(function(i, ele) {
+            nodes.push(ele.id());
+        });
+
+        nodes.sort(function(a, b) {
+            return pooledData[b][options.attrName] - pooledData[a][options.attrName];
+        });
+
+        for(var i=0; i < nodes.length; i++) {
+            pooledData[nodes[i]][options.attrName2] = i;
+        }
 
         // update'em all
         cy.batchData(pooledData);

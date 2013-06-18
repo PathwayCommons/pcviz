@@ -217,7 +217,8 @@ var NetworkView = Backbone.View.extend({
                                 // Run the ranker on this graph
                                 cy.rankNodes();
 
-                                (new NumberOfNodesView({ model: { numberOfNodes: cy.nodes().length }})).render();
+                                var numberOfNodes = cy.nodes().length;
+                                (new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
 
                                 var edgeTypes = [
                                     "consecutive-catalysis",
@@ -238,6 +239,13 @@ var NetworkView = Backbone.View.extend({
                                         $("#row-" + type).hide();
                                     }
                                 });
+
+                                (new NodesSliderView({
+                                    model: {
+                                        min: cy.nodes("[?isseed]").length,
+                                        max: numberOfNodes
+                                    }
+                                })).render();
                             }
                         };
 
