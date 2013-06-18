@@ -222,6 +222,10 @@
                           </div>
                       </div>
                       <div id="cancer-context-dialog" class="mdm tile hide"></div>
+                      <div id="step-loading" class="hide">
+                          <p>loading...</p>
+                          <img src="images/loading.gif" alt="loading..." height="17" width="50">
+                      </div>
                   </div>
               </div>
           </div>
@@ -273,9 +277,17 @@
               </tr>
           </table>
 
-          <h4>Alteration Frequency <small>({{altered}}%)</small></h4>
-          <div class="progress">
-              <div class="bar bar-danger" style="width: {{altered}}%;"></div>
+          <div class="alteration-frequency-info">
+              <hr>
+              <h3>Cancer Context</h3>
+              <h4>Alteration Frequency <small>({{altered}}%)</small></h4>
+              <div class="progress">
+                  <div class="bar bar-danger" style="width: {{altered}}%;"></div>
+              </div>
+
+              <a href="http://www.cbioportal.org/public-portal/cross_cancer.do?tab_index=tab_visualize&clinical_param_selection=null&cancer_study_id=all&genetic_profile_ids_PROFILE_MUTATION_EXTENDED=gbm_tcga_mutations&genetic_profile_ids_PROFILE_COPY_NUMBER_ALTERATION=gbm_tcga_gistic&Z_SCORE_THRESHOLD=2.0&RPPA_SCORE_THRESHOLD=1.0&case_set_id=gbm_tcga_cnaseq&case_ids=&gene_list={{geneSymbol}}&gene_set_choice=user-defined-list&Action=Submit" target="_blank" class="btn btn-inverse btn-block cbioportal">
+                  <i class="icon-share"></i> Run cross-cancer analysis in cBioPortal
+              </a>
           </div>
       </div>
   </script>
@@ -423,7 +435,7 @@
   </script>
 
   <script type="text/template" id="cancer-study-added-tmpl">
-      <li class="todo-done" data-cancer-id="{{studyId}}">
+      <li class="todo-done" data-cancer-id="{{studyId}}" data-case-size="{{numberOfCases}}">
           <div class="todo-icon fui-man-24"></div>
           <div class="todo-content">
               <h4 class="todo-name">
@@ -462,11 +474,27 @@
               Load context
           </a>
       </div>
-
   </script>
 
   <script type="text/template" id="cancer-study-select-item-tmpl">
       <option value="{{studyId}}">{{name}}</option>
+  </script>
+
+  <script type="text/template" id="noty-context-loaded-template">
+      Cancer context was loaded successfully from {{numberOfStudies}} studies ({{numberOfCases}} cases total).
+  </script>
+
+  <script type="text/template" id="noty-context-loaded-one-template">
+      Cancer context was loaded successfully from {{numberOfStudies}} study ({{numberOfCases}} cases total).
+  </script>
+
+  <script type="text/template" id="noty-no-context-template">
+      There are no active cancer studies left. Cleared cancer context.
+  </script>
+
+  <script type="text/template" id="noty-new-study-loaded-template">
+      Cancer context from <b>{{name}}</b> was loaded successfully ({{numberOfCases}} cases).
+      You can deactivate the context by clicking on the cancer study name on the list.
   </script>
 
   <!-- JS libraries -->

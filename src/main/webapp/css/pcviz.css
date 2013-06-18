@@ -269,3 +269,17 @@ footer {
     width: 250px;
 }
 
+#step-loading {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.cbioportal {
+    font-size: 16px;
+    padding: 10px;
+}
+
+.cbioportal i {
+    font-size: 14px;
+}
+

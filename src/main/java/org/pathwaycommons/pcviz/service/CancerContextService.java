@@ -1,5 +1,6 @@
 package org.pathwaycommons.pcviz.service;
 
+import flexjson.JSONSerializer;
 import org.cbio.causality.data.portal.CBioPortalAccessor;
 import org.cbio.causality.data.portal.CancerStudy;
 import org.cbio.causality.data.portal.CaseList;
@@ -49,12 +50,13 @@ public class CancerContextService {
     }
 
     @Cacheable("cancerContextStudiesCache")
-    public List<CancerStudy> listAvailableCancers() throws IOException {
-        return getcBioPortalAccessor().getCancerStudies();
+    public String listAvailableCancers() throws IOException {
+        JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
+        return jsonSerializer.deepSerialize(getcBioPortalAccessor().getCancerStudies());
     }
 
     @Cacheable("cancerContextDetailsCache")
-    public CancerStudyDetails getStudyDetails(String study) throws IOException {
+    public String getStudyDetails(String study) throws IOException {
         CancerStudyDetails cancerStudyDetails = new CancerStudyDetails();
 
         // Get/set cancer study
@@ -74,7 +76,8 @@ public class CancerContextService {
             if(isZscores(geneticProfile)) cancerStudyDetails.setHasExpression(true);
         }
 
-        return cancerStudyDetails;
+        JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
+        return jsonSerializer.deepSerialize(cancerStudyDetails);
     }
 
     private boolean isZscores(GeneticProfile geneticProfile) {

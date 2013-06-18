@@ -33,11 +33,10 @@ public class CancerController {
     public ResponseEntity<String> listStudies() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json; charset=utf-8");
-        JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
 
         String cancerStudies;
         try {
-            cancerStudies = jsonSerializer.deepSerialize(cancerContextService.listAvailableCancers());
+            cancerStudies = cancerContextService.listAvailableCancers();
         } catch (IOException e) {
             return new ResponseEntity<String>(e.getMessage(), headers, HttpStatus.BAD_REQUEST);
         }
@@ -52,9 +51,7 @@ public class CancerController {
 
         String response;
         try {
-            CancerStudyDetails studyDetails = cancerContextService.getStudyDetails(study);
-            JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
-            response = jsonSerializer.deepSerialize(studyDetails);
+            response = cancerContextService.getStudyDetails(study);
         } catch (IOException e) {
             return new ResponseEntity<String>(e.getMessage(), headers, HttpStatus.BAD_REQUEST);
         }
