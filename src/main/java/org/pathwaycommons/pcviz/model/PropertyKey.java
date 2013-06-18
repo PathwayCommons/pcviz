@@ -14,7 +14,8 @@ public enum PropertyKey
     ISDIRECTED,
     TYPE,
     IMPORTANCE,
-	PUBMED;
+	PUBMED,
+    RANK;
 
 	@Override
 	public String toString()
