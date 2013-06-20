@@ -254,6 +254,8 @@ var ContextAwareNetworkView = Backbone.View.extend({
         }
 
         cy.batchData(avgData);
+        // Now that we have new data, we have to run the ranker again
+        cy.rankNodes();
 
         return this;
     }
