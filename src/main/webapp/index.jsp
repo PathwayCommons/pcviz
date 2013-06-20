@@ -581,20 +581,20 @@
       <div class="context-dialog hide" id="step2">
           <h4>2) Data types</h4>
           <label class="checkbox" for="mutation" id="label-mutation">
-            <input type="checkbox" class="data-type" value="mutation" id="mutation" data-toggle="checkbox">
+            <input type="checkbox" class="data-type" value="mutation" id="mutation" data-toggle="checkbox" checked="checked">
               Mutation
           </label>
           <label class="checkbox" for="cna" id="label-cna">
-              <input type="checkbox" class="data-type" value="cna" id="cna" data-toggle="checkbox">
+              <input type="checkbox" class="data-type" value="cna" id="cna" data-toggle="checkbox" checked="checked">
               Copy Number Alteration
           </label>
           <label class="checkbox" for="exp" id="label-exp">
-              <input type="checkbox" class="data-type" value="exp" id="exp" data-toggle="checkbox">
+              <input type="checkbox" class="data-type" value="exp" id="exp" data-toggle="checkbox" checked="checked">
               Gene Expression
           </label>
       </div>
       <div class="load-context">
-          <a class="btn btn-inverse btn-block disabled" id="context-load-button">
+          <a class="btn btn-inverse btn-block" id="context-load-button">
               <i class="icon-circle-arrow-down"></i>
               Load context
           </a>

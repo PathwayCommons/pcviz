@@ -27,9 +27,8 @@ var CancerContextDialogView = Backbone.View.extend({
         selfEl.html(this.template({}));
 
         $("#rightMenuTabs").scrollTo("#step1", 750);
-        $("#context-load-button").hide();
-
         $("#step-loading").show();
+        $("#context-load-button").hide();
 
         var studies = new CancerStudies();
         studies.fetch({
@@ -54,21 +53,28 @@ var CancerContextDialogView = Backbone.View.extend({
                             selectedStudy.fetch({
                                 success: function() {
                                     $("#step-loading").fadeOut();
+                                    var contextLoadButton = $("#context-load-button");
+
+                                    if(contextLoadButton.hasClass("disabled")) {
+                                        contextLoadButton.fadeOut();
+                                    } else {
+                                        contextLoadButton.show()
+                                    }
 
                                     var model = selectedStudy.toJSON();
 
                                     if(!model.hasCNA)
-                                        $("#label-cna").hide();
+                                        $("#label-cna").hide().find("input").attr("checked", false);
                                     else
                                         $("#label-cna").show();
 
                                     if(!model.hasMutation)
-                                        $("#label-mutation").hide();
+                                        $("#label-mutation").hide().find("input").attr("checked", false);
                                     else
                                         $("#label-mutation").show();
 
                                     if(!model.hasExpression)
-                                        $("#label-exp").hide();
+                                        $("#label-exp").hide().find("input").attr("checked", false);
                                     else
                                         $("#label-exp").show();
 
@@ -94,7 +100,7 @@ var CancerContextDialogView = Backbone.View.extend({
                                     setupLabel();
 
                                     // Now bind the event to the add button
-                                    $("#context-load-button").unbind("click").click(function(e) {
+                                    contextLoadButton.unbind("click").click(function(e) {
                                         if($(this).hasClass("disabled")) return;
 
                                         $("#step-loading").show();
