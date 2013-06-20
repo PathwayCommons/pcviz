@@ -7,6 +7,7 @@ var NetworkView = Backbone.View.extend({
 	detailsInfo: "#graph-details-info",
 	// content id for the gene input field
 	tagsInputField: "input[name='tagsinput']",
+    tooSlowMessage: "#too-slow-message",
     controlButtonsContainer: "#control-panels",
 	// cytoscape web visual style object
 	cyStyle: cytoscape.stylesheet()
@@ -105,6 +106,7 @@ var NetworkView = Backbone.View.extend({
 	    networkLoading.slideDown();
         container.hide();
         controlsContainer.hide();
+        $(this.detailsInfo).hide();
 
 	    // get gene names from the input field
         var names = $(self.tagsInputField).val().toUpperCase();
@@ -152,8 +154,8 @@ var NetworkView = Backbone.View.extend({
                 }
 
                 window.setTimeout(function() {
-                    $("#too-slow-message").slideDown();
-                }, 4000);
+                    $(self.tooSlowMessage).slideDown();
+                }, 5000);
 
                 // TODO: change graph type dynamically! (nhood)
                 $.getJSON("graph/" + networkType + "/" + names,
@@ -161,8 +163,9 @@ var NetworkView = Backbone.View.extend({
                         networkLoading.hide();
                         container.html("");
                         container.show();
+                        $(self.detailsInfo).show();
                         controlsContainer.show();
-                        $("#too-slow-message").hide();
+                        $(self.tooSlowMessage).hide();
 
                         var windowSize = self.options.windowSize;
                         if(windowSize == undefined)
@@ -291,7 +294,7 @@ var NetworkView = Backbone.View.extend({
 		// remove previous content
 		info.hide();
 		container.empty();
-		container.append(_.template($("#loading-small-template").html(), {}));
+		container.append(_.template($("#loading-biogene-template").html(), {}));
 		container.show();
 
 		// request json data from BioGene service

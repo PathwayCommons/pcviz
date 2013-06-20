@@ -31,7 +31,7 @@ var BioGeneView = Backbone.View.extend({
         if(!this.model.isseed) {
             $(".add-gene-to-network")
                 .click(function(event) {
-                    $("#tagsinput").addTag($(this).data("gene"));
+                    $("input[name='tagsinput']").addTag($(this).data("gene"));
                 })
                 .tooltip({
                     placement: 'right'
