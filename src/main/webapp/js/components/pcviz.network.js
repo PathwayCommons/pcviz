@@ -177,6 +177,9 @@ var NetworkView = Backbone.View.extend({
                                 height: windowSize.height,
                                 width: windowSize.width
                             },
+                            minZoom: 0.25,
+                            maxZoom: 16,
+
                             ready: function() {
                                 window.cy = this; // for debugging
 
