@@ -1,10 +1,7 @@
 package org.pathwaycommons.pcviz.service;
 
 import flexjson.JSONSerializer;
-import org.cbio.causality.data.portal.CBioPortalAccessor;
-import org.cbio.causality.data.portal.CancerStudy;
-import org.cbio.causality.data.portal.CaseList;
-import org.cbio.causality.data.portal.GeneticProfile;
+import org.cbio.causality.data.portal.*;
 import org.cbio.causality.model.Alteration;
 import org.cbio.causality.model.AlterationPack;
 import org.pathwaycommons.pcviz.model.CancerStudyDetails;
@@ -81,7 +78,8 @@ public class CancerContextService {
     }
 
     private boolean isZscores(GeneticProfile geneticProfile) {
-        return geneticProfile.getId().toLowerCase().endsWith("_mrna_median_zscores");
+        return geneticProfile.getType().equals(ProfileType.MRNA_EXPRESSION)
+                    && geneticProfile.getId().toLowerCase().endsWith("_zscores");
     }
 
     private boolean isExtendedMutation(GeneticProfile geneticProfile) {
