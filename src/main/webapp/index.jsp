@@ -116,6 +116,20 @@
               <div id="network-loading">
                   <h4>Loading network...</h4>
                   <img src="images/loading.gif" alt="loading network...">
+
+                  <div class="help-text palette palette-silver hide" id="too-slow-message">
+                      <h5>Taking too long?</h5><br>
+                      Sorry about this!
+                      For your genes, we try to contact
+                      <a href="http://pathwaycommons.org" target="_blank">Pathway Commons</a>
+                      in order to build a network of interest for you;
+                      but some of the querying methods we use can take some time to complete
+                      and we do this dynamically in order for us to give you the most up-to-date interactions.
+                      Therefore, it sometimes takes too long to create the network,
+                      but we are constantly working to reduce the waiting time.
+                      <br>
+                      <br>
+                  </div>
               </div>
               <div id="network-container">
                   <div id="main-network-view"></div>
