@@ -120,11 +120,11 @@
                   <div class="help-text palette palette-silver hide" id="too-slow-message">
                       <h5>Taking too long?</h5><br>
                       Sorry about this!
-                      For your genes, we try to contact
+                      Based on the genes you enter, we try to contact
                       <a href="http://pathwaycommons.org" target="_blank">Pathway Commons</a>
-                      in order to build a network of interest for you;
+                      to build a network of interest for you;
                       but some of the querying methods we use can take some time to complete
-                      and we do this dynamically in order for us to give you the most up-to-date interactions.
+                      and we do this dynamically in order to give you the most up-to-date interactions.
                       Therefore, it sometimes takes too long to create the network,
                       but we are constantly working to reduce the waiting time.
                       <br>
@@ -161,7 +161,7 @@
           <div class="span4"> <!-- slider bars and everything -->
               <div id="rightMenuTabs" class="tab-content">
                   <div class="tab-pane fade active in" id="graph-details">
-                      <div id="graph-details-info">
+                      <div id="graph-details-info" class="hide">
                           <p class="help-text palette palette-silver">
                               Click on one of the interactions or genes in the network to see more details...
                           </p>
@@ -489,6 +489,11 @@
 
   <script type="text/template" id="loading-text-template">
       <span class="loading">loading...</span>
+  </script>
+
+  <script type="text/template" id="loading-biogene-template">
+      loading gene information...<br>
+      <img src="images/loading.gif" alt="loading..." height="17" width="50">
   </script>
 
   <script type="text/template" id="loading-large-template">
