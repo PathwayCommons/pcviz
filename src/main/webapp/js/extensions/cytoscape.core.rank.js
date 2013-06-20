@@ -36,7 +36,16 @@
         });
 
         nodes.sort(function(a, b) {
-            return pooledData[b][options.attrName] - pooledData[a][options.attrName];
+            var diff = pooledData[b][options.attrName] - pooledData[a][options.attrName]
+
+            if(diff == 0) {
+                diff = cy.$("#" + b).data("altered") - cy.$("#" + a).data("altered");
+
+                if(diff == 0) {
+                    diff = cy.$("#" + b).data("cited") - cy.$("#" + a).data("cited");
+                }
+            }
+            return diff;
         });
 
         for(var i=0; i < nodes.length; i++) {
