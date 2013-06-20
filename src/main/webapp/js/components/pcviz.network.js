@@ -151,6 +151,10 @@ var NetworkView = Backbone.View.extend({
                     })).render();
                 }
 
+                window.setTimeout(function() {
+                    $("#too-slow-message").slideDown();
+                }, 4000);
+
                 // TODO: change graph type dynamically! (nhood)
                 $.getJSON("graph/" + networkType + "/" + names,
                     function(data) {
@@ -158,6 +162,7 @@ var NetworkView = Backbone.View.extend({
                         container.html("");
                         container.show();
                         controlsContainer.show();
+                        $("#too-slow-message").hide();
 
                         var windowSize = self.options.windowSize;
                         if(windowSize == undefined)
