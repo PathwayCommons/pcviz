@@ -12,12 +12,26 @@
     /* Routers */
     AppRouter = Backbone.Router.extend({
         routes: {
+            "embed/:type/:terms": "embed",
             ":type/:terms": "gene",
             ":type/": "emptyGene",
             "*actions": "home"
         },
 
+        embed: function(type, terms) {
+            (new EmbedHomeView({})).render();
+            (new EmbedNetworkView({
+                el: "#embed-network-view",
+                model: {
+                    networkType: type,
+                    genes: terms
+                }
+            })).render();
+        },
+
         home: function(actions) {
+            (new HeaderView({})).render();
+            (new FooterView({})).render();
             var networkType = "neighborhood";
             (new HomeView({ model: { terms: "MDM2", networkType: networkType }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
@@ -25,6 +39,8 @@
         },
 
         gene: function(type, terms) {
+            (new HeaderView({})).render();
+            (new FooterView({})).render();
             (new HomeView({ model: { terms: terms, networkType: type }})).render();
             (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();

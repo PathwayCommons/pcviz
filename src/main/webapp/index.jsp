@@ -39,59 +39,70 @@
     <![endif]-->
   </head>
   <body>
-  <div class="palette-silver">
-    <div class="container">
-      <div id="pcviz-headline" class="pcviz-headline">
-        <h1 class="pcviz-logo">
-          PCViz
-          <small>Pathway Commons Network Visualizer</small>
-        </h1>
-      </div>
-    </div>
+  <div id="pcviz-header">
   </div>
 
-    <div class="container" id="main-container">
+  <div class="container" id="main-container">
         <!-- all the backbone magic will happen here -->
-    </div>
-  <footer>
-      <div class="container">
-          <div class="row">
-              <div class="span8">
-                  <h3 class="footer-title">Contact</h3>
-                  <p>PCViz is built and maintained by
-                      <a href="http://cbio.mskcc.org">Memorial Sloan-Kettering Cancer Center</a> and
-                      the <a href="http://baderlab.org">University of Toronto</a>.
-                  </p>
+  </div>
 
-                  <p>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                      Aenean a sapien leo. Nunc ornare rutrum ante eget rhoncus.
-                      Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                      Curabitur suscipit, ligula a sollicitudin viverra, eros elit ornare mauris, sed fringilla ipsum erat vitae nibh.
-                      Mauris vulputate enim non dui mattis facilisis.
-                      Ut non lacus augue, id egestas enim.
-                      Etiam pellentesque ante eget arcu pretium semper.
-                      Sed imperdiet venenatis mi, id aliquet lectus feugiat cursus.
-                      Suspendisse potenti. In eget sodales augue.
-                      Fusce massa leo, volutpat a faucibus nec, tristique sit amet velit.
-                      Proin et augue lacus, sit amet accumsan nibh.
-                      Maecenas tincidunt posuere sagittis.
-                  </p>
-              </div>
+  <div id="pcviz-footer">
+  </div>
 
-              <div class="span4">
-                  <div class="footer-banner">
-                      <h3 class="footer-title">PCViz: More</h3>
-                      <ul>
-                          <li>Help</li>
-                          <li>Tutorials</li>
-                          <li>Code</li>
-                      </ul>
-                  </div>
+  <script type="text/template" id="pcviz-header-template">
+      <div class="palette-silver">
+          <div class="container">
+              <div id="pcviz-headline" class="pcviz-headline">
+                  <h1 class="pcviz-logo">
+                      PCViz
+                      <small>Pathway Commons Network Visualizer</small>
+                  </h1>
               </div>
           </div>
       </div>
-  </footer>
+  </script>
+
+  <script type="text/template" id="pcviz-footer-template">
+      <footer>
+          <div class="container">
+              <div class="row">
+                  <div class="span8">
+                      <h3 class="footer-title">Contact</h3>
+                      <p>PCViz is built and maintained by
+                          <a href="http://cbio.mskcc.org">Memorial Sloan-Kettering Cancer Center</a> and
+                          the <a href="http://baderlab.org">University of Toronto</a>.
+                      </p>
+
+                      <p>
+                          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                          Aenean a sapien leo. Nunc ornare rutrum ante eget rhoncus.
+                          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                          Curabitur suscipit, ligula a sollicitudin viverra, eros elit ornare mauris, sed fringilla ipsum erat vitae nibh.
+                          Mauris vulputate enim non dui mattis facilisis.
+                          Ut non lacus augue, id egestas enim.
+                          Etiam pellentesque ante eget arcu pretium semper.
+                          Sed imperdiet venenatis mi, id aliquet lectus feugiat cursus.
+                          Suspendisse potenti. In eget sodales augue.
+                          Fusce massa leo, volutpat a faucibus nec, tristique sit amet velit.
+                          Proin et augue lacus, sit amet accumsan nibh.
+                          Maecenas tincidunt posuere sagittis.
+                      </p>
+                  </div>
+
+                  <div class="span4">
+                      <div class="footer-banner">
+                          <h3 class="footer-title">PCViz: More</h3>
+                          <ul>
+                              <li>Help</li>
+                              <li>Tutorials</li>
+                              <li>Code</li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </footer>
+  </script>
 
   <script type="text/template" id="main-template">
       <div class="row topcontrols">
@@ -294,6 +305,21 @@
           </div>
       </div>
   </script>
+
+  <script type="text/template" id="main-embed-template">
+      <div class="mainview">
+          <div>  <!-- cytoscape view -->
+              <div id="network-embed-loading">
+                  <h4>Loading network...</h4>
+                  <img src="images/loading.gif" alt="loading network...">
+              </div>
+              <div id="network-embed-container">
+                  <div id="embed-network-view"></div>
+              </div>
+          </div>
+      </div>
+  </script>
+
 
   <!-- BioGeneView template for backbone.js -->
   <script type="text/template" id="biogene-template">

@@ -107,3 +107,33 @@ var HomeView = Backbone.View.extend({
         return this;
     }
 });
+
+var HeaderView = Backbone.View.extend({
+    template: _.template($("#pcviz-header-template").html()),
+    el: "#pcviz-header",
+
+    render: function() {
+        this.$el.html(this.template({}));
+    }
+});
+
+var FooterView = Backbone.View.extend({
+    template: _.template($("#pcviz-footer-template").html()),
+    el: "#pcviz-footer",
+
+    render: function() {
+        this.$el.html(this.template({}));
+    }
+});
+
+var EmbedHomeView = Backbone.View.extend({
+    el: "#main-container",
+    template:_.template($("#main-embed-template").html()),
+
+    render: function() {
+        this.$el.html(this.template(this.model));
+
+        return this;
+    }
+
+});

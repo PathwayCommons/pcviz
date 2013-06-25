@@ -312,3 +312,12 @@ footer {
     font-size: 14px;
 }
 
+/* Embed */
+#embed-network-view {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+

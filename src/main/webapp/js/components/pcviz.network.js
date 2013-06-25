@@ -353,3 +353,159 @@ var NetworkView = Backbone.View.extend({
         container.show();
     }
 });
+
+
+var EmbedNetworkView = Backbone.View.extend({
+    // div id for the initial display before the actual network loaded
+    networkLoading: "#network-embed-loading",
+    // cytoscape web visual style object
+    cyStyle: cytoscape.stylesheet()
+        .selector("node")
+        .css({
+            "content": "data(id)",
+            "shape": "data(shape)",
+            "border-width": 3,
+            "background-color": "mapData(altered, 0, 1, #DDDDDD, red)",
+            "border-color": "#555",
+            "font-size": "15"
+        })
+        .selector("[?isseed]")
+        .css({
+            "border-width": 5,
+            "color": "#1abc9c",
+            "font-weight": "bold",
+            "font-size": "17"
+        })
+        .selector("edge")
+        .css({
+            "width": "mapData(cited, 5, 50, 0.4, 0.5)",
+            "line-color": "#444"
+        })
+        .selector("[?isdirected]")
+        .css({
+            "target-arrow-shape": "triangle"
+        })
+        .selector("[!isvalid]")
+        .css({
+            "color": "#e74c3c"
+        })
+        .selector("edge[type='transinhibit']")
+        .css({
+            "line-color": "#E74C3C" // alizarin
+        })
+        .selector("edge[type='controls-state-change']")
+        .css({
+            "line-color": "#2980B9" // belize hole
+        })
+        .selector("edge[type='in-same-complex']")
+        .css({
+            "line-color": "#34495E" // wet asphalt
+        })
+        .selector("edge[type='transactivate']")
+        .css({
+            "line-color": "#16A085" // green see
+        })
+        .selector("edge[type='degrades']")
+        .css({
+            "line-color": "#D35400" // pumpkin
+        })
+        .selector("edge[type='blocks-degradation']")
+        .css({
+            "line-color": "#9B59B6" // amethyst
+        })
+        .selector("edge[type='consecutive-catalysis']")
+        .css({
+            "line-color": "#2ECC71" // emerald
+        })
+        .selector(":selected")
+        .css({
+            "background-color": "#000",
+            "line-color": "#000",
+            "source-arrow-color": "#000",
+            "target-arrow-color": "#000"
+        })
+        .selector(".ui-cytoscape-edgehandles-source")
+        .css({
+            "border-color": "#5CC2ED",
+            "border-width": 3
+        })
+        .selector(".ui-cytoscape-edgehandles-target, node.ui-cytoscape-edgehandles-preview")
+        .css({
+            "background-color": "#5CC2ED"
+        })
+        .selector("edge.ui-cytoscape-edgehandles-preview")
+        .css({
+            "line-color": "#5CC2ED"
+        })
+        .selector("node.ui-cytoscape-edgehandles-preview, node.intermediate")
+        .css({
+            "shape": "rectangle",
+            "width": 15,
+            "height": 15
+        }),
+    render: function() {
+        var self = this;
+
+        var container = $(self.el);
+        var networkLoading = $(self.networkLoading);
+
+        networkLoading.slideDown();
+        container.hide();
+
+        // get gene names from the model
+        var names = this.model.genes;
+        var networkType = this.model.networkType;
+
+        $.getJSON("graph/" + networkType + "/" + names,
+            function(data) {
+                networkLoading.hide();
+                container.html("");
+                container.show();
+
+                var windowSize = self.options.windowSize;
+                if(windowSize == undefined)
+                    windowSize = {};
+
+                var cyOptions = {
+                    elements: data,
+                    style: self.cyStyle,
+                    showOverlay: false,
+                    layout: {
+                        name: 'pcviz',
+                        height: windowSize.height,
+                        width: windowSize.width
+                    },
+                    minZoom: 0.25,
+                    maxZoom: 16,
+
+                    ready: function() {
+                        window.cy = this; // for debugging
+
+                        // We don't need this, so better disable
+                        cy.boxSelectionEnabled(false);
+
+                        // add pan zoom control panel
+                        container.cytoscapePanzoom();
+
+                        // When a node is moved, saved its new location
+                        cy.on('free', 'node', function(evt) {
+                            var node = this;
+                            var position = node.position();
+                            localStorage.setItem(node.id(), JSON.stringify(position));
+                        });
+
+                        // This is to get rid of overlapping nodes and panControl
+                        cy.zoom(0.90).center();
+
+                        // Run the ranker on this graph
+                        cy.rankNodes();
+                    }
+                };
+
+                container.cy(cyOptions);
+            });
+
+        return this;
+    }
+
+});
