@@ -61,7 +61,7 @@
         },
 
         cleanInput: function(input) {
-            input = input
+            return input
                 .replace(new RegExp("<", "g"), "")
                 .replace(new RegExp(">", "g"), "")
                 .toUpperCase();
