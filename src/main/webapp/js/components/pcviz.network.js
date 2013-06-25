@@ -44,7 +44,7 @@ var NetworkView = Backbone.View.extend({
         .css({
             "line-color": "#E74C3C" // alizarin
         })
-        .selector("edge[type='state-change']")
+        .selector("edge[type='controls-state-change']")
         .css({
             "line-color": "#2980B9" // belize hole
         })
