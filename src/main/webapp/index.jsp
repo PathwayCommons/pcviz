@@ -29,7 +29,7 @@
 
     <!-- Loading cytoscape.js plugins -->
     <link href="css/jquery.cytoscape-panzoom.css" rel="stylesheet">
-    <link href="css/font-awesome.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 
       <!-- Loading PCViz; this should always be the last to call! -->
       <link href="css/pcviz.css" rel="stylesheet">
@@ -151,10 +151,11 @@
               <div id="network-container">
                   <div id="main-network-view"></div>
                   <div class="row" id="control-panels">
-                      <div class="span6 offset2">
+                      <div class="span6 offset1">
                           <div class="btn-toolbar">
                               <div class="btn-group network-controls">
                                   <a class="btn" id="download-network" href="#"><i class="icon-download-alt"></i> Download</a>
+                                  <a class="btn" id="embed-network" href="#"><i class="icon-code"></i> Embed</a>
                                   <a class="btn" id="refresh-view" href="#"><i class="icon-refresh"></i> Refresh</a>
                                   <a class="btn" id="full-screen-link" href="#"><i class="icon-resize-full"></i> Full screen</a>
                               </div>
@@ -163,7 +164,7 @@
                   </div>
 
                   <div class="row hide" id="extra-download-options">
-                      <div class="span6 offset2">
+                      <div class="span6 offset1">
                           <div class="share download-options">
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
