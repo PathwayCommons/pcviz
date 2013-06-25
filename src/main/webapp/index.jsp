@@ -193,9 +193,10 @@
                                           </td>
                                       </tr>
                                       <tr>
-                                          <td colspan=5 class="embed-preview">
+                                          <td colspan="2"></td>
+                                          <td colspan="3" class="embed-preview">
                                               <a href="#" class="btn" id="embed-preview-button"><i class="icon-eye-open"></i> Preview</a>
-                                              <a href="#" class="btn" id="embed-close-button"><i class="icon-remove"></i> Cancel</a>
+                                              <a href="#" class="btn btn-danger" id="embed-close-button"><i class="icon-remove"></i> Cancel</a>
                                           </td>
                                       </tr>
 
