@@ -317,7 +317,39 @@ footer {
     height: 100%;
     width: 100%;
     position: absolute;
-    left: 20px;
-    top: 20px;
+    left: 0;
+    top: 0;
+    z-index: 9;
 }
+
+#network-embed-container {
+    padding-bottom: 35px;
+}
+
+#embed-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+#pcviz-footerline {
+    height: 35px;
+    padding: 5px;
+    padding-top: 10px;
+}
+
+h4.pcviz-embed-logo {
+    padding-left: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+h4.pcviz-embed-logo small {
+    color: white;
+}
+
+
+
 
