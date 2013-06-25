@@ -5,6 +5,7 @@
 <%
     WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
     String pcURL = (String) context.getBean("pathwayCommonsURLStr");
+    String pcVizURL = (String) context.getBean("pcVizURLStr");
 %>
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
@@ -42,12 +43,17 @@
   <div id="pcviz-header">
   </div>
 
-  <div class="container" id="main-container">
-        <!-- all the backbone magic will happen here -->
+  <div id="dynamic-container">
+      <!-- all the backbone magic will happen here -->
   </div>
 
   <div id="pcviz-footer">
   </div>
+
+  <script type="text/template" id="main-container-template">
+      <div class="{{isContainer ? 'container' : ''}}" id="main-container">
+      </div>
+  </script>
 
   <script type="text/template" id="pcviz-header-template">
       <div class="palette-silver">
@@ -320,6 +326,22 @@
       </div>
   </script>
 
+  <script type="text/template" id="embed-footer-template">
+      <div class="palette-silver" id="embed-footer">
+          <div id="pcviz-footerline">
+              <p class="pull-right">
+                  <a class="btn" id="embed-explore-button" target="_blank" href="<%=pcVizURL%>/#{{networkType}}/{{genes}}" title="explore this network in PCViz"><i class="icon-share"></i></a>
+              </p>
+              <h4 class="pcviz-embed-logo" data-url="<%=pcVizURL%>">
+                  PCViz
+                  <small>Pathway Commons Network Visualizer</small>
+              </h4>
+          </div>
+      </div>
+  </script>
+
+  <script type="text/template" id="embed-header-template">
+  </script>
 
   <!-- BioGeneView template for backbone.js -->
   <script type="text/template" id="biogene-template">

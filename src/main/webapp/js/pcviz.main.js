@@ -19,17 +19,23 @@
         },
 
         embed: function(type, terms) {
+            var networkModel = {
+                networkType: type,
+                genes: this.cleanInput(terms)
+            };
+
+            (new ContainerView({ model: false })).render();
+            (new EmbedHeaderView({})).render();
+            (new EmbedFooterView({ model: networkModel })).render();
             (new EmbedHomeView({})).render();
             (new EmbedNetworkView({
                 el: "#embed-network-view",
-                model: {
-                    networkType: type,
-                    genes: terms
-                }
+                model: networkModel
             })).render();
         },
 
         home: function(actions) {
+            (new ContainerView({ model: true })).render();
             (new HeaderView({})).render();
             (new FooterView({})).render();
             var networkType = "neighborhood";
@@ -39,15 +45,26 @@
         },
 
         gene: function(type, terms) {
+            (new ContainerView({ model: true })).render();
             (new HeaderView({})).render();
             (new FooterView({})).render();
-            (new HomeView({ model: { terms: terms, networkType: type }})).render();
+            (new HomeView({ model: {
+                terms: this.cleanInput(terms),
+                networkType: type
+            }})).render();
             (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         },
 
         emptyGene: function(type) {
             this.gene(type, "");
+        },
+
+        cleanInput: function(input) {
+            input = input
+                .replace(new RegExp("<", "g"), "")
+                .replace(new RegExp(">", "g"), "")
+                .toUpperCase();
         }
     });
 

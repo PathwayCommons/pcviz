@@ -1,3 +1,14 @@
+var ContainerView = Backbone.View.extend({
+    el: "#dynamic-container",
+    template: _.template($("#main-container-template").html()),
+
+    render: function() {
+        this.$el.html(this.template({ isContainer: this.model }));
+
+        return this;
+    }
+});
+
 var HomeView = Backbone.View.extend({
     el: "#main-container",
     template:_.template($("#main-template").html()),
@@ -126,12 +137,34 @@ var FooterView = Backbone.View.extend({
     }
 });
 
+var EmbedHeaderView = Backbone.View.extend({
+    template: _.template($("#embed-header-template").html()),
+    el: "#pcviz-header",
+
+    render: function() {
+        this.$el.html(this.template({}));
+    }
+});
+
+var EmbedFooterView = Backbone.View.extend({
+    template: _.template($("#embed-footer-template").html()),
+    el: "#pcviz-footer",
+
+    render: function() {
+        this.$el.html(this.template(this.model));
+    }
+});
+
 var EmbedHomeView = Backbone.View.extend({
     el: "#main-container",
     template:_.template($("#main-embed-template").html()),
 
     render: function() {
         this.$el.html(this.template(this.model));
+
+        $(".pcviz-embed-logo").click(function(e) {
+            window.open($(this).data("url"), "_blank");
+        });
 
         return this;
     }

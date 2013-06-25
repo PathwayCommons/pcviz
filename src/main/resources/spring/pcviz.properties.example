@@ -22,3 +22,6 @@ autoCompleteResult.limit=10
 # CBioPortal
 cbioportal.cache.folder=/tmp/cocitations/portal
 cbioportal.cache.folder.test=/tmp/cocitations/portal-test
+
+# PCViz self URL
+pcviz.url=http://awabi.cbio.mskcc.org/pc2-demo/
