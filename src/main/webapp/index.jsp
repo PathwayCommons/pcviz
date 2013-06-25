@@ -174,6 +174,36 @@
                           </div>
                       </div>
                   </div>
+
+                  <div class="row hide" id="extra-embed-options">
+                      <div class="span5 offset3">
+                          <div class="embed-options share">
+                                  <table>
+                                      <tr>
+                                          <td class="span1"></td>
+                                          <th class="span1">Height</th>
+                                          <td class="span1"><input placeholder="Height" class="input-mini embed-size-input" type="text" id="embed-form-height" value="500"></td>
+                                          <th class="span1">Width</th>
+                                          <td class="span1"><input placeholder="Width" class="input-mini embed-size-input" type="text" id="embed-form-width" value="500"></td>
+                                      </tr>
+                                      <tr>
+                                          <th colspan="2">HTML Code:</th>
+                                          <td colspan="3">
+                                              <textarea id="embed-form-html" rows=3 class="span3"></textarea>
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td colspan=5 class="embed-preview">
+                                              <a href="#" class="btn" id="embed-preview-button"><i class="icon-eye-open"></i> Preview</a>
+                                              <a href="#" class="btn" id="embed-close-button"><i class="icon-remove"></i> Cancel</a>
+                                          </td>
+                                      </tr>
+
+                                  </table>
+                              </div>
+                      </div>
+                  </div>
+
               </div>
           </div>
           <div class="span4"> <!-- slider bars and everything -->
@@ -312,6 +342,8 @@
           </div>
       </div>
   </script>
+
+  <script type="text/template" id="embed-code-template"><iframe width="{{width}}" height="{{height}}" src="http://awabi.cbio.mskcc.org/pc2-demo/#embed/{{networkType}}/{{genes}}" scrolling="no" frameborder="0" seamless="seamless"></iframe></script>
 
   <script type="text/template" id="main-embed-template">
       <div class="mainview">
