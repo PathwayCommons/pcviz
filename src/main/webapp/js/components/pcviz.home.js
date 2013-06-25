@@ -72,8 +72,14 @@ var HomeView = Backbone.View.extend({
 
         $("#download-network").click(function(e) {
             e.preventDefault();
+
+            if($("#embed-network").hasClass("active")) {
+                $("#embed-network").trigger('click');
+            }
+
             $("#download-network").toggleClass("active");
             $("#extra-download-options").toggle("slideDown");
+
         });
 
         $("#download-png").click(function(e) {
@@ -114,6 +120,73 @@ var HomeView = Backbone.View.extend({
         $("#pcviz-headline").click(function(e) {
             window.location.hash = "";
         });
+
+        var embedCodeView = new EmbedCodeView({
+            model: {
+                genes: terms,
+                networkType: kind
+            }
+        }).render();
+
+        $("#embed-network").click(function(e) {
+            e.preventDefault();
+
+            if($("#download-network").hasClass("active")) {
+                $("#download-network").trigger('click');
+            }
+
+            $(this).toggleClass("active");
+            $("#extra-embed-options").toggle("slideDown");
+            embedCodeView.render();
+        });
+
+        $(".embed-size-input").keyup(function() {
+            embedCodeView.render();
+        });
+
+        $("#embed-close-button").click(function(e) {
+            e.preventDefault();
+            $("#download-network").trigger('click');
+        });
+
+        $("#embed-preview-button").click(function(e) {
+            e.preventDefault();
+
+            var size = embedCodeView.getSize();
+
+            $.fancybox(
+                embedCodeView.getHtml(),
+                {
+                    'autoDimensions' : false,
+                    'width' : size.width + "px",
+                    'height' : size.width + "px",
+                    'transitionIn' : 'none',
+                    'transitionOut' : 'none'
+                }
+            );
+
+        });
+
+        return this;
+    }
+});
+
+var EmbedCodeView = Backbone.View.extend({
+    el: "#embed-form-html",
+    getHtml: function() {
+        var model = _.extend(this.model, this.getSize());
+        return this.template(model);
+    },
+
+    getSize: function() {
+        var width = $("#embed-form-width").val();
+        var height = $("#embed-form-height").val();
+
+        return {width: width, height: height};
+    },
+
+    template: _.template($("#embed-code-template").html()),    render: function() {
+        this.$el.html(this.getHtml());
 
         return this;
     }
