@@ -146,7 +146,7 @@ var HomeView = Backbone.View.extend({
 
         $("#embed-close-button").click(function(e) {
             e.preventDefault();
-            $("#download-network").trigger('click');
+            $("#embed-network").trigger('click');
         });
 
         $("#embed-preview-button").click(function(e) {
