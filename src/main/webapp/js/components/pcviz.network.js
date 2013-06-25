@@ -234,7 +234,7 @@ var NetworkView = Backbone.View.extend({
                                 var edgeTypes = [
                                     "consecutive-catalysis",
                                     "degrades",
-                                    "state-change",
+                                    "controls-state-change",
                                     "blocks-degradation",
                                     "transinhibit",
                                     "transactivate",
