@@ -176,12 +176,12 @@
                       <div class="share mrl edge-types">
                           <h4 class="demo-panel-title edge-types-title">Interaction types</h4>
                           <table class="table table-condensed">
-                              <tr id="row-state-change">
+                              <tr id="row-controls-state-change">
                                   <td>
-                                      <span id="state-change-count">0</span>
+                                      <span id="controls-state-change-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label state-change" data-itx-type="state-change">state change <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-state-change" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                               <tr id="row-consecutive-catalysis">
@@ -375,7 +375,7 @@
       inhibits degradation
   </script>
 
-  <script type="text/template" id="edge-type-text-state-change-template">
+  <script type="text/template" id="edge-type-text-controls-state-change-template">
       state change
   </script>
 
@@ -444,7 +444,7 @@
     </li>
   </script>
 
-  <script type="text/template" id="edge-state-change-template">
+  <script type="text/template" id="edge-controls-state-change-template">
       <span class="gene source-gene">{{source}}</span> changes the state of <span class="gene target-gene">{{target}}</span>.
   </script>
 
