@@ -101,17 +101,18 @@ public class PathwayCommonsGraphService {
 
             // the Pattern framework can generate SIF too
             SIFSearcher searcher = new SIFSearcher(
-                    new ControlsStateChangeMiner(),
-                    new ControlsStateChangeButIsParticipantMiner(),
-                    new ConsecutiveCatalysisMiner(null), // todo pass black list here
-    //				new InSameComplexMiner(), // add this line after implementing ranking
-                    new DegradesMiner()
+                SIFType.CONTROLS_STATE_CHANGE,
+				SIFType.CONTROLS_EXPRESSION,
+				SIFType.CONTROLS_DEGRADATION
+//				SIFType.CONSECUTIVE_CATALYSIS,
+//				SIFType.IN_SAME_COMPLEX,
+//				SIFType.INTERACTS_WITH
             );
 
             for (SIFInteraction sif : searcher.searchSIF(model))
             {
-                String srcName = sif.source;
-                String targetName = sif.target;
+                String srcName = sif.sourceID;
+                String targetName = sif.targetID;
 
                 nodeNames.add(srcName);
                 nodeNames.add(targetName);
@@ -120,7 +121,7 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.ID, srcName + targetName);
                 edge.setProperty(PropertyKey.SOURCE, srcName);
                 edge.setProperty(PropertyKey.TARGET, targetName);
-                edge.setProperty(PropertyKey.ISDIRECTED, sif.directed);
+                edge.setProperty(PropertyKey.ISDIRECTED, sif.type.isDirected());
                 edge.setProperty(PropertyKey.TYPE, sif.type);
 
 				edge.setProperty(PropertyKey.PUBMED,
