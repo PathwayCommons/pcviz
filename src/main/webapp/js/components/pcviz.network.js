@@ -1,25 +1,13 @@
-var NetworkView = Backbone.View.extend({
-	// div id for the initial display before the actual network loaded
-	networkLoading: "#network-loading",
-	// div id for the contents of the details tab
-	detailsContent: "#graph-details-content",
-	// div id for the initial info message of the details tab
-	detailsInfo: "#graph-details-info",
-	// content id for the gene input field
-	tagsInputField: "input[name='tagsinput']",
-    tooSlowMessage: "#too-slow-message",
-    controlButtonsContainer: "#control-panels",
-	// cytoscape web visual style object
-	cyStyle: cytoscape.stylesheet()
-	    .selector("node")
-	    .css({
-	        "content": "data(id)",
-	        "shape": "data(shape)",
-	        "border-width": 3,
-	        "background-color": "mapData(altered, 0, 1, #DDDDDD, red)",
-	        "border-color": "#555",
+var pcVizStyleSheet = cytoscape.stylesheet()
+        .selector("node")
+        .css({
+            "content": "data(id)",
+            "shape": "data(shape)",
+            "border-width": 3,
+            "background-color": "mapData(altered, 0, 1, #DDDDDD, red)",
+            "border-color": "#555",
             "font-size": "15"
-	    })
+        })
         .selector("[?isseed]")
         .css({
             "border-width": 5,
@@ -32,10 +20,10 @@ var NetworkView = Backbone.View.extend({
             "width": "mapData(cited, 5, 50, 0.4, 0.5)",
             "line-color": "#444"
         })
-	    .selector("[?isdirected]")
-	    .css({
-	        "target-arrow-shape": "triangle"
-	    })
+        .selector("[?isdirected]")
+        .css({
+            "target-arrow-shape": "triangle"
+        })
         .selector("[!isvalid]")
         .css({
             "color": "#e74c3c"
@@ -65,31 +53,47 @@ var NetworkView = Backbone.View.extend({
             "line-color": "#2980B9"
         })
         .selector(":selected")
-	    .css({
-	        "background-color": "#000",
-	        "line-color": "#000",
-	        "source-arrow-color": "#000",
-	        "target-arrow-color": "#000"
-	    })
-	    .selector(".ui-cytoscape-edgehandles-source")
-	    .css({
-	        "border-color": "#5CC2ED",
-	        "border-width": 3
-	    })
-	    .selector(".ui-cytoscape-edgehandles-target, node.ui-cytoscape-edgehandles-preview")
-	    .css({
-	        "background-color": "#5CC2ED"
-	    })
-	    .selector("edge.ui-cytoscape-edgehandles-preview")
-	    .css({
-	        "line-color": "#5CC2ED"
-	    })
-	    .selector("node.ui-cytoscape-edgehandles-preview, node.intermediate")
-	    .css({
-	        "shape": "rectangle",
-	        "width": 15,
-	        "height": 15
-	    }),
+        .css({
+            "background-color": "#000",
+            "line-color": "#000",
+            "source-arrow-color": "#000",
+            "target-arrow-color": "#000"
+        })
+        .selector(".ui-cytoscape-edgehandles-source")
+        .css({
+            "border-color": "#5CC2ED",
+            "border-width": 3
+        })
+        .selector(".ui-cytoscape-edgehandles-target, node.ui-cytoscape-edgehandles-preview")
+        .css({
+            "background-color": "#5CC2ED"
+        })
+        .selector("edge.ui-cytoscape-edgehandles-preview")
+        .css({
+            "line-color": "#5CC2ED"
+        })
+        .selector("node.ui-cytoscape-edgehandles-preview, node.intermediate")
+        .css({
+            "shape": "rectangle",
+            "width": 15,
+            "height": 15
+        });
+
+
+var NetworkView = Backbone.View.extend({
+	// div id for the initial display before the actual network loaded
+	networkLoading: "#network-loading",
+	// div id for the contents of the details tab
+	detailsContent: "#graph-details-content",
+	// div id for the initial info message of the details tab
+	detailsInfo: "#graph-details-info",
+	// content id for the gene input field
+	tagsInputField: "input[name='tagsinput']",
+    tooSlowMessage: "#too-slow-message",
+    controlButtonsContainer: "#control-panels",
+	// cytoscape web visual style object
+	cyStyle: pcVizStyleSheet,
+
     render: function() {
 	    // reference to the NetworkView instance itself, this is required since
 	    // 'this' doesn't refer to the actual instance for callback functions
@@ -353,86 +357,8 @@ var EmbedNetworkView = Backbone.View.extend({
     // div id for the initial display before the actual network loaded
     networkLoading: "#network-embed-loading",
     // cytoscape web visual style object
-    cyStyle: cytoscape.stylesheet()
-        .selector("node")
-        .css({
-            "content": "data(id)",
-            "shape": "data(shape)",
-            "border-width": 3,
-            "background-color": "mapData(altered, 0, 1, #DDDDDD, red)",
-            "border-color": "#555",
-            "font-size": "15"
-        })
-        .selector("[?isseed]")
-        .css({
-            "border-width": 5,
-            "color": "#1abc9c",
-            "font-weight": "bold",
-            "font-size": "17"
-        })
-        .selector("edge")
-        .css({
-            "width": "mapData(cited, 5, 50, 0.4, 0.5)",
-            "line-color": "#444"
-        })
-        .selector("[?isdirected]")
-        .css({
-            "target-arrow-shape": "triangle"
-        })
-        .selector("[!isvalid]")
-        .css({
-            "color": "#e74c3c"
-        })
-        .selector("edge[type='consecutive-catalysis']")
-        .css({
-            "line-color": "#9B59B6"
-        })
-        .selector("edge[type='controls-degradation']")
-        .css({
-            "line-color": "#D35400"
-        })
-        .selector("edge[type='controls-expression']")
-        .css({
-            "line-color": "#2ECC71" // emerald
-        })
-        .selector("edge[type='interacts-with']")
-        .css({
-            "line-color": "#000000"
-        })
-        .selector("edge[type='in-same-complex']")
-        .css({
-            "line-color": "#34495E"
-        })
-        .selector("edge[type='controls-state-change']")
-        .css({
-            "line-color": "#2980B9"
-        })
-        .selector(":selected")
-        .css({
-            "background-color": "#000",
-            "line-color": "#000",
-            "source-arrow-color": "#000",
-            "target-arrow-color": "#000"
-        })
-        .selector(".ui-cytoscape-edgehandles-source")
-        .css({
-            "border-color": "#5CC2ED",
-            "border-width": 3
-        })
-        .selector(".ui-cytoscape-edgehandles-target, node.ui-cytoscape-edgehandles-preview")
-        .css({
-            "background-color": "#5CC2ED"
-        })
-        .selector("edge.ui-cytoscape-edgehandles-preview")
-        .css({
-            "line-color": "#5CC2ED"
-        })
-        .selector("node.ui-cytoscape-edgehandles-preview, node.intermediate")
-        .css({
-            "shape": "rectangle",
-            "width": 15,
-            "height": 15
-        }),
+    cyStyle: pcVizStyleSheet,
+
     render: function() {
         var self = this;
 
