@@ -280,7 +280,7 @@
                       <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</small></h4>
                       <table>
                           <tr>
-                              <td>
+                              <td class="minus-sign-container">
                                   <a href="#" id="decrease-button" class="slider-control"><i class="icon-minus"></i></a>
                               </td>
                               <td colspan='2' class="nodes-slider-container">
