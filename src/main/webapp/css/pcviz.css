@@ -137,10 +137,6 @@ footer {
     margin-left: 10px;
 }
 
-.transinhibit {
-    background-color: #E74C3C !important;
-}
-
 .controls-state-change {
     background-color: #2980B9 !important;
 }
@@ -149,16 +145,16 @@ footer {
     background-color: #34495E !important;
 }
 
-.transactivate {
-    background-color: #16A085 !important;
+.interacts {
+    background: #000000 !important;
 }
 
-.degrades {
-    background-color: #D35400 !important;
-}
-
-.blocks-degradation {
+.controls-expression {
     background-color: #9B59B6 !important;
+}
+
+.controls-degradation {
+    background-color: #D35400 !important;
 }
 
 .consecutive-catalysis {
