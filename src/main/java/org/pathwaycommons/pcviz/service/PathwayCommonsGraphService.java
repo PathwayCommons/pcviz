@@ -121,8 +121,9 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.ID, srcName + targetName);
                 edge.setProperty(PropertyKey.SOURCE, srcName);
                 edge.setProperty(PropertyKey.TARGET, targetName);
-                edge.setProperty(PropertyKey.ISDIRECTED, sif.type.isDirected());
-                edge.setProperty(PropertyKey.TYPE, sif.type);
+                SIFType sifType = sif.type;
+                edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
+                edge.setProperty(PropertyKey.TYPE, sifType.getTag());
 
 				edge.setProperty(PropertyKey.PUBMED,
 					sif.pubmedIDs == null ? Collections.emptyList() : sif.pubmedIDs);

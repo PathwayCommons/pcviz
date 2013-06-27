@@ -233,6 +233,22 @@
                                       <span class="itx-type-on-off label controls-state-change" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
+                              <tr id="row-controls-expression">
+                                  <td>
+                                      <span id="controls-expression-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label controls-expression" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr id="row-controls-degradation">
+                                  <td>
+                                      <span id="controls-degradation-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label controls-degradation" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
                               <tr id="row-consecutive-catalysis">
                                   <td>
                                       <span id="consecutive-catalysis-count">0</span>
@@ -249,38 +265,15 @@
                                       <span class="itx-type-on-off label in-same-complex" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-transactivate">
+                              <tr id="row-interacts">
                                   <td>
-                                      <span id="transactivate-count">0</span>
+                                      <span id="interacts-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label transactivate" data-itx-type="transactivate">expression upregulation <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
-                              <tr id="row-transinhibit">
-                                  <td>
-                                      <span id="transinhibit-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label transinhibit" data-itx-type="transinhibit">expression upregulation <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label interacts" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-blocks-degradation">
-                                  <td>
-                                      <span id="blocks-degradation-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label blocks-degradation" data-itx-type="blocks-degradation">degradation upregulation <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
-                              <tr id="row-degrades">
-                                  <td>
-                                      <span id="degrades-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label degrades" data-itx-type="degrades">degradation downregulation  <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
+
                           </table>
                       </div>
 
@@ -536,27 +529,21 @@
       <i>e.g.</i> the first entity produces a substrate that is consumed by the second entity.
   </script>
 
-  <script type="text/template" id="edge-degrades-template">
+  <script type="text/template" id="edge-controls-degradation-template">
       <span class="gene source-gene">{{source}}</span>
-      upregulates the degradation of
+      controls the degradation of
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
-  <script type="text/template" id="edge-blocks-degradation-template">
+  <script type="text/template" id="edge-controls-expression-template">
       <span class="gene source-gene">{{source}}</span>
-      downregulates the degradation of
+      controls the expression of
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
-  <script type="text/template" id="edge-transactivate-template">
+  <script type="text/template" id="edge-interacts-with-template">
       <span class="gene source-gene">{{source}}</span>
-      upregulates the expression of
-      <span class="gene target-gene">{{target}}</span>.
-  </script>
-
-  <script type="text/template" id="edge-transinhibit-template">
-      <span class="gene source-gene">{{source}}</span>
-      downregulates the expression of
+      interacts with
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
