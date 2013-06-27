@@ -104,7 +104,7 @@ public class PathwayCommonsGraphService {
                 SIFType.CONTROLS_STATE_CHANGE,
 				SIFType.CONTROLS_EXPRESSION,
 				SIFType.CONTROLS_DEGRADATION
-//				SIFType.CONSECUTIVE_CATALYSIS,
+//				SIFType.CONSECUTIVE_CATALYSIS
 //				SIFType.IN_SAME_COMPLEX,
 //				SIFType.INTERACTS_WITH
             );

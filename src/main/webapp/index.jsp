@@ -230,7 +230,7 @@
                                       <span id="controls-state-change-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label controls-state-change" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-state-change" data-itx-type="controls-state-change">controls state change <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                               <tr id="row-controls-expression">
@@ -238,7 +238,7 @@
                                       <span id="controls-expression-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label controls-expression" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-expression" data-itx-type="controls-expression">controls expression <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                               <tr id="row-controls-degradation">
@@ -246,7 +246,7 @@
                                       <span id="controls-degradation-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label controls-degradation" data-itx-type="controls-state-change">state change <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-degradation" data-itx-type="controls-degradation">controls degradation <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                               <tr id="row-consecutive-catalysis">
@@ -265,12 +265,12 @@
                                       <span class="itx-type-on-off label in-same-complex" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-interacts">
+                              <tr id="row-interacts-with">
                                   <td>
-                                      <span id="interacts-count">0</span>
+                                      <span id="interacts-with-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label interacts" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label interacts-with" data-itx-type="in-same-complex">interacts with <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
 
@@ -430,28 +430,24 @@
       </div>
   </script>
 
-  <script type="text/template" id="edge-type-text-transinhibit-template">
-      expression downregulation
+  <script type="text/template" id="edge-type-text-controls-state-change-template">
+      controls state change
   </script>
 
-  <script type="text/template" id="edge-type-text-transactivate-template">
-      expression upregulation
+  <script type="text/template" id="edge-type-text-controls-expression-template">
+      controls expression
   </script>
 
   <script type="text/template" id="edge-type-text-in-same-complex-template">
       in same complex
   </script>
 
-  <script type="text/template" id="edge-type-text-degrades-template">
-      degrades
+  <script type="text/template" id="edge-type-text-interacts-with-template">
+      interacts
   </script>
 
-  <script type="text/template" id="edge-type-text-inhibits-degradation-template">
-      inhibits degradation
-  </script>
-
-  <script type="text/template" id="edge-type-text-controls-state-change-template">
-      state change
+  <script type="text/template" id="edge-type-text-controls-degradation-template">
+      controls degradation
   </script>
 
   <script type="text/template" id="edge-type-text-consecutive-catalysis-template">

@@ -145,12 +145,12 @@ footer {
     background-color: #34495E !important;
 }
 
-.interacts {
+.interacts-with {
     background: #000000 !important;
 }
 
 .controls-expression {
-    background-color: #9B59B6 !important;
+    background-color: #2ECC71 !important;
 }
 
 .controls-degradation {
@@ -158,7 +158,7 @@ footer {
 }
 
 .consecutive-catalysis {
-    background-color: #2ECC71 !important;
+    background-color: #9B59B6 !important;
 }
 
 .itx-removed {

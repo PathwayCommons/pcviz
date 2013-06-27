@@ -42,7 +42,7 @@ var NetworkView = Backbone.View.extend({
         })
         .selector("edge[type='consecutive-catalysis']")
         .css({
-            "line-color": "#2ECC71" // emerald
+            "line-color": "#9B59B6"
         })
         .selector("edge[type='controls-degradation']")
         .css({
@@ -50,9 +50,9 @@ var NetworkView = Backbone.View.extend({
         })
         .selector("edge[type='controls-expression']")
         .css({
-            "line-color": "#9B59B6"
+            "line-color": "#2ECC71" // emerald
         })
-        .selector("edge[type='interacts']")
+        .selector("edge[type='interacts-with']")
         .css({
             "line-color": "#000000"
         })
@@ -385,7 +385,7 @@ var EmbedNetworkView = Backbone.View.extend({
         })
         .selector("edge[type='consecutive-catalysis']")
         .css({
-            "line-color": "#2ECC71" // emerald
+            "line-color": "#9B59B6"
         })
         .selector("edge[type='controls-degradation']")
         .css({
@@ -393,9 +393,9 @@ var EmbedNetworkView = Backbone.View.extend({
         })
         .selector("edge[type='controls-expression']")
         .css({
-            "line-color": "#9B59B6"
+            "line-color": "#2ECC71" // emerald
         })
-        .selector("edge[type='interacts']")
+        .selector("edge[type='interacts-with']")
         .css({
             "line-color": "#000000"
         })
