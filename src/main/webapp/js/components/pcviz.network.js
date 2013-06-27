@@ -40,33 +40,29 @@ var NetworkView = Backbone.View.extend({
         .css({
             "color": "#e74c3c"
         })
-        .selector("edge[type='transinhibit']")
-        .css({
-            "line-color": "#E74C3C" // alizarin
-        })
-        .selector("edge[type='controls-state-change']")
-        .css({
-            "line-color": "#2980B9" // belize hole
-        })
-        .selector("edge[type='in-same-complex']")
-        .css({
-            "line-color": "#34495E" // wet asphalt
-        })
-        .selector("edge[type='transactivate']")
-        .css({
-            "line-color": "#16A085" // green see
-        })
-        .selector("edge[type='degrades']")
-        .css({
-            "line-color": "#D35400" // pumpkin
-        })
-        .selector("edge[type='blocks-degradation']")
-        .css({
-            "line-color": "#9B59B6" // amethyst
-        })
         .selector("edge[type='consecutive-catalysis']")
         .css({
             "line-color": "#2ECC71" // emerald
+        })
+        .selector("edge[type='controls-degradation']")
+        .css({
+            "line-color": "#D35400"
+        })
+        .selector("edge[type='controls-expression']")
+        .css({
+            "line-color": "#9B59B6"
+        })
+        .selector("edge[type='interacts']")
+        .css({
+            "line-color": "#000000"
+        })
+        .selector("edge[type='in-same-complex']")
+        .css({
+            "line-color": "#34495E"
+        })
+        .selector("edge[type='controls-state-change']")
+        .css({
+            "line-color": "#2980B9"
         })
         .selector(":selected")
 	    .css({
@@ -233,13 +229,11 @@ var NetworkView = Backbone.View.extend({
 
                                 var edgeTypes = [
                                     "consecutive-catalysis",
-                                    "degrades",
+                                    "controls-degradation",
                                     "controls-state-change",
-                                    "blocks-degradation",
-                                    "transinhibit",
-                                    "transactivate",
-                                    "consecutive-analysis",
-                                    "in-same-complex"
+                                    "controls-expression",
+                                    "in-same-complex",
+                                    "interacts-with"
                                 ];
 
                                 _.each(edgeTypes, function(type) {
