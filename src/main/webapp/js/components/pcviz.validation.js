@@ -48,9 +48,11 @@ var GeneValidationsView = Backbone.View.extend({
                         })).render();
                     }
                 } else {
-                    // multiple match -- bad
-                    $(inputEl).addClass("error-tag");
-                    self.allValid = false;
+                    if(!_.contains(aValidation.get("matches"), aValidation.get("query"))) {
+                        // multiple match -- bad
+                        $(inputEl).addClass("error-tag");
+                        self.allValid = false;
+                    }
                 }
             }
         });

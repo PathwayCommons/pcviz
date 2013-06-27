@@ -14,6 +14,7 @@ public class GeneNameService {
 
     private Resource geneResource;
     private HashMap<String, HashSet<String>> geneMaps = null;
+    private ArrayList<String> geneMapKeysSorted = null;
     private Integer autoCompleteLimit = Integer.MAX_VALUE;
 
     public Resource getGeneResource() {
@@ -48,6 +49,7 @@ public class GeneNameService {
 
         try {
             geneMaps = new HashMap<String, HashSet<String>>();
+            geneMapKeysSorted = new ArrayList<String>();
             Scanner scanner = new Scanner(getGeneResource().getInputStream());
             // Skip the first (header) line
             scanner.nextLine();
@@ -63,10 +65,13 @@ public class GeneNameService {
                 String[] secondaryNames = tokens[1].split(", ");
                 for (String secondaryName : secondaryNames) {
                     secondaryName = secondaryName.trim().toUpperCase();
-                    if(!secondaryName.isEmpty()) addToMap(secondaryName, primaryName);
+                    if(!secondaryName.isEmpty()) {
+                        addToMap(secondaryName, primaryName);
+                    }
                 }
             }
 
+            Collections.sort(geneMapKeysSorted);
         } catch (IOException e) {
             log.error("Could not initialize the gene map: " + e.getLocalizedMessage());
         }
@@ -78,6 +83,7 @@ public class GeneNameService {
         if(strings == null) {
             strings = new HashSet<String>();
             geneMaps.put(secondaryName, strings);
+            geneMapKeysSorted.add(secondaryName);
         }
 
         strings.add(primaryName);
@@ -90,7 +96,7 @@ public class GeneNameService {
 
         term = term.toUpperCase();
 
-        for (String key : geneMaps.keySet()) {
+        for (String key : geneMapKeysSorted) {
             if(key.startsWith(term)) {
                 HashSet<String> matches = geneMaps.get(key);
                 assert matches != null;
