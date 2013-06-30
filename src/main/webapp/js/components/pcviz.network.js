@@ -176,9 +176,17 @@ var NetworkView = Backbone.View.extend({
                             style: self.cyStyle,
                             showOverlay: false,
                             layout: {
-                                name: 'pcviz',
-                                height: windowSize.height,
-                                width: windowSize.width
+                                name: 'arbor',
+                                liveUpdate: true,
+                                edgeLength: function(e) { return 10/(e.cited+1); },
+                                nodeMass: function(e) { return e.isseed ? 10 : 0.1; },
+                                repulsion: 1000,
+                                stiffness: 100,
+                                gravity: true,
+                                maxSimulationTime: 2000,
+                                stop: function() { console.log("finished."); }
+                                /*                                height: windowSize.height,
+                               width: windowSize.width*/
                             },
                             minZoom: 0.25,
                             maxZoom: 16,
