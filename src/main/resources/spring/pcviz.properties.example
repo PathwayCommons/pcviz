@@ -13,6 +13,10 @@ cocitation.shelflife=30
 cocitation.cache.folder=/tmp/cocitations
 cocitation.cache.folder.test=/tmp/cocitations-test
 
+# If the number of cocitations is below is this number, don't show it
+cocitation.min.edge=1
+cocitation.min.node=0
+
 # HGNC util
 #hgnc.location=http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit
 hgnc.location=file:/tmp/hgnc.txt
