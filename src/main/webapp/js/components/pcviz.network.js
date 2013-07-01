@@ -182,7 +182,7 @@ var NetworkView = Backbone.View.extend({
                                 repulsion: 1000,
                                 stiffness: 100,
                                 gravity: true,
-                                maxSimulationTime: 5000,
+                                maxIterations: 30,
                                 stableEnergy: function(energy){
                                     return (energy.max <= 8) || (energy.mean <= 0.6);
                                 }
