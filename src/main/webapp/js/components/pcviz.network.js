@@ -178,15 +178,14 @@ var NetworkView = Backbone.View.extend({
                             layout: {
                                 name: 'arbor',
                                 liveUpdate: true,
-                                edgeLength: function(e) { return 10/(e.cited+1); },
                                 nodeMass: function(e) { return e.isseed ? 10 : 0.1; },
                                 repulsion: 1000,
                                 stiffness: 100,
                                 gravity: true,
-                                maxSimulationTime: 2000,
-                                stop: function() { console.log("finished."); }
-                                /*                                height: windowSize.height,
-                               width: windowSize.width*/
+                                maxSimulationTime: 5000,
+                                stableEnergy: function(energy){
+                                    return (energy.max <= 8) || (energy.mean <= 0.6);
+                                }
                             },
                             minZoom: 0.25,
                             maxZoom: 16,
