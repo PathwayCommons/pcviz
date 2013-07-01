@@ -65,22 +65,28 @@
 			return;
 		}
 
-		var sys = this.system = arbor.ParticleSystem(options.repulsion, options.stiffness, options.friction, options.gravity, options.fps, options.dt, options.precision);
+		var sys = this.system = arbor.ParticleSystem(
+            options.repulsion,
+            options.stiffness,
+            options.friction,
+            options.gravity,
+            options.fps,
+            options.dt,
+            options.precision
+        );
 		this.system = sys;
 
-		if( options.liveUpdate && options.fit ){
+		if( options.liveUpdate && options.fit ) {
 			cy.reset();
-		};
+		}
 		
 		var doneTime = 250;
 		var doneTimeout;
 		
 		var ready = false;
 		
-		var lastDraw = +new Date;
-		var sysRenderer = {
-			init: function(system){
-			},
+		var lastDraw = +new Date();
+		sys.renderer = {
 			redraw: function(){
 				var energy = sys.energy();
 
@@ -96,7 +102,6 @@
 				var movedNodes = [];
 				
 				sys.eachNode(function(n, point){ 
-					var id = n.name;
 					var data = n.data;
 					var node = data.element;
 					
@@ -112,15 +117,13 @@
 						movedNodes.push( node );
 					}
 				});
-				
 
 				var timeToDraw = (+new Date - lastDraw) >= 16;
 				if( options.liveUpdate && movedNodes.length > 0 && timeToDraw ){
 					new $$.Collection(cy, movedNodes).rtrigger("position");
-					lastDraw = +new Date;
+					lastDraw = +new Date();
 				}
 
-				
 				if( !ready ){
 					ready = true;
 					cy.one("layoutready", options.ready);
@@ -129,7 +132,6 @@
 			}
 			
 		};
-		sys.renderer = sysRenderer;
 		sys.screenSize( width, height );
 		sys.screenPadding( options.padding[0], options.padding[1], options.padding[2], options.padding[3] );
 		sys.screenStep( options.stepSize );
@@ -152,28 +154,23 @@
 		function fromScreen(pos){
 			var x = pos.x;
 			var y = pos.y;
-			var w = width;
-			var h = height;
-			
+
 			var left = -2;
 			var right = 2;
-			var top = -2;
-			var bottom = 2;
-			
+
 			var d = 4;
 			
 			return {
-				x: x/w * d + left,
-				y: y/h * d + right
+				x: x/width * d + left,
+				y: y/height * d + right
 			};
 		}
 		
 		var grabHandler = function(e){
 			grabbed = this;
 			var pos = sys.fromScreen( this.position() );
-			var p = arbor.Point(pos.x, pos.y);
-			this.scratch().arbor.p = p;
-			
+            this.scratch().arbor.p = arbor.Point(pos.x, pos.y);
+
 			switch( e.type ){
 			case "grab":
 				this.scratch().arbor.fixed = true;
@@ -227,7 +224,7 @@
 				cy.fit();
 			}
 			callback();
-		};
+		}
 		
 		var grabbableNodes = nodes.filter(":grabbable");
 		// disable grabbing if so set
