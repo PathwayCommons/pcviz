@@ -63,7 +63,15 @@
 			return;
 		}
 
-		var sys = this.system = arbor.ParticleSystem(options.repulsion, options.stiffness, options.friction, options.gravity, options.fps, options.dt, options.precision);
+		var sys = this.system = arbor.ParticleSystem(
+            options.repulsion,
+            options.stiffness,
+            options.friction,
+            options.gravity,
+            options.fps,
+            options.dt,
+            options.precision
+        );
 		this.system = sys;
 
 		if( options.liveUpdate && options.fit ){
@@ -187,15 +195,6 @@
 				length: length
 			});
 		});
-		
-		function packToCenter(callback){
-			// TODO implement this for IE :(
-			
-			if( options.fit ){
-				cy.fit();
-			}
-			callback();
-		}
 		
 		sys.start();
 	};
