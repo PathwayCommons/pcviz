@@ -26,8 +26,7 @@
 		// function that returns true if the system is stable to indicate
 		// that the layout can be stopped
 		stableEnergy: function( energy ){
-			var e = energy; 
-			return (e.max <= 0.5) || (e.mean <= 0.3);
+			return (energy.max <= 0.5) || (energy.mean <= 0.3);
 		}
 	};
 	
@@ -69,15 +68,16 @@
 
 		if( options.liveUpdate && options.fit ){
 			cy.reset();
-		};
+		}
 		
 		var ready = false;
         var iterated = 0;
 		
-		var lastDraw = +new Date;
-		var sysRenderer = {
-			init: function(system){
+        sys.renderer = {
+			init: function(){
+                return this;
 			},
+
 			redraw: function(){
 				var energy = sys.energy();
 
@@ -85,7 +85,7 @@
 				if( (options.stableEnergy != null
                     && energy != null
                     && energy.n > 0
-                    && options.stableEnergy(energy)) || iterated > options.maxNumberOfIterations ){
+                    && options.stableEnergy(energy)) || iterated > options.maxIterations ){
 					sys.stop();
 					return;
 				}
@@ -93,7 +93,6 @@
 				var movedNodes = [];
 				
 				sys.eachNode(function(n, point){ 
-					var id = n.name;
 					var data = n.data;
 					var node = data.element;
 					
@@ -122,7 +121,6 @@
 			}
 			
 		};
-		sys.renderer = sysRenderer;
 		sys.screenSize( width, height );
 		sys.screenPadding( options.padding[0], options.padding[1], options.padding[2], options.padding[3] );
 		sys.screenStep( options.stepSize );
@@ -145,19 +143,15 @@
 		function fromScreen(pos){
 			var x = pos.x;
 			var y = pos.y;
-			var w = width;
-			var h = height;
-			
+
 			var left = -2;
 			var right = 2;
-			var top = -2;
-			var bottom = 2;
-			
+
 			var d = 4;
 			
 			return {
-				x: x/w * d + left,
-				y: y/h * d + right
+				x: x/width * d + left,
+				y: y/height * d + right
 			};
 		}
 
@@ -185,7 +179,6 @@
 		});
 		
 		edges.each(function(){
-			var id = this.id();
 			var src = this.source().id();
 			var tgt = this.target().id();
 			var length = calculateValueForElement(this, options.edgeLength);
@@ -202,14 +195,14 @@
 				cy.fit();
 			}
 			callback();
-		};
+		}
 		
 		sys.start();
 	};
 
 	PCVizArbor.prototype.stop = function(){
 		if( this.system != null ){
-			system.stop();
+			this.system.stop();
 		}
 	};
 	
