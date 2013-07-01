@@ -7,7 +7,6 @@
         maxIterations: 50,
 		fit: true, // fit to viewport
 		padding: [ 50, 50, 50, 50 ], // top, right, bottom, left
-		ungrabifyWhileSimulating: true, // so you can't drag nodes during layout
 
 		// forces used by arbor (use arbor default on undefined)
 		repulsion: undefined,
@@ -103,7 +102,7 @@
 					}
 					var pos = node._private.position;
 					
-					if( !node.locked() && !node.grabbed() ){
+					if( !node.locked() ){
 						pos.x = point.x;
 						pos.y = point.y;
 						
@@ -161,25 +160,7 @@
 				y: y/h * d + right
 			};
 		}
-		
-		var grabHandler = function(e){
-			grabbed = this;
-			var pos = sys.fromScreen( this.position() );
-			var p = arbor.Point(pos.x, pos.y);
-			this.scratch().arbor.p = p;
-			
-			switch( e.type ){
-			case "grab":
-				this.scratch().arbor.fixed = true;
-				break;
-			case "dragstop":
-				this.scratch().arbor.fixed = false;
-				this.scratch().arbor.tempMass = 1000
-				break;
-			}
-		};
-		nodes.bind("grab drag dragstop", grabHandler);
-			  	
+
 		nodes.each(function(i, node){
 			var id = this._private.data.id;
 			var mass = calculateValueForElement(this, options.nodeMass);
@@ -222,12 +203,6 @@
 			}
 			callback();
 		};
-		
-		var grabbableNodes = nodes.filter(":grabbable");
-		// disable grabbing if so set
-		if( options.ungrabifyWhileSimulating ){
-			grabbableNodes.ungrabify();
-		}
 		
 		sys.start();
 	};
