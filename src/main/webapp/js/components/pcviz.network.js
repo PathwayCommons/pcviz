@@ -79,6 +79,19 @@ var pcVizStyleSheet = cytoscape.stylesheet()
             "height": 15
         });
 
+var pcVizLayoutOptions = {
+    name: 'pcvizarbor',
+    liveUpdate: true,
+    nodeMass: function(e) { return e.isseed ? 10 : 0.1; },
+    repulsion: 1000,
+    stiffness: 100,
+    gravity: true,
+    maxIterations: 30,
+    stableEnergy: function(energy) {
+        return (energy.max <= 8) || (energy.mean <= 0.6);
+    }
+};
+
 
 var NetworkView = Backbone.View.extend({
 	// div id for the initial display before the actual network loaded
@@ -175,11 +188,7 @@ var NetworkView = Backbone.View.extend({
                             elements: data,
                             style: self.cyStyle,
                             showOverlay: false,
-                            layout: {
-                                name: 'pcviz',
-                                height: windowSize.height,
-                                width: windowSize.width
-                            },
+                            layout: pcVizLayoutOptions,
                             minZoom: 0.25,
                             maxZoom: 16,
 
@@ -386,11 +395,7 @@ var EmbedNetworkView = Backbone.View.extend({
                     elements: data,
                     style: self.cyStyle,
                     showOverlay: false,
-                    layout: {
-                        name: 'pcviz',
-                        height: windowSize.height,
-                        width: windowSize.width
-                    },
+                    layout: pcVizLayoutOptions,
                     minZoom: 0.25,
                     maxZoom: 16,
 
