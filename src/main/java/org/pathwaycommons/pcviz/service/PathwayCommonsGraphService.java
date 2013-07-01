@@ -21,6 +21,25 @@ import java.util.*;
 public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
 
+    private Integer minNumberOfCoCitationsForEdges = 0;
+    private Integer minNumberOfCoCitationsForNodes = 0;
+
+    public Integer getMinNumberOfCoCitationsForEdges() {
+        return minNumberOfCoCitationsForEdges;
+    }
+
+    public void setMinNumberOfCoCitationsForEdges(Integer minNumberOfCoCitationsForEdges) {
+        this.minNumberOfCoCitationsForEdges = minNumberOfCoCitationsForEdges;
+    }
+
+    public Integer getMinNumberOfCoCitationsForNodes() {
+        return minNumberOfCoCitationsForNodes;
+    }
+
+    public void setMinNumberOfCoCitationsForNodes(Integer minNumberOfCoCitationsForNodes) {
+        this.minNumberOfCoCitationsForNodes = minNumberOfCoCitationsForNodes;
+    }
+
     private String pathwayCommonsUrl;
 
     public String getPathwayCommonsUrl() {
@@ -114,6 +133,10 @@ public class PathwayCommonsGraphService {
                 String srcName = sif.sourceID;
                 String targetName = sif.targetID;
 
+                int cocitations = getCocitations(srcName, targetName);
+                if(cocitations < getMinNumberOfCoCitationsForEdges())
+                    continue;
+
                 nodeNames.add(srcName);
                 nodeNames.add(targetName);
 
@@ -128,7 +151,7 @@ public class PathwayCommonsGraphService {
 				edge.setProperty(PropertyKey.PUBMED,
 					sif.pubmedIDs == null ? Collections.emptyList() : sif.pubmedIDs);
 
-                edge.setProperty(PropertyKey.CITED, getCocitations(srcName, targetName));
+                edge.setProperty(PropertyKey.CITED, cocitations);
                 graph.getEdges().add(edge);
             }
         }
@@ -139,11 +162,15 @@ public class PathwayCommonsGraphService {
         } finally {
             for (String nodeName : nodeNames)
             {
+                int totalCocitations = getTotalCocitations(nodeName);
+                if(totalCocitations < getMinNumberOfCoCitationsForNodes())
+                    continue;
+
                 CytoscapeJsNode node = new CytoscapeJsNode();
                 node.setProperty(PropertyKey.ID, nodeName);
                 boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
                 node.setProperty(PropertyKey.ISVALID, isValid);
-                node.setProperty(PropertyKey.CITED, isValid ? getTotalCocitations(nodeName) : 0);
+                node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
                 boolean isSeed = genes.contains(nodeName);
                 node.setProperty(PropertyKey.ISSEED, isSeed);
                 node.setProperty(PropertyKey.RANK, 0);
