@@ -176,7 +176,7 @@ var NetworkView = Backbone.View.extend({
                             style: self.cyStyle,
                             showOverlay: false,
                             layout: {
-                                name: 'arbor',
+                                name: 'pcvizarbor',
                                 liveUpdate: true,
                                 nodeMass: function(e) { return e.isseed ? 10 : 0.1; },
                                 repulsion: 1000,
