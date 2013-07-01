@@ -43,6 +43,16 @@
 		var width = container.clientWidth;
 		var height = container.clientHeight;
 
+        nodes.each(function(i, ele) {
+            if(store.enabled) {
+                var position = store.get(this.id());
+                if(position != null) {
+                    this.position(position);
+                    this.lock();
+                }
+            }
+        });
+
 		// arbor doesn't work with just 1 node
 		if( cy.nodes().size() <= 1 ){
 			if( options.fit ){
@@ -93,9 +103,19 @@
 				if( (options.stableEnergy != null
                     && energy != null
                     && energy.n > 0
-                    && options.stableEnergy(energy)) || iterated > options.maxIterations ){
+                    && options.stableEnergy(energy)) || (iterated++) > options.maxIterations )
+                {
+                    nodes.unlock();
 					sys.stop();
-					return;
+
+                    // Save locations of the nodes
+                    if(store.enabled) {
+                        nodes.each(function(i, ele) {
+                            store.set(this.id(), this.position());
+                        });
+                    }
+
+                    return;
 				}
 
 				var movedNodes = [];
