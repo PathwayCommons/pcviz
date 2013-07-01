@@ -337,7 +337,7 @@
       </div>
   </script>
 
-  <script type="text/template" id="embed-code-template"><iframe width="{{width}}" height="{{height}}" src="http://awabi.cbio.mskcc.org/pc2-demo/#embed/{{networkType}}/{{genes}}" scrolling="no" frameborder="0" seamless="seamless"></iframe></script>
+  <script type="text/template" id="embed-code-template"><iframe width="{{width}}" height="{{height}}" src="<%=pcVizURL%>/#embed/{{networkType}}/{{genes}}" scrolling="no" frameborder="0" seamless="seamless"></iframe></script>
 
   <script type="text/template" id="main-embed-template">
       <div class="mainview">
