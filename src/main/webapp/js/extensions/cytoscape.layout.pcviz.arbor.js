@@ -4,7 +4,7 @@
 		liveUpdate: true, // whether to show the layout as it's running
 		ready: undefined, // callback on layoutready 
 		stop: undefined, // callback on layoutstop
-		maxSimulationTime: 4000, // max length in ms to run the layout
+        maxIterations: 50,
 		fit: true, // fit to viewport
 		padding: [ 50, 50, 50, 50 ], // top, right, bottom, left
 		ungrabifyWhileSimulating: true, // so you can't drag nodes during layout
@@ -72,10 +72,8 @@
 			cy.reset();
 		};
 		
-		var doneTime = 250;
-		var doneTimeout;
-		
 		var ready = false;
+        var iterated = 0;
 		
 		var lastDraw = +new Date;
 		var sysRenderer = {
@@ -85,14 +83,14 @@
 				var energy = sys.energy();
 
 				// if we're stable (according to the client), we're done
-				if( options.stableEnergy != null && energy != null && energy.n > 0 && options.stableEnergy(energy) ){
+				if( (options.stableEnergy != null
+                    && energy != null
+                    && energy.n > 0
+                    && options.stableEnergy(energy)) || iterated > options.maxNumberOfIterations ){
 					sys.stop();
 					return;
 				}
 
-				clearTimeout(doneTimeout);
-				doneTimeout = setTimeout(doneHandler, doneTime);
-				
 				var movedNodes = [];
 				
 				sys.eachNode(function(n, point){ 
@@ -112,15 +110,11 @@
 						movedNodes.push( node );
 					}
 				});
-				
 
-				var timeToDraw = (+new Date - lastDraw) >= 16;
-				if( options.liveUpdate && movedNodes.length > 0 && timeToDraw ){
+				if( options.liveUpdate && movedNodes.length > 0){
 					new $$.Collection(cy, movedNodes).rtrigger("position");
-					lastDraw = +new Date;
 				}
 
-				
 				if( !ready ){
 					ready = true;
 					cy.one("layoutready", options.ready);
@@ -235,42 +229,7 @@
 			grabbableNodes.ungrabify();
 		}
 		
-		var doneHandler = function(){
-			if( window.isIE ){
-				packToCenter(function(){
-					done();
-				});
-			} else {
-				done();
-			}
-			
-			function done(){
-				if( !options.liveUpdate ){
-					if( options.fit ){
-						cy.reset();
-					}
-
-					cy.nodes().rtrigger("position");
-				}
-
-				// unbind handlers
-				nodes.unbind("grab drag dragstop", grabHandler);
-				
-				// enable back grabbing if so set
-				if( options.ungrabifyWhileSimulating ){
-					grabbableNodes.grabify();
-				}
-
-				cy.one("layoutstop", options.stop);
-				cy.trigger("layoutstop");
-			}
-		};
-		
 		sys.start();
-		setTimeout(function(){
-			sys.stop();
-		}, options.maxSimulationTime);
-		
 	};
 
 	PCVizArbor.prototype.stop = function(){
