@@ -78,21 +78,23 @@ var pcVizStyleSheet = cytoscape.stylesheet()
             "width": 15,
             "height": 15
         });
-
+var edgeLengthArray = new Array(); // a map from edgeID to number
+var defaultEdgeLength = 10; // we will hop 0.15 of this amount each time, the larger the biger the radiuses
 var pcVizLayoutOptions = {
     name: 'pcvizarbor',
     liveUpdate: true,
-    nodeMass: function(e) { return e.isseed ? 10 : 0.1; },
-    repulsion: 1000,
-    stiffness: 100,
+    nodeMass: function(e) { return e.isseed ? 2.5 : 0.2; },
+    edgeLength: function(e) { 
+	return edgeLengthArray[e.id];
+    },
+    repulsion: 1800,
+    stiffness: 75,
     gravity: true,
-    maxIterations: 30,
+    maxIterations: 350,
     stableEnergy: function(energy) {
-        return (energy.max <= 8) || (energy.mean <= 0.6);
+        return (energy.max <= 0.5) || (energy.mean <= 0.1);
     }
 };
-
-
 var NetworkView = Backbone.View.extend({
 	// div id for the initial display before the actual network loaded
 	networkLoading: "#network-loading",
@@ -183,13 +185,128 @@ var NetworkView = Backbone.View.extend({
                         var windowSize = self.options.windowSize;
                         if(windowSize == undefined)
                             windowSize = {};
+			/**
+			 * distribution of citation of edges is calculated her
+			 * 
+			 * edges connected to seed nodes:
+			 * for each seed node
+			 * get the distribution of all edges connected to that seed node
+			 * place the 8 largest cited edges on the first radius (smallest edge length)
+			 * then the next 2^4 will go on the second radius, 
+			 * next 2^5 on the third... so on
+			 * 
+			 * for edges not connected to seed nodes
+			 * their length should be propotional to the radius size of the seed-edges
+			 * (edges connected to seed nodes)
+			**/
+			// method for sorting numeric array
+			var c = function compareNumbers(a, b)
+			{
+			    return (b - a);
+			}
+			var edges = data.edges; // all edges
+			var nodes = data.nodes; // all nodes
+			var hopAverage = new Array(); // average citation of each hop radius
+			var hopCount = new Array(); // number of nodes on each hop radius
+			var nonSeedEdges = new Array(); // a map of edge ID to boolean
+			var citedDis; // distribution of citation for each seed node's edges
+			// first set all edges to nonseed
+			for (var j = 0 ; j < edges.length; j++)
+			{
+				nonSeedEdges[edges[j].data.id] = true;
+			}
+			// for each seed node
+			for (var i = 0 ; i < nodes.length; i++)
+			{
+				if(nodes[i].data.isseed)
+				{
+					// calculate the citation distribution 
+					citedDis = new Array();
+					var nID = nodes[i].data.id;
+					for (var j = 0 ; j < edges.length; j++)
+					{
+						if (edges[j].data.target == nID || 
+						    edges[j].data.source == nID)
+						{
+							citedDis.push(parseInt(edges[j].data.cited, 10));
+						}
+					}
+					// sort it 
+					citedDis.sort(c);
+					// now based on this distribution calculate the hops
+					// hop: radius from the seed node
+					for (var j = 0 ; j < edges.length; j++)
+					{
+						var e = edges[j].data;
+						if (edges[j].data.target == nID || edges[j].data.source == nID)
+						{
+							var k = 7; // from the 8-th element
+							var hop = 1;
+							while(k < citedDis.length &&
+							      e.cited < citedDis[k])
+							{
+								hop++;
+								k = k + Math.pow(2, hop + 2); // skip 2^(previous number of nodes)
+							}
+							// here hop statistics are updated to later calculate non-seed edge length
+							// accordingly, hopAverage holds sums, not average till here, I will update it later
+							// if this hop level is new, define it
+							if(typeof hopAverage[hop -1] === 'undefined')
+							{
+								hopAverage[hop - 1] = e.cited;
+								hopCount[hop - 1] = 1;
+							}
+							// otherwise just add it up
+							else
+							{
+								hopAverage[hop - 1] += e.cited; 
+								hopCount[hop - 1] += 1; 
+							}
+							// length will be hop radius away from the seed
+							var length = hop * 0.15 * defaultEdgeLength;
+							edgeLengthArray[e.id] = length;
+							// mark this edge as processed
+							nonSeedEdges[e.id] = false;
+						}
+					}
+				}
+			}
+			// hereon edge length of non-seed edges will be calculated
+			// edges not connected to seed nodes
+			// first normalize hopAverages
+			for (var i = 0; i < hopCount.length; i++)
+			{
+				hopAverage[i] /= hopCount[i];
+			}
+			
+			var maxHop = hopAverage.length;
+			// so the edge length should be proportional to radiuses of seed nodes
+			for (var i = 0; i < edges.length; i++)
+			{
+				if (nonSeedEdges[edges[i].data.id])
+				{
+					var e = edges[i].data;
+					var hop = 0;
+					// hop till average hop is reached
+					while ( hop < maxHop && 
+						e.cited < hopAverage[hop])
+					{
+						hop++;
+					}
+					// assign length of this edge
+					var length = hop * 0.15 * defaultEdgeLength;
+					edgeLengthArray[e.id] = length;
+				}
+			}
+			// finished calculating edge lengths
+
 
                         var cyOptions = {
                             elements: data,
                             style: self.cyStyle,
                             showOverlay: false,
                             layout: pcVizLayoutOptions,
-                            minZoom: 0.25,
+                            minZoom: 0.125,
                             maxZoom: 16,
 
                             ready: function() {
@@ -230,14 +347,19 @@ var NetworkView = Backbone.View.extend({
                                     var position = node.position();
                                     localStorage.setItem(node.id(), JSON.stringify(position));
                                 });
-
-                                // This is to get rid of overlapping nodes and panControl
-                                cy.zoom(0.90).center();
+				var numberOfNodes = cy.nodes().length;
+				// make the canvas is size propotoinal to the square root of the number of nodes
+				// see extensions.cytoscape.layout.pcvix.arbor.js
+				// so the zoom level should change accordingly
+				var w = cy.container().clientWidth;
+				var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
+				// 0.9 is multiplied to get rid of the overlap as before
+				var zoomLevel = 0.9 * (w / width);
+                                cy.zoom(zoomLevel);
 
                                 // Run the ranker on this graph
                                 cy.rankNodes();
 
-                                var numberOfNodes = cy.nodes().length;
                                 (new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
 
                                 var edgeTypes = [
