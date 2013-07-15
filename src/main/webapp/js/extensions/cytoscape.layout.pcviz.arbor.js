@@ -4,7 +4,7 @@
 		liveUpdate: true, // whether to show the layout as it's running
 		ready: undefined, // callback on layoutready 
 		stop: undefined, // callback on layoutstop
-        maxIterations: 50,
+        	maxIterations: 50,
 		fit: true, // fit to viewport
 		padding: [ 50, 50, 50, 50 ], // top, right, bottom, left
 
@@ -40,8 +40,13 @@
 		var nodes = cy.nodes();
 		var edges = cy.edges();
 		var container = cy.container();
-		var width = container.clientWidth;
-		var height = container.clientHeight;
+
+		var w = container.clientWidth;
+		var h = container.clientWidth;
+		// make the canvas size propotoinal to the square root of the number of nodes
+		// having in mind that the size is OK for 50 nodes
+		var width = Math.max(w , Math.ceil(Math.sqrt(nodes.length) * w/Math.sqrt(30)));
+		var height = Math.max(h , Math.ceil(Math.sqrt(nodes.length) * h/Math.sqrt(30)));
 
         nodes.each(function(i, ele) {
             if(store.enabled) {
