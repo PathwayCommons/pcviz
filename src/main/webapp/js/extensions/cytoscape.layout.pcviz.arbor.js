@@ -1,3 +1,5 @@
+var iterations = 0; // used to count the iterations
+var displayStep = 15; // will update the display every displayStep amount of time
 ;(function($$)
 {	
 	var defaults = {
@@ -96,10 +98,11 @@
 		);
 
 		this.system = sys;
-		if( options.liveUpdate && options.fit )
+		if( options.liveUpdate && options.fit)
 		{
 			
 			cy.reset();
+			
 		}
 	
 		var ready = false;
@@ -122,19 +125,17 @@
 				{
 				    nodes.unlock();
 				    sys.stop();
-				    cy.center();
-
+				    cy.fit();
 				    // Save locations of the nodes
 				    if(store.enabled) 
 				    {
 					nodes.each(function(i, ele) 
 						{
-						    store.set(this.id(), this.position());
+						    //store.set(this.id(), this.position());
 				    		});
 	       			    }
 		    		    return;
 				}
-
 				var movedNodes = [];
 
 				sys.eachNode(function(n, point)
@@ -155,8 +156,8 @@
 						movedNodes.push( node );
 					}
 				});
-
-				if( options.liveUpdate && movedNodes.length > 0 )
+				iterations++; // update the screen every displayStep iterations
+				if( options.liveUpdate && movedNodes.length > 0  && (iterations % displayStep == 0))
 				{
 					new $$.Collection(cy, movedNodes).rtrigger("position");
 				}
