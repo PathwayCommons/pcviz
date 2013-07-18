@@ -90,7 +90,8 @@ var pcVizLayoutOptions = {
     repulsion: 1800,
     stiffness: 75,
     gravity: true,
-    maxIterations: 300,
+    maxIterations: 75,
+    displayStepSize: 5,
     stableEnergy: function(energy) {
         return (energy.max <= 2) || (energy.mean <= 0.5);
     },
@@ -471,10 +472,10 @@ var EmbedNetworkView = Backbone.View.extend({
  * next 2^5 on the third... so on
  * 
  * for edges not connected to seed nodes
- * their length should be propotional to the radius size of the seed-edges
+ * their length should be proportional to the radius size of the seed-edges
  * (edges connected to seed nodes)
  */
-function calcEdgeDistribution(data, numberOfNodes)
+function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a cytoscape.js core plugin
 {
 	// method for sorting numeric array
 	var c = function compareNumbers(a, b)

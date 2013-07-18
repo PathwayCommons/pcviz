@@ -1,12 +1,9 @@
-var iterations = 0; // used to count the iterations
-var displayStep = 15; // will update the display every displayStep amount of time
-;(function($$)
-{	
+;(function($$) {
 	var defaults = {
 		liveUpdate: true, // whether to show the layout as it's running
 		ready: undefined, // callback on layoutready 
 		stop: undefined, // callback on layoutstop
-        	maxIterations: 50,
+        maxIterations: 50,
 		fit: true, // fit to viewport
 		padding: [ 50, 50, 50, 50 ], // top, right, bottom, left
 
@@ -24,6 +21,7 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 		edgeLength: undefined,
 
 		stepSize: 1, // size of timestep in simulation
+        displayStepSize: 1, // will update the display every displayStep amount of time
 
 		// function that returns true if the system is stable to indicate
 		// that the layout can be stopped
@@ -52,24 +50,19 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 		var width = Math.max(w , Math.ceil(Math.sqrt(nodes.length) * w/Math.sqrt(30)));
 		var height = Math.max(h , Math.ceil(Math.sqrt(nodes.length) * h/Math.sqrt(30)));
 
-		nodes.each(function(i, ele) 
-		{
-		    if(store.enabled) 
-		    {
-			var position = store.get(this.id());
-			if(position != null) 
-			{
-			    this.position(position);
-			    this.lock();
-			}
+		nodes.each(function(i, ele) {
+		    if(store.enabled) {
+                var position = store.get(this.id());
+                if(position != null) {
+                    this.position(position);
+                    this.lock();
+                }
 		    }
 		});
 
 		// arbor doesn't work with just 1 node
-		if( cy.nodes().size() <= 1 )
-		{
-			if( options.fit )
-			{
+		if( cy.nodes().size() <= 1 ) {
+			if( options.fit ) {
 				cy.reset();
 			}
 
@@ -98,23 +91,21 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 		);
 
 		this.system = sys;
-		if( options.liveUpdate && options.fit)
-		{
-			
+		if( options.liveUpdate && options.fit) {
 			cy.reset();
-			
 		}
 	
 		var ready = false;
 		var iterated = 0;
-	
-		sys.renderer = {
-			init: function()
-			{
+        var displayIterations = 0; // used to count the iterations
+        var displayStep = options.displayStepSize;
+
+        sys.renderer = {
+			init: function() {
 	       			return this;
 			},
-			redraw: function()
-			{
+
+			redraw: function() {
 				var energy = sys.energy();
 
 				// if we're stable (according to the client), we're done
@@ -126,20 +117,17 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 				    nodes.unlock();
 				    sys.stop();
 				    cy.fit();
+
 				    // Save locations of the nodes
-				    if(store.enabled) 
-				    {
-					nodes.each(function(i, ele) 
-						{
-						    //store.set(this.id(), this.position());
-				    		});
-	       			    }
-		    		    return;
+				    if(store.enabled) {
+					    nodes.each(function(i, ele) { store.set(this.id(), this.position()); });
+                    }
+
+                    return;
 				}
 				var movedNodes = [];
 
-				sys.eachNode(function(n, point)
-				{ 
+				sys.eachNode(function(n, point) {
 					var data = n.data;
 					var node = data.element;
 	
@@ -156,14 +144,12 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 						movedNodes.push( node );
 					}
 				});
-				iterations++; // update the screen every displayStep iterations
-				if( options.liveUpdate && movedNodes.length > 0  && (iterations % displayStep == 0))
-				{
+				displayIterations++; // update the screen every displayStep iterations
+				if( options.liveUpdate && movedNodes.length > 0  && (displayIterations % displayStep == 0)) {
 					new $$.Collection(cy, movedNodes).rtrigger("position");
 				}
 
-				if( !ready )
-				{
+				if( !ready ) {
 					ready = true;
 					cy.one("layoutready", options.ready);
 					cy.trigger("layoutready");
@@ -176,8 +162,7 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 		sys.screenPadding( options.padding[0], options.padding[1], options.padding[2], options.padding[3] );
 		sys.screenStep( options.stepSize );
 
-		function calculateValueForElement(element, value)
-		{
+		function calculateValueForElement(element, value) {
 			if( value == null )
 			{
 				return undefined;
@@ -196,8 +181,7 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 		}
 		
 		// TODO we're using a hack; sys.toScreen should work :(
-		function fromScreen(pos)
-		{
+		function fromScreen(pos) {
 			var x = pos.x;
 			var y = pos.y;
 
@@ -222,10 +206,6 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 					x: node.position().x,
 					y: node.position().y });
 
-				//if( node.locked() ){
-				//	return;
-				//}
-
 				this.scratch().arbor = sys.addNode(id, {
 					element: this,
 					mass: mass,
@@ -235,24 +215,21 @@ var displayStep = 15; // will update the display every displayStep amount of tim
 				});
 			}); // end of nodes.each
 	
-		edges.each(function()
-			{
-				var src = this.source().id();
-				var tgt = this.target().id();
-				var length = calculateValueForElement(this, options.edgeLength);
-	
-				this.scratch().arbor = sys.addEdge(src, tgt, {
-					length: length
-				});
-			}); // end of edges.each
+		edges.each(function() {
+            var src = this.source().id();
+            var tgt = this.target().id();
+            var length = calculateValueForElement(this, options.edgeLength);
+
+            this.scratch().arbor = sys.addEdge(src, tgt, {
+                length: length
+            });
+        }); // end of edges.each
 
 		sys.start();
 	}; // end of PCVizArbor.prototype.run
 
-	PCVizArbor.prototype.stop = function()
-	{
-		if( this.system != null )
-		{
+	PCVizArbor.prototype.stop = function() {
+		if( this.system != null ) {
 			this.system.stop();
 		}
 	}; // end of PCVizArbor.prototype.stop
