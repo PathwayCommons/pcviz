@@ -20,7 +20,7 @@
         width: 1000,
 
         // if we know the location of a node, try not to update it as much as possible
-        byPassUpdate: 20,
+        byPassUpdate: 10,
 
 		// static numbers or functions that dynamically return what these
 		// values should be for each element
