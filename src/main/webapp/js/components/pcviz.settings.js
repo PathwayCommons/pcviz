@@ -70,6 +70,7 @@ var SettingsView = Backbone.View.extend({
 
         $("#add-cancer-study").click(function(e) {
             e.preventDefault();
+            $("#cancer-context-hint").hide();
             (new CancerContextDialogView()).render();
         });
 
@@ -85,6 +86,7 @@ var BlinkDetailsTabView = Backbone.View.extend({
         var detailsMenuItem = this.$el;
         if(!detailsMenuItem.hasClass("active")) {
             detailsMenuItem.fadeTo('slow', 0.2).fadeTo('slow', 1.0);
+            this.$el.find("a").tab('show');
         }
 
         return this;
