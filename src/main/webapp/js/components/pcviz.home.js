@@ -21,13 +21,22 @@ var HomeView = Backbone.View.extend({
         $(this.el).html("");
         $(this.el).html(this.template(this.model));
 
+        var redirectForNewNetwork = function() {
+            window.location.hash = $("#query-type").val() + "/" + $("input[name='tagsinput']").val();
+        };
+
+        var loadNetworkTimer = 0;
+        var waitTime = 1500;
+
         $("#tagsinput").tagsInput({
             defaultText: "...",
             onAddTag: function() {
-                window.location.hash = $("#query-type").val() + "/" + $("input[name='tagsinput']").val();
+                window.clearTimeout(loadNetworkTimer);
+                loadNetworkTimer = window.setTimeout(redirectForNewNetwork, waitTime);
             },
             onRemoveTag: function() {
-                window.location.hash = $("#query-type").val() + "/" + $("input[name='tagsinput']").val();
+                window.clearTimeout(loadNetworkTimer);
+                loadNetworkTimer = window.setTimeout(redirectForNewNetwork, waitTime);
             },
             autocomplete_url: 'autocomplete/',
             removeWithBackspace: false
