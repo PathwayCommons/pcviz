@@ -77,6 +77,8 @@ var BioGeneView = Backbone.View.extend({
 
         if($("#cancer-context-list li.todo-done").length == 0) {
             this.$el.find(".alteration-frequency-info").hide();
+        } else {
+            this.$el.find(".alteration-frequency-help").hide();
         }
 
         var expanderOpts = {slicePoint: 200,
