@@ -6,7 +6,7 @@
 	<groupId>org.mskcc.cbio.pcviz</groupId>
 	<artifactId>pcviz</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>Pathway Commons Visualizer</name>
 	<url>http://cbio.mskcc.org/pcviz</url>
 
