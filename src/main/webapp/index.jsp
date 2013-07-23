@@ -326,6 +326,21 @@
                               </a>
                           </div>
                       </div>
+                      <div id="cancer-context-hint">
+                          <table>
+                              <tr>
+                                  <td>
+                                      <p class="help-slider-text palette palette-silver">
+                                          You can load one or more cancer studies from <a href="http://www.cbioportal.org">cBioPortal</a> as context to your network.
+                                          Once loaded, you can enable or disable any context item by clicking on the cancer study name.
+                                      </p>
+                                  </td>
+                                  <td width="100">
+                                      <img src="images/help-up-arrow.png" width="90">
+                                  </td>
+                              </tr>
+                          </table>
+                      </div>
                       <div id="cancer-context-dialog" class="mdm tile hide"></div>
                       <div id="step-loading" class="hide">
                           <p>loading...</p>
