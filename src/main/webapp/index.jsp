@@ -73,25 +73,27 @@
           <div class="container">
               <div class="row">
                   <div class="span8">
-                      <h3 class="footer-title">Contact</h3>
-                      <p>PCViz is built and maintained by
-                          <a href="http://cbio.mskcc.org">Memorial Sloan-Kettering Cancer Center</a> and
-                          the <a href="http://baderlab.org">University of Toronto</a>.
+                      <h3 class="footer-title">About</h3>
+
+                      <p>
+                          PCViz is a open-source web-based network visualization tool that helps users
+                          query <a href="http://www.pathwaycommons.org">Pathway Commons</a>
+                          and obtain details about genes and their interactions extracted from multiple pathway
+                          data resources.
                       </p>
 
                       <p>
-                          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                          Aenean a sapien leo. Nunc ornare rutrum ante eget rhoncus.
-                          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                          Curabitur suscipit, ligula a sollicitudin viverra, eros elit ornare mauris, sed fringilla ipsum erat vitae nibh.
-                          Mauris vulputate enim non dui mattis facilisis.
-                          Ut non lacus augue, id egestas enim.
-                          Etiam pellentesque ante eget arcu pretium semper.
-                          Sed imperdiet venenatis mi, id aliquet lectus feugiat cursus.
-                          Suspendisse potenti. In eget sodales augue.
-                          Fusce massa leo, volutpat a faucibus nec, tristique sit amet velit.
-                          Proin et augue lacus, sit amet accumsan nibh.
-                          Maecenas tincidunt posuere sagittis.
+                          It allows interactive exploration of the gene networks where users can:
+                      <ul>
+                        <li>expand the network by adding new genes of interest</li>
+                        <li>reduce the size of the network by filtering genes or interactions based on different criteria</li>
+                        <li>load cancer context to see the overall frequency of alteration for each gene in the network</li>
+                        <li>download networks in various formats for further analysis or use in publication</li>
+                      </ul>
+
+                      <p>PCViz is built and maintained by
+                          <a href="http://cbio.mskcc.org">Memorial Sloan-Kettering Cancer Center</a> and
+                          the <a href="http://baderlab.org">University of Toronto</a>.
                       </p>
                   </div>
 
@@ -99,9 +101,28 @@
                       <div class="footer-banner">
                           <h3 class="footer-title">PCViz: More</h3>
                           <ul>
-                              <li>Help</li>
-                              <li>Tutorials</li>
-                              <li>Code</li>
+                              <li>
+                                  <a href="https://code.google.com/p/pathway-commons/wiki/PCViz">Tutorials / Help</a>
+                              </li>
+                              <li>
+                                  <a href="http://www.pathwaycommons.org">Pathway Commons</a>
+                              </li>
+                              <li>
+                                  <a href="http://www.cbioportal.org">cBioPortal</a>
+                              </li>
+                              <li>
+                                  <a href="http://cytoscape.github.io/cytoscape.js/">cytoscape.js</a>
+                              </li>
+                              <li>
+                                  <a href="http://www.biopax.org/paxtools">BioPAX / Paxtools</a>
+                              </li>
+                              <li>
+                                  <a href="http://www.ihop-net.org/">iHOP</a>
+                              </li>
+                              <li>
+                                  <a href="http://code.google.com/p/pathway-commons/">Code</a>
+                              </li>
+
                           </ul>
                       </div>
                   </div>
@@ -156,7 +177,7 @@
                               <div class="btn-group network-controls">
                                   <a class="btn" id="download-network" href="#"><i class="icon-download-alt"></i> Download</a>
                                   <a class="btn" id="embed-network" href="#"><i class="icon-code"></i> Embed</a>
-                                  <a class="btn" id="refresh-view" href="#"><i class="icon-refresh"></i> Refresh</a>
+                                  <a class="btn" id="refresh-view" href="#"><i class="icon-refresh"></i> Reset</a>
                                   <a class="btn" id="full-screen-link" href="#"><i class="icon-resize-full"></i> Full screen</a>
                               </div>
                           </div> <!-- /toolbar -->
