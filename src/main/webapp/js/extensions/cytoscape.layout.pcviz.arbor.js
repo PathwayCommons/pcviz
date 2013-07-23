@@ -15,6 +15,13 @@
 		fps: undefined,
 		precision: undefined,
 
+        // height/width
+        height: 1000,
+        width: 1000,
+
+        // if we know the location of a node, try not to update it as much as possible
+        byPassUpdate: 10,
+
 		// static numbers or functions that dynamically return what these
 		// values should be for each element
 		nodeMass: undefined, 
@@ -43,19 +50,18 @@
 		var edges = cy.edges();
 		var container = cy.container();
 
-		var w = container.clientWidth;
-		var h = container.clientWidth;
 		// make the canvas size propotoinal to the square root of the number of nodes
 		// having in mind that the size is OK for 50 nodes
-		var width = Math.max(w , Math.ceil(Math.sqrt(nodes.length) * w/Math.sqrt(30)));
-		var height = Math.max(h , Math.ceil(Math.sqrt(nodes.length) * h/Math.sqrt(30)));
+		//var width = Math.max(w , Math.ceil(Math.sqrt(nodes.length) * w/Math.sqrt(30)));
+		//var height = Math.max(h , Math.ceil(Math.sqrt(nodes.length) * h/Math.sqrt(30)));
+        var width = options.width;
+        var height = options.height;
 
 		nodes.each(function(i, ele) {
 		    if(store.enabled) {
                 var position = store.get(this.id());
                 if(position != null) {
                     this.position(position);
-                    this.lock();
                 }
 		    }
 		});
@@ -114,7 +120,6 @@
 				    && energy.n > 0
 				    && options.stableEnergy(energy)) || (iterated++) > options.maxIterations )
 				{
-				    nodes.unlock();
 				    sys.stop();
 				    cy.fit();
 
@@ -136,6 +141,13 @@
 						return;
 					}
 					var pos = node._private.position;
+
+                    if(store.enabled) {
+                        var position = store.get(node.id());
+                        if(position != null && (iterated % options.byPassUpdate) != 0) {
+                            return;
+                        }
+                    }
 	
 					if( !node.locked() )
 					{
@@ -202,9 +214,9 @@
 				var mass = calculateValueForElement(this, options.nodeMass);
 				var locked = this._private.locked;
 
-				var pos = fromScreen({
+				var pos = {
 					x: node.position().x,
-					y: node.position().y });
+					y: node.position().y };
 
 				this.scratch().arbor = sys.addNode(id, {
 					element: this,

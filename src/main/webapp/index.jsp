@@ -304,7 +304,7 @@
                           </tr>
                       </table>
 
-                      <h4 class="demo-panel-title">Graph query type</h4>
+                      <h4 class="demo-panel-title">Query type</h4>
                       <select value="0" class="span3" tabindex="1" id="query-type" name="herolist">
                           <option selected="selected" value="neighborhood">Neighborhood</option>
                           <option value="pathsbetween">Paths-between</option>
