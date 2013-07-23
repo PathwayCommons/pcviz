@@ -146,8 +146,6 @@
                         var position = store.get(node.id());
                         if(position != null && (iterated % options.byPassUpdate) != 0) {
                             return;
-                        } else {
-                            console.log("not-bypassed");
                         }
                     }
 	
