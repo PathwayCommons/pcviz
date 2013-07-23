@@ -57,8 +57,10 @@
             (new ContainerView({ model: true })).render();
             (new HeaderView({})).render();
             (new FooterView({})).render();
+            var genes = ["MDM2", "EGFR", "BRCA1", "TP53"];
+            var randomGene = genes[Math.floor(Math.random()*genes.length)];
             var networkType = "neighborhood";
-            (new HomeView({ model: { terms: "MDM2", networkType: networkType }})).render();
+            (new HomeView({ model: { terms: randomGene, networkType: networkType }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
         },
