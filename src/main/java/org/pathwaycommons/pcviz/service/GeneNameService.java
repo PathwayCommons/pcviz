@@ -76,7 +76,7 @@ public class GeneNameService {
             while(scanner.hasNext()) {
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t", -1);
-                assert tokens.length == 2;
+                assert tokens.length == 3;
 
                 String primaryName = tokens[0].trim().toUpperCase();
                 addToMap(primaryName, primaryName);
@@ -88,6 +88,14 @@ public class GeneNameService {
                         addToMap(secondaryName, primaryName);
                     }
                 }
+
+	            String[] uniprotIds = tokens[2].split(", ");
+	            for (String uniprotId : uniprotIds) {
+		            uniprotId = uniprotId.trim().toUpperCase();
+		            if(!uniprotId.isEmpty()) {
+			            addToMap(uniprotId, primaryName);
+		            }
+	            }
             }
 
             Collections.sort(geneMapKeysSorted);
