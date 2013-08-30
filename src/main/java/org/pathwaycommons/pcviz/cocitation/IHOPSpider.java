@@ -72,7 +72,7 @@ public class IHOPSpider
 
 			if (ID == null)
 			{
-				log.error("Cannot find internal ID of " + symbol + ".");
+				log.debug("Cannot find internal ID of " + symbol + ".");
 				return null;
 			}
 
