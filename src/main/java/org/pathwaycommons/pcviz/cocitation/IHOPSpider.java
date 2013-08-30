@@ -79,7 +79,9 @@ public class IHOPSpider
 			url = getGenePageURL(ID);
 			reader = getReader(url);
 
-			return parseCocitations(reader);
+            Map<String, Integer> map = parseCocitations(reader);
+            reader.close();
+            return map;
 		}
 		catch (IOException e)
 		{
