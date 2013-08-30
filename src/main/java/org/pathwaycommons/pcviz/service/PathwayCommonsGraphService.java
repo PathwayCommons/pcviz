@@ -176,8 +176,7 @@ public class PathwayCommonsGraphService {
         }
         catch (Exception e)
         {
-            log.error("There was a problem loading the network: " + e.getMessage());
-            e.printStackTrace();
+            log.trace("There was a problem loading the network: " + e.getMessage());
         } finally {
             for (String nodeName : nodeNames)
             {
