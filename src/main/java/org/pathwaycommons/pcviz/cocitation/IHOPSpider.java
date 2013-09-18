@@ -85,8 +85,8 @@ public class IHOPSpider
 		}
 		catch (IOException e)
 		{
-			log.error("Cannot parse co-citations for " + symbol + ".", e);
-			return null;
+			log.warn("Cannot parse co-citations for " + symbol + ".", e);
+            return null;
 		}
 	}
 
@@ -181,7 +181,7 @@ public class IHOPSpider
 		}
 
 		// Cannot find
-		if (log.isWarnEnabled()) log.warn("Cannot find internal ID of " + symbol);
+		log.debug("Cannot find internal ID of " + symbol);
 		return null;
 	}
 
@@ -218,7 +218,9 @@ public class IHOPSpider
 		BufferedReader reader = getReader(url);
 		try
 		{
-			return parseSymbol(reader);
+            String symbol = parseSymbol(reader);
+            reader.close();
+            return symbol;
 		}
 		catch (IOException e)
 		{
