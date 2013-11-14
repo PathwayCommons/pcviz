@@ -168,7 +168,7 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.TYPE, sifType.getTag());
 
 				edge.setProperty(PropertyKey.PUBMED,
-					sif.pubmedIDs == null ? Collections.emptyList() : sif.pubmedIDs);
+					sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
 
                 edge.setProperty(PropertyKey.CITED, cocitations);
                 graph.getEdges().add(edge);
