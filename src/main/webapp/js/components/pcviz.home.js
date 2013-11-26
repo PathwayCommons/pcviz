@@ -45,7 +45,7 @@ var HomeView = Backbone.View.extend({
         };
 
         var loadNetworkTimer = 0;
-        var waitTime = 1500;
+        var waitTime = 750;
 
         $("#tagsinput").tagsInput({
             defaultText: "...",

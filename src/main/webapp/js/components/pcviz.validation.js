@@ -25,6 +25,13 @@ var GeneValidations = Backbone.Collection.extend({
 
     initialize: function(attributes) {
         this.url += attributes.genes;
+    },
+
+    getPrimaryNames: function() {
+        return _.reduce(this.models, function(seed, aValidation) {
+            seed.push(aValidation.get("matches"));
+            return seed;
+        }, []).join(",");
     }
 });
 
@@ -60,6 +67,7 @@ var GeneValidationsView = Backbone.View.extend({
                         (new NotyView({
                             template: "#noty-semivalid-symbols-template",
                             warning: true,
+                            timeout: 20000,
                             model: {
                                 query: query,
                                 synonym: match
