@@ -9,7 +9,7 @@ Clone the repository and in the main directory, use the following command to cop
 The property `hgnc.location` should point to a valid HGNC output that contains the official gene symbols and their synonyms.
 This file can be downloaded as follows:
 
-	wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit"
+	wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_hgnc_id&col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit" 
 
 Make sure all other properties reflect the options you wanted to set and then use the following command to start the application within a test Tomcat instance:
 
