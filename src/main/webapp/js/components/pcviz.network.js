@@ -456,11 +456,35 @@ var EmbedNetworkView = Backbone.View.extend({
                         // add pan zoom control panel
                         container.cytoscapePanzoom();
 
-                        // When a node is moved, saved its new location
-                        cy.on('free', 'node', function(evt) {
-                            var node = this;
-                            var position = node.position();
-                            localStorage.setItem(node.id(), JSON.stringify(position));
+                        var createAndPostClickMessage = function(where, target) {
+                            var message = {
+                                type: "pcvizclick",
+                                content: {
+                                    target: target,
+                                    where: where
+                                }
+                            };
+
+                            top.postMessage(JSON.stringify(message), "*");
+                        };
+
+                        // we are gonna use 'tap' to handle events for multiple devices
+                        // add click listener on nodes
+                        cy.on('tap', 'node', function(evt){
+                            createAndPostClickMessage("node", this);
+                        });
+
+                        cy.on('tap', 'edge', function(evt){
+                            createAndPostClickMessage("edge", this);
+                        });
+
+                        // add click listener to core (for background clicks)
+                        cy.on('tap', function(evt) {
+                            // if click on background, hide details
+                            if(evt.cyTarget === cy)
+                            {
+                                createAndPostClickMessage("background", null);
+                            }
                         });
 
                         // This is to get rid of overlapping nodes and panControl
@@ -468,14 +492,26 @@ var EmbedNetworkView = Backbone.View.extend({
 
                         // Run the ranker on this graph
                         cy.rankNodes();
-
-                        var numberOfNodes = cy.nodes().length;
-                        var numberOfEdges = cy.edges().length;
-                        top.postMessage("Nodes: " + numberOfNodes + "; edges: " + numberOfEdges, "*");
                     } // end of ready function
                 }; // end of cyOptions
 
                 container.cy(cyOptions);
+
+                // Post this message to the main web-page
+                var numberOfNodes = data.nodes.length;
+                var numberOfEdges = data.edges.length;
+
+                var message = {
+                    type: "pcvizloaded",
+                    content: {
+                        numberOfEdges: numberOfEdges,
+                        numberOfNodes: numberOfNodes
+                    }
+                };
+
+                top.postMessage(JSON.stringify(message), "*");
+                // end of message passing
+
             } // end of success method: function(data) 
         ); // end of JSON query
 
