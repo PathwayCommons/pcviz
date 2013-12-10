@@ -456,11 +456,11 @@ var EmbedNetworkView = Backbone.View.extend({
                         // add pan zoom control panel
                         container.cytoscapePanzoom();
 
-                        var createAndPostClickMessage = function(where, target) {
+                        var createAndPostClickMessage = function(where, info) {
                             var message = {
                                 type: "pcvizclick",
                                 content: {
-                                    target: target,
+                                    info: info,
                                     where: where
                                 }
                             };
