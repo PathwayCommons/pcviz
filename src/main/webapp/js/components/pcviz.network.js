@@ -468,6 +468,10 @@ var EmbedNetworkView = Backbone.View.extend({
 
                         // Run the ranker on this graph
                         cy.rankNodes();
+
+                        var numberOfNodes = cy.nodes().length;
+                        var numberOfEdges = cy.edges().length;
+                        top.postMessage("Nodes: " + numberOfNodes + "; edges: " + numberOfEdges, "*");
                     } // end of ready function
                 }; // end of cyOptions
 
