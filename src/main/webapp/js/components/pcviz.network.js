@@ -471,11 +471,11 @@ var EmbedNetworkView = Backbone.View.extend({
                         // we are gonna use 'tap' to handle events for multiple devices
                         // add click listener on nodes
                         cy.on('tap', 'node', function(evt){
-                            createAndPostClickMessage("node", this);
+                            createAndPostClickMessage("node", this.data());
                         });
 
                         cy.on('tap', 'edge', function(evt){
-                            createAndPostClickMessage("edge", this);
+                            createAndPostClickMessage("edge", this.data());
                         });
 
                         // add click listener to core (for background clicks)
@@ -483,7 +483,7 @@ var EmbedNetworkView = Backbone.View.extend({
                             // if click on background, hide details
                             if(evt.cyTarget === cy)
                             {
-                                createAndPostClickMessage("background", null);
+                                createAndPostClickMessage("background", null, "none");
                             }
                         });
 
