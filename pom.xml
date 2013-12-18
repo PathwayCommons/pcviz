@@ -55,6 +55,11 @@
 			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
 		</repository>
 		<repository>
+			<id>pathwaycommons</id>
+			<name>PC Repository at Google Code</name>
+			<url>http://repo.pathway-commons.googlecode.com/hg/</url>
+		</repository>
+		<repository>
 			<id>pattern.repo</id>
 			<name>Repository of BioPAX Pattern Framework</name>
 			<url>http://maven-repo.biopax-pattern.googlecode.com/hg/</url>
