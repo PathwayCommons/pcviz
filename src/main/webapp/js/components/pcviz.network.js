@@ -475,9 +475,10 @@ var EmbedNetworkView = Backbone.View.extend({
                                 // add click listener on nodes
                                 cy.on('tap', 'node', function(evt){
                                     // request json data from BioGene service
+                                    var node = this;
                                     $.getJSON("biogene/human/" + node.id(), function(queryResult) {
                                         var geneInfo = queryResult.geneInfo[0];
-                                        var nodeData = this.data();
+                                        var nodeData = node.data();
                                         nodeData["annotation"] = geneInfo;
                                         createAndPostClickMessage("node", geneInfo);
                                     }); // end of JSON query result
