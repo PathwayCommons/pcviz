@@ -474,7 +474,13 @@ var EmbedNetworkView = Backbone.View.extend({
                                 // we are gonna use 'tap' to handle events for multiple devices
                                 // add click listener on nodes
                                 cy.on('tap', 'node', function(evt){
-                                    createAndPostClickMessage("node", this.data());
+                                    // request json data from BioGene service
+                                    $.getJSON("biogene/human/" + node.id(), function(queryResult) {
+                                        var geneInfo = queryResult.geneInfo[0];
+                                        var nodeData = this.data();
+                                        nodeData["annotation"] = geneInfo;
+                                        createAndPostClickMessage("node", geneInfo);
+                                    }); // end of JSON query result
                                 });
 
                                 cy.on('tap', 'edge', function(evt){
