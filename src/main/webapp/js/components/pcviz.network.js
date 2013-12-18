@@ -480,7 +480,7 @@ var EmbedNetworkView = Backbone.View.extend({
                                         var geneInfo = queryResult.geneInfo[0];
                                         var nodeData = node.data();
                                         nodeData["annotation"] = geneInfo;
-                                        createAndPostClickMessage("node", geneInfo);
+                                        createAndPostClickMessage("node", nodeData);
                                     }); // end of JSON query result
                                 });
 
