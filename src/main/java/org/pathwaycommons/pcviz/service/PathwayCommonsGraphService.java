@@ -139,12 +139,8 @@ public class PathwayCommonsGraphService {
 
             // the Pattern framework can generate SIF too
             SIFSearcher searcher = new SIFSearcher(
-                SIFType.CONTROLS_STATE_CHANGE,
-				SIFType.CONTROLS_EXPRESSION,
-				SIFType.CONSECUTIVE_CATALYSIS,
-				//SIFType.IN_SAME_COMPLEX,
-				//SIFType.INTERACTS_WITH,
-                SIFType.CONTROLS_DEGRADATION
+                SIFType.CONTROLS_STATE_CHANGE_OF,
+				SIFType.CONTROLS_EXPRESSION_OF
             );
 
             for (SIFInteraction sif : searcher.searchSIF(model))

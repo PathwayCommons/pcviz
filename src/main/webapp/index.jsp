@@ -782,6 +782,7 @@
   <script src="js/noty/themes/noty.pcviz.theme.js"></script>
   <script src="js/store.js"></script>
   <script src="js/jquery.scrollTo-1.4.3.1-min.js"></script>
+  <script src="js/js_cols.min.js"></script>
 
   <!--[if lt IE 8]>
   <script src="js/icon-font-ie7.js"></script>
