@@ -53,7 +53,10 @@
 			<id>biopax.snapshots</id>
 			<name>BioPAX Repository at Sourceforge</name>
 			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
-		</repository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
 		<repository>
 			<id>pathwaycommons</id>
 			<name>PC Repository at Google Code</name>
