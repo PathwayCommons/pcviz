@@ -275,44 +275,44 @@
                       <div class="share mrl edge-types">
                           <h4 class="demo-panel-title edge-types-title">Interaction types</h4>
                           <table class="table table-condensed">
-                              <tr id="row-controls-state-change">
+                              <tr id="row-controls-state-change-of">
                                   <td>
-                                      <span id="controls-state-change-count">0</span>
+                                      <span id="controls-state-change-of-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label controls-state-change" data-itx-type="controls-state-change">controls state change <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
-                              <tr id="row-controls-expression">
-                                  <td>
-                                      <span id="controls-expression-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label controls-expression" data-itx-type="controls-expression">controls expression <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-state-change-of" data-itx-type="controls-state-change-of">controls state change <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-controls-degradation">
+                              <tr id="row-controls-expression-of">
                                   <td>
-                                      <span id="controls-degradation-count">0</span>
+                                      <span id="controls-expression-of-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label controls-degradation" data-itx-type="controls-degradation">controls degradation <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
-                              <tr id="row-consecutive-catalysis">
-                                  <td>
-                                      <span id="consecutive-catalysis-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label consecutive-catalysis" data-itx-type="consecutive-catalysis">consecutive catalysis <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-expression-of" data-itx-type="controls-expression-of">controls expression <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-in-same-complex">
+                              <tr id="row-controls-degradation-of">
                                   <td>
-                                      <span id="in-same-complex-count">0</span>
+                                      <span id="controls-degradation-of-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label in-same-complex" data-itx-type="in-same-complex">in same complex <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label controls-degradation-of" data-itx-type="controls-degradation-of">controls degradation <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr id="row-catalysis-precedes">
+                                  <td>
+                                      <span id="catalysis-precedes-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label catalysis-precedes" data-itx-type="catalysis-precedes">consecutive catalysis <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <tr id="row-in-complex-with">
+                                  <td>
+                                      <span id="in-complex-with-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label in-complex-with" data-itx-type="in-complex-with">in same complex <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                               <tr id="row-interacts-with">
@@ -320,7 +320,7 @@
                                       <span id="interacts-with-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label interacts-with" data-itx-type="in-same-complex">interacts with <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off label interacts-with" data-itx-type="in-complex-with">interacts with <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
 
@@ -501,15 +501,15 @@
       </div>
   </script>
 
-  <script type="text/template" id="edge-type-text-controls-state-change-template">
+  <script type="text/template" id="edge-type-text-controls-state-change-of-template">
       controls state change
   </script>
 
-  <script type="text/template" id="edge-type-text-controls-expression-template">
+  <script type="text/template" id="edge-type-text-controls-expression-of-template">
       controls expression
   </script>
 
-  <script type="text/template" id="edge-type-text-in-same-complex-template">
+  <script type="text/template" id="edge-type-text-in-complex-with-template">
       in same complex
   </script>
 
@@ -517,11 +517,11 @@
       interacts
   </script>
 
-  <script type="text/template" id="edge-type-text-controls-degradation-template">
+  <script type="text/template" id="edge-type-text-controls-degradation-of-template">
       controls degradation
   </script>
 
-  <script type="text/template" id="edge-type-text-consecutive-catalysis-template">
+  <script type="text/template" id="edge-type-text-catalysis-precedes-template">
       consecutive catalysis
   </script>
 
@@ -586,23 +586,23 @@
     </li>
   </script>
 
-  <script type="text/template" id="edge-controls-state-change-template">
+  <script type="text/template" id="edge-controls-state-change-of-template">
       <span class="gene source-gene">{{source}}</span> changes the state of <span class="gene target-gene">{{target}}</span>.
   </script>
 
-  <script type="text/template" id="edge-consecutive-catalysis-template">
+  <script type="text/template" id="edge-catalysis-precedes-template">
       <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
       catalyze two conversions connected via a common molecule,
       <i>e.g.</i> the first entity produces a substrate that is consumed by the second entity.
   </script>
 
-  <script type="text/template" id="edge-controls-degradation-template">
+  <script type="text/template" id="edge-controls-degradation-of-template">
       <span class="gene source-gene">{{source}}</span>
       controls the degradation of
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
-  <script type="text/template" id="edge-controls-expression-template">
+  <script type="text/template" id="edge-controls-expression-of-template">
       <span class="gene source-gene">{{source}}</span>
       controls the expression of
       <span class="gene target-gene">{{target}}</span>.
@@ -614,7 +614,7 @@
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
-  <script type="text/template" id="edge-in-same-complex-template">
+  <script type="text/template" id="edge-in-complex-with-template">
       <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
       are members of the  same complex.
   </script>
