@@ -199,7 +199,7 @@ public class PathwayCommonsGraphService {
         // the Pattern framework can generate SIF too
         SIFSearcher searcher = new SIFSearcher(
                 SIFType.CONTROLS_STATE_CHANGE_OF,
-                SIFType.CONTROLS_DEGRADATION_OF
+                SIFType.CONTROLS_DEGRADATION_OF,
                 SIFType.CATALYSIS_PRECEDES
         );
 
@@ -214,10 +214,10 @@ public class PathwayCommonsGraphService {
 
             nodeNames.add(srcName);
             nodeNames.add(targetName);
-                SIFType sifType = sif.type;
+            SIFType sifType = sif.type;
 
             CytoscapeJsEdge edge = new CytoscapeJsEdge();
-                edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
+            edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
             edge.setProperty(PropertyKey.SOURCE, srcName);
             edge.setProperty(PropertyKey.TARGET, targetName);
             edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
