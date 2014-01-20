@@ -200,6 +200,7 @@ public class PathwayCommonsGraphService {
         SIFSearcher searcher = new SIFSearcher(
                 SIFType.CONTROLS_STATE_CHANGE_OF,
                 SIFType.CONTROLS_DEGRADATION_OF
+                SIFType.CATALYSIS_PRECEDES
         );
 
         for (SIFInteraction sif : searcher.searchSIF(model))
@@ -213,12 +214,12 @@ public class PathwayCommonsGraphService {
 
             nodeNames.add(srcName);
             nodeNames.add(targetName);
+                SIFType sifType = sif.type;
 
             CytoscapeJsEdge edge = new CytoscapeJsEdge();
-            edge.setProperty(PropertyKey.ID, srcName + targetName);
+                edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
             edge.setProperty(PropertyKey.SOURCE, srcName);
             edge.setProperty(PropertyKey.TARGET, targetName);
-            SIFType sifType = sif.type;
             edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
             edge.setProperty(PropertyKey.TYPE, sifType.getTag());
 
