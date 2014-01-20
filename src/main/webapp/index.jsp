@@ -79,6 +79,8 @@
   <div id="pcviz-footer">
   </div>
 
+  <div id="sbgn-view-container"></div>
+
   <script type="text/template" id="main-container-template">
       <div class="{{isContainer ? 'container' : ''}}" id="main-container">
       </div>
@@ -583,7 +585,6 @@
                           Show detailed process (SBGN)
                       </a>
 
-                      <div class="sbgn-view-container"></div>
                   </td>
               </tr>
           </table>

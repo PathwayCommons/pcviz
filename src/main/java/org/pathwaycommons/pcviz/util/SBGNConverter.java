@@ -66,10 +66,10 @@ public class SBGNConverter {
         compoundNode.setProperty(PropertyKey.ID, abCompound);
         CytoscapeJsNode nodeA2 = new CytoscapeJsNode();
         nodeA2.setProperty(PropertyKey.ID, geneA2);
-        nodeA2.setProperty(PropertyKey.PARENT, compoundNode);
+        nodeA2.setProperty(PropertyKey.PARENT, abCompound);
         CytoscapeJsNode nodeB2 = new CytoscapeJsNode();
         nodeB2.setProperty(PropertyKey.ID, geneB2);
-        nodeB2.setProperty(PropertyKey.PARENT, compoundNode);
+        nodeB2.setProperty(PropertyKey.PARENT, abCompound);
 
         // Let's do the connections
         // A -> R, B -> R
@@ -85,7 +85,7 @@ public class SBGNConverter {
         // R -> C(A, B)
         CytoscapeJsEdge eAB2 = new CytoscapeJsEdge();
         eAB2.setProperty(PropertyKey.SOURCE, abInteraction);
-        eAB2.setProperty(PropertyKey.TARGET, compoundNode);
+        eAB2.setProperty(PropertyKey.TARGET, abCompound);
 
         // Add all of them
         List<CytoscapeJsNode> nodes = graph.getNodes();

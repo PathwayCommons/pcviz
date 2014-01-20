@@ -368,6 +368,8 @@ h4.pcviz-embed-logo small {
     height: 300px;
     right: 0;
     bottom: 0;
+    background-color: white;
+    border: 2px solid black;
 }
 
 
