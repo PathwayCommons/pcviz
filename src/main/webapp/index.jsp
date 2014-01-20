@@ -280,7 +280,7 @@
                                       <span id="controls-state-change-count">0</span>
                                   </td>
                                   <td>
-                                      <span class="itx-type-on-off label controls-state-change" data-itx-type="controls-state-change">controls state change <span class="fui-cross-16"></span></span>
+                                      <span class="itx-type-on-off labelcontrols-state-change" data-itx-type="controls-state-change">controls state change <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
                               <tr id="row-controls-expression">
@@ -576,7 +576,19 @@
 
                   </td>
               </tr>
+              <tr>
+                  <td colspan="2">
+                      <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Show detailed process (SBGN)
+                      </a>
+
+                      <div class="sbgn-view-container"></div>
+                  </td>
+              </tr>
           </table>
+
+
       </div>
   </script>
 
@@ -758,6 +770,14 @@
       You can deactivate the context by clicking on the cancer study name on the list.
   </script>
 
+  <script type="text/template" id="sbgn-container-template">
+      <div id="sbgn-viewer">
+          <h4>Loading network...</h4>
+          <img src="images/loading.gif" alt="loading network...">
+      </div>
+  </script>
+
+
   <!-- JS libraries -->
   <script src="js/jquery-1.8.2.min.js"></script>
   <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
@@ -794,6 +814,7 @@
   <script src="js/components/pcviz.home.js"></script>
   <script src="js/components/pcviz.validation.js"></script>
   <script src="js/components/pcviz.settings.js"></script>
+  <script src="js/components/pcviz.sbgn.js"></script>
   <script src="js/components/pcviz.network.js"></script>
   <script src="js/components/pcviz.biogene.js"></script>
   <script src="js/components/pcviz.edgeinfo.js"></script>

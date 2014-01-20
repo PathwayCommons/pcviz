@@ -199,7 +199,7 @@ public class PathwayCommonsGraphService {
         // the Pattern framework can generate SIF too
         SIFSearcher searcher = new SIFSearcher(
                 SIFType.CONTROLS_STATE_CHANGE_OF,
-                SIFType.CONTROLS_EXPRESSION_OF
+                SIFType.CONTROLS_DEGRADATION_OF
         );
 
         for (SIFInteraction sif : searcher.searchSIF(model))
@@ -227,25 +227,25 @@ public class PathwayCommonsGraphService {
 
             edge.setProperty(PropertyKey.CITED, cocitations);
             graph.getEdges().add(edge);
+        }
 
-            for (String nodeName : nodeNames)
-            {
-                int totalCocitations = getTotalCocitations(nodeName);
-                if(totalCocitations < getMinNumberOfCoCitationsForNodes())
-                    continue;
+        for (String nodeName : nodeNames)
+        {
+            int totalCocitations = getTotalCocitations(nodeName);
+            if(totalCocitations < getMinNumberOfCoCitationsForNodes())
+                continue;
 
-                CytoscapeJsNode node = new CytoscapeJsNode();
-                node.setProperty(PropertyKey.ID, nodeName);
-                boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
-                node.setProperty(PropertyKey.ISVALID, isValid);
-                node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
-                boolean isSeed = genes.contains(nodeName);
-                node.setProperty(PropertyKey.ISSEED, isSeed);
-                node.setProperty(PropertyKey.RANK, 0);
-                node.setProperty(PropertyKey.ALTERED, 0);
-                graph.getNodes().add(node);
+            CytoscapeJsNode node = new CytoscapeJsNode();
+            node.setProperty(PropertyKey.ID, nodeName);
+            boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
+            node.setProperty(PropertyKey.ISVALID, isValid);
+            node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
+            boolean isSeed = genes.contains(nodeName);
+            node.setProperty(PropertyKey.ISSEED, isSeed);
+            node.setProperty(PropertyKey.RANK, 0);
+            node.setProperty(PropertyKey.ALTERED, 0);
+            graph.getNodes().add(node);
 
-            }
         }
 
         return graph;
