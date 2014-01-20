@@ -21,14 +21,13 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
             "content": "data(id)",
-            "shape": "data(shape)",
             "border-width": 3,
+            "shape": "circle",
             "border-color": "#555",
             "font-size": "15"
         })
         .selector("edge")
         .css({
-            "width": "mapData(cited, 5, 50, 0.4, 0.5)",
             "line-color": "#444",
             "target-arrow-shape": "triangle"
 
@@ -58,30 +57,13 @@ var pcVizStyleSheet = cytoscape.stylesheet()
             "shape": "rectangle",
             "width": 15,
             "height": 15
-        }); // end of pcVizStyleSheet
-var edgeLengthArray = new Array(); // a map from edgeID to number
-var pcVizLayoutOptions = {
-    name: 'pcvizarbor',
-    liveUpdate: true,
-    nodeMass: function(e) { return e.isseed ? 2.5 : 0.2; },
-    edgeLength: function(e) { 
-	return edgeLengthArray[e.id];
-    },
-    repulsion: 1800,
-    stiffness: 75,
-    gravity: true,
-    maxIterations: 75,
-    displayStepSize: 5,
-    stableEnergy: function(energy) {
-        return (energy.max <= 2) || (energy.mean <= 0.5);
-    },
-    precision: 0
-}; // end of pcVizLayoutOptions
+         })
+    ; // end of pcVizStyleSheet
 
 var SBGNView = Backbone.View.extend({
 	cyStyle: pcVizStyleSheet,
     template: _.template( $("#sbgn-container-template").html() ),
-    el: $("#sbgn-view-container"),
+    el: "#sbgn-view-container",
 
 	render: function() {
         var thatEl = this.$el;
@@ -96,28 +78,20 @@ var SBGNView = Backbone.View.extend({
             // Empty contents and put the new one
             thatEl.html(thatTmpl());
 
-            var genesStr = this.model.source + "," + this.model.target;
+            var genesStr = source + "," + target;
 
-            $.getJSON("graph/detailed/" + networkType + "/" + genesStr,
+            $.getJSON("graph/detailed/pathsbetween/" + genesStr,
                 function(data) {
-                    var container = $("#fullscreen-network-view");
+                    var container = $("#sbgn-viewer");
 
                     var cyOptions = {
                         elements: data,
-                        style: self.cyStyle,
-                        showOverlay: false,
-                        layout: pcVizLayoutOptions,
-                        minZoom: 0.125,
-                        maxZoom: 16,
-
-                        ready: function() {
-                            var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
-                            // 0.9 is multiplied to get rid of the overlap as before
-                            var zoomLevel = 0.9 * (w / width);
-                            cy.zoom(zoomLevel);
-                        }
+                        style: pcVizStyleSheet,
+                        layout: { name: 'arbor' },
+                        showOverlay: false
                     };
 
+                    container.html("");
                     container.cy(cyOptions);
 
                 } // end of function(data)
