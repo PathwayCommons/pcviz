@@ -137,11 +137,11 @@ footer {
     margin-left: 10px;
 }
 
-.controls-state-change {
+.controls-state-change-of {
     background-color: #2980B9 !important;
 }
 
-.in-same-complex {
+.in-complex-with {
     background-color: #34495E !important;
 }
 
@@ -149,15 +149,15 @@ footer {
     background: #000000 !important;
 }
 
-.controls-expression {
+.controls-expression-of {
     background-color: #2ECC71 !important;
 }
 
-.controls-degradation {
+.controls-degradation-of {
     background-color: #D35400 !important;
 }
 
-.consecutive-catalysis {
+.catalysis-precedes {
     background-color: #9B59B6 !important;
 }
 

@@ -47,15 +47,15 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .css({
             "color": "#e74c3c"
         })
-        .selector("edge[type='consecutive-catalysis']")
+        .selector("edge[type='catalysis-precedes']")
         .css({
             "line-color": "#9B59B6"
         })
-        .selector("edge[type='controls-degradation']")
+        .selector("edge[type='controls-degradation-of']")
         .css({
             "line-color": "#D35400"
         })
-        .selector("edge[type='controls-expression']")
+        .selector("edge[type='controls-expression-of']")
         .css({
             "line-color": "#2ECC71" // emerald
         })
@@ -63,11 +63,11 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .css({
             "line-color": "#000000"
         })
-        .selector("edge[type='in-same-complex']")
+        .selector("edge[type='in-complex-with']")
         .css({
             "line-color": "#34495E"
         })
-        .selector("edge[type='controls-state-change']")
+        .selector("edge[type='controls-state-change-of']")
         .css({
             "line-color": "#2980B9"
         })
@@ -279,11 +279,11 @@ var NetworkView = Backbone.View.extend({
 				                (new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
 
 				                var edgeTypes = [
-				                    "consecutive-catalysis",
-				                    "controls-degradation",
-				                    "controls-state-change",
-				                    "controls-expression",
-				                    "in-same-complex",
+				                    "catalysis-precedes",
+				                    "controls-degradation-of",
+				                    "controls-state-change-of",
+				                    "controls-expression-of",
+				                    "in-complex-with",
 				                    "interacts-with"
 				                ];
 
