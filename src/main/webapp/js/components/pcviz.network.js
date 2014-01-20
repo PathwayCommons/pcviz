@@ -200,7 +200,7 @@ var NetworkView = Backbone.View.extend({
 				}, 5000);
 
 				// TODO: change graph type dynamically! (nhood)
-				$.getJSON("simple/graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
+				$.getJSON("graph/simple/" + networkType + "/" + geneValidations.getPrimaryNames(),
 				    function(data) 
 				    {
 				        networkLoading.hide();
@@ -403,6 +403,10 @@ var NetworkView = Backbone.View.extend({
             el: "#graph-details-content"
         })).render();
         container.show();
+
+        (new SBGNView({
+            model: edge.data()
+        })).render();
     }
 }); // end of NetworkView = Backbone.View.extend({
 
@@ -427,7 +431,7 @@ var EmbedNetworkView = Backbone.View.extend({
         var names = this.model.genes;
         var networkType = this.model.networkType;
 
-        $.getJSON("simple/graph/" + networkType + "/" + names,
+        $.getJSON("graph/simple/" + networkType + "/" + names,
             function(data) 
             {
                 networkLoading.hide();
