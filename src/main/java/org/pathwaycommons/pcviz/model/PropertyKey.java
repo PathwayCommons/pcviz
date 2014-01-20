@@ -34,6 +34,7 @@ public enum PropertyKey
     ISDIRECTED,
     TYPE,
     IMPORTANCE,
+    PARENT,
 	PUBMED,
     RANK;
 

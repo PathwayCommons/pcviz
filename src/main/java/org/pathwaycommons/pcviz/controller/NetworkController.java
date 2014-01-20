@@ -47,8 +47,8 @@ public class NetworkController
         this.pathwayCommonsGraphService = pathwayCommonsGraphService;
     }
 
-    @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
-	public ResponseEntity<String> getEntityInJson(@PathVariable String type, @PathVariable String genes)
+    @RequestMapping(value = "{format}/{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
+	public ResponseEntity<String> getEntityInJson(@PathVariable String format, @PathVariable String type, @PathVariable String genes)
 	{
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json; charset=utf-8");
@@ -59,9 +59,15 @@ public class NetworkController
             nType = PathwayCommonsGraphService.NETWORK_TYPE.PATHSBETWEEN;
         } // TODO: Should we support commonstream and pathsfromto, too?
 
+        format = format.toLowerCase().trim();
+        PathwayCommonsGraphService.NETWORK_FORMAT nFormat = PathwayCommonsGraphService.NETWORK_FORMAT.SIMPLE;
+        if(format.equals("detailed")) {
+            nFormat = PathwayCommonsGraphService.NETWORK_FORMAT.DETAILED;
+        }
+
         HashSet<String> geneSet = new HashSet<String>();
         geneSet.addAll(Arrays.asList(genes.split(",")));
-        String networkJson = getPathwayCommonsGraphService().createNetwork(nType, geneSet);
+        String networkJson = getPathwayCommonsGraphService().createNetwork(nFormat, nType, geneSet);
 
 		return new ResponseEntity<String>(
 			networkJson,
@@ -69,5 +75,4 @@ public class NetworkController
 			HttpStatus.OK
 		);
 	}
-
 }

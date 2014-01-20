@@ -200,7 +200,7 @@ var NetworkView = Backbone.View.extend({
 				}, 5000);
 
 				// TODO: change graph type dynamically! (nhood)
-				$.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
+				$.getJSON("simple/graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
 				    function(data) 
 				    {
 				        networkLoading.hide();
@@ -427,7 +427,7 @@ var EmbedNetworkView = Backbone.View.extend({
         var names = this.model.genes;
         var networkType = this.model.networkType;
 
-        $.getJSON("graph/" + networkType + "/" + names,
+        $.getJSON("simple/graph/" + networkType + "/" + names,
             function(data) 
             {
                 networkLoading.hide();

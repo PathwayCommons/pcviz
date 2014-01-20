@@ -31,12 +31,15 @@
         <constructor-arg index="0" value="${biogene.format}"/>
     </bean>
 
+    <bean id="sbgnConverter" class="org.pathwaycommons.pcviz.util.SBGNConverter"/>
+
     <bean class="org.pathwaycommons.pcviz.service.PathwayCommonsGraphService" id="graphService">
         <property name="cocitMan" ref="cocitationManager"/>
         <property name="pathwayCommonsUrl" value="${pathwaycommons.url}"/>
         <property name="geneNameService" ref="geneNameService"/>
         <property name="minNumberOfCoCitationsForEdges" value="${cocitation.min.edge}"/>
         <property name="minNumberOfCoCitationsForNodes" value="${cocitation.min.node}"/>
+        <property name="sbgnConverter" ref="sbgnConverter"/>
     </bean>
 
     <bean class="org.pathwaycommons.pcviz.service.BioGeneService" id="bioGeneService">
@@ -72,4 +75,5 @@
     <bean class="java.lang.String" id="pcVizURLStr">
         <constructor-arg index="0" value="${pcviz.url}"/>
     </bean>
+
 </beans>

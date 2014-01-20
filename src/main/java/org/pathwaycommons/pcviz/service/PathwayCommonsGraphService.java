@@ -30,6 +30,7 @@ import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.pathwaycommons.pcviz.util.SBGNConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -79,6 +80,16 @@ public class PathwayCommonsGraphService {
         this.geneNameService = geneNameService;
     }
 
+    private SBGNConverter sbgnConverter;
+
+    public SBGNConverter getSbgnConverter() {
+        return sbgnConverter;
+    }
+
+    public void setSbgnConverter(SBGNConverter sbgnConverter) {
+        this.sbgnConverter = sbgnConverter;
+    }
+
     /**
      * Cache for co-citations.
      */
@@ -114,19 +125,16 @@ public class PathwayCommonsGraphService {
     }
 
     @Cacheable("networkCache")
-    public String createNetwork(NETWORK_TYPE type, Collection<String> genes) {
+    public String createNetwork(NETWORK_FORMAT format, NETWORK_TYPE type, Collection<String> genes) {
         String networkJson;
         JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
-        CytoscapeJsGraph graph = new CytoscapeJsGraph();
-
-        HashSet<String> nodeNames = new HashSet<String>();
+        CytoscapeJsGraph graph;
 
         // TODO: Use cpath2 client for this
         String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
         for (String gene : genes)
         {
             biopaxUrl += "source=" + gene + "&";
-            nodeNames.add(gene);
         }
         biopaxUrl += "kind=" + type.toString();
 
@@ -137,43 +145,89 @@ public class PathwayCommonsGraphService {
             URLConnection urlConnection = url.openConnection();
             Model model = ioHandler.convertFromOWL(urlConnection.getInputStream());
 
-            // the Pattern framework can generate SIF too
-            SIFSearcher searcher = new SIFSearcher(
-                SIFType.CONTROLS_STATE_CHANGE_OF,
-				SIFType.CONTROLS_EXPRESSION_OF
-            );
-
-            for (SIFInteraction sif : searcher.searchSIF(model))
-            {
-                String srcName = sif.sourceID;
-                String targetName = sif.targetID;
-
-                int cocitations = getCocitations(srcName, targetName);
-                if(cocitations < getMinNumberOfCoCitationsForEdges())
-                    continue;
-
-                nodeNames.add(srcName);
-                nodeNames.add(targetName);
-
-                CytoscapeJsEdge edge = new CytoscapeJsEdge();
-                edge.setProperty(PropertyKey.ID, srcName + targetName);
-                edge.setProperty(PropertyKey.SOURCE, srcName);
-                edge.setProperty(PropertyKey.TARGET, targetName);
-                SIFType sifType = sif.type;
-                edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
-                edge.setProperty(PropertyKey.TYPE, sifType.getTag());
-
-				edge.setProperty(PropertyKey.PUBMED,
-					sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
-
-                edge.setProperty(PropertyKey.CITED, cocitations);
-                graph.getEdges().add(edge);
+            switch (format) {
+                case DETAILED:
+                    graph = getDetailedNetwork(model, genes);
+                    break;
+                default:
+                case SIMPLE:
+                    graph = getSimpleNetwork(model, genes);
+                    break;
             }
+
         }
         catch (Exception e)
         {
             log.debug("There was a problem loading the network: " + e.getMessage());
-        } finally {
+            // Simply create an empty model
+            graph = new CytoscapeJsGraph();
+        }
+
+        networkJson = jsonSerializer.deepSerialize(graph);
+        return networkJson;
+
+    }
+
+    /**
+     * Takes a BioPAX model and a set of 'seed' genes as input;
+     * first converts the graph into an SBGN and then the SBGN to cytospace.js native graph
+     *
+     * @param model BioPAX model to be converted to SBGN-like
+     * @param genes Seed genes (for secondary annotation)
+     * @return JSONazible CytoscapeJSNetwork
+     */
+    private CytoscapeJsGraph getDetailedNetwork(Model model, Collection<String> genes) {
+        // This probably requires a util method; because the conversion is more harder
+        // hence passing it along
+        return getSbgnConverter().toSBGNCompoundGraph(model, genes);
+    }
+
+    /**
+     * Takes a BioPAX model and a set of 'seed' genes as input;
+     * first converts the graph into a SIF and then the SIF to cytospace.js native graph
+     *
+     * @param model BioPAX model to be converted to SIF
+     * @param genes Seed genes (for secondary annotation)
+     * @return JSONazible CytoscapeJSNetwork
+     */
+    private CytoscapeJsGraph getSimpleNetwork(Model model, Collection<String> genes) {
+        CytoscapeJsGraph graph = new CytoscapeJsGraph();
+
+        HashSet<String> nodeNames = new HashSet<String>();
+        nodeNames.addAll(genes);
+
+        // the Pattern framework can generate SIF too
+        SIFSearcher searcher = new SIFSearcher(
+                SIFType.CONTROLS_STATE_CHANGE_OF,
+                SIFType.CONTROLS_EXPRESSION_OF
+        );
+
+        for (SIFInteraction sif : searcher.searchSIF(model))
+        {
+            String srcName = sif.sourceID;
+            String targetName = sif.targetID;
+
+            int cocitations = getCocitations(srcName, targetName);
+            if(cocitations < getMinNumberOfCoCitationsForEdges())
+                continue;
+
+            nodeNames.add(srcName);
+            nodeNames.add(targetName);
+
+            CytoscapeJsEdge edge = new CytoscapeJsEdge();
+            edge.setProperty(PropertyKey.ID, srcName + targetName);
+            edge.setProperty(PropertyKey.SOURCE, srcName);
+            edge.setProperty(PropertyKey.TARGET, targetName);
+            SIFType sifType = sif.type;
+            edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
+            edge.setProperty(PropertyKey.TYPE, sifType.getTag());
+
+            edge.setProperty(PropertyKey.PUBMED,
+                    sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
+
+            edge.setProperty(PropertyKey.CITED, cocitations);
+            graph.getEdges().add(edge);
+
             for (String nodeName : nodeNames)
             {
                 int totalCocitations = getTotalCocitations(nodeName);
@@ -194,9 +248,7 @@ public class PathwayCommonsGraphService {
             }
         }
 
-        networkJson = jsonSerializer.deepSerialize(graph);
-        return networkJson;
-
+        return graph;
     }
 
     /**
@@ -270,5 +322,26 @@ public class PathwayCommonsGraphService {
             return name;
         }
     }
+
+    public enum NETWORK_FORMAT {
+        SIMPLE("simple"),
+        DETAILED("detailed");
+
+        private final String name;
+
+        NETWORK_FORMAT(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
 
 }
