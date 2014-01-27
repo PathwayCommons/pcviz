@@ -36,7 +36,7 @@
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<url>http://localhost:8080/manager</url>
+					<url>http://localhost:8080/manager/text</url>
 					<server>localhost</server>
 				</configuration>
 			</plugin>
