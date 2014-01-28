@@ -24,10 +24,10 @@ package org.pathwaycommons.pcviz.model;
  */
 public enum PropertyKey
 {
-	ID,
-	SOURCE,
-	TARGET,
-	CITED,
+    ID,
+    SOURCE,
+    TARGET,
+    CITED,
     ISVALID,
     ALTERED,
     ISSEED,
@@ -35,12 +35,20 @@ public enum PropertyKey
     TYPE,
     IMPORTANCE,
     PARENT,
-	PUBMED,
-    RANK;
+    PUBMED,
+    RANK,
+    BBOX,
+    CLAZZ,
+    ENTITY,
+    LABEL,
+    ORIENTATION,
+    PORT,
+    STATESANDINFOS;
 
-	@Override
-	public String toString()
-	{
-		return super.toString().toLowerCase();
-	}
+    @Override
+    public String toString()
+    {
+        return super.toString().toLowerCase();
+    }
 }
+
