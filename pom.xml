@@ -92,6 +92,12 @@
 			<version>${paxtools.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.biopax.paxtools</groupId>
+			<artifactId>sbgn-converter</artifactId>
+			<version>${paxtools.version}</version>
+		</dependency>
+
         <dependency>
             <groupId>org.cbio</groupId>
             <artifactId>causality</artifactId>

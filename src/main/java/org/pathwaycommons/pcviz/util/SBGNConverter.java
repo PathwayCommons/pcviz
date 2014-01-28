@@ -1,52 +1,140 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.util;
 
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import org.biopax.paxtools.io.sbgn.L3ToSBGNPDConverter;
 import org.biopax.paxtools.model.Model;
+import org.omg.CORBA.PolicyError;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.sbgn.bindings.Arc;
+import org.sbgn.bindings.Glyph;
+import org.sbgn.bindings.Port;
+import org.sbgn.bindings.Sbgn;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+public class SBGNConverter
+{
+    public void addGlyph(Glyph parent, Glyph glyph, ArrayList<Glyph> states, CytoscapeJsGraph graph)
+    {
+        CytoscapeJsNode cNode = new CytoscapeJsNode();
 
-public class SBGNConverter {
-    /**
-     * Takes a BioPAX model and a set of 'seed' genes as input;
-     * first converts the graph into a SIF and then the SIF to cytospace.js native graph
-     *
-     * @param model BioPAX model to be converted to SIF
-     * @param genes Seed genes (for secondary annotation)
-     * @return JSONazible CytoscapeJSNetwork
-     */
-    public CytoscapeJsGraph toSBGNCompoundGraph(Model model, Collection<String> genes) {
+        cNode.setProperty(PropertyKey.ID, glyph.getId());
+        cNode.setProperty(PropertyKey.CLAZZ, glyph.getClazz());
+        cNode.setProperty(PropertyKey.BBOX, glyph.getBbox());
+        String lbl = (glyph.getLabel() == null) ? "unknown" : glyph.getLabel().getText();
+        cNode.setProperty(PropertyKey.LABEL, lbl); 
+        cNode.setProperty(PropertyKey.STATESANDINFOS, states);
+        cNode.setProperty(PropertyKey.ORIENTATION, glyph.getOrientation());
+        if(parent == null)
+            cNode.setProperty(PropertyKey.PARENT, "");
+        else
+            cNode.setProperty(PropertyKey.PARENT, parent.getId());
+
+        graph.getNodes().add(cNode);
+    }
+
+    private void traverseAndAddGlyphs(Glyph parent, List<Glyph> nodes,
+        CytoscapeJsGraph graph, java.util.Map<String, Glyph> portGlyphMap)
+    {
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            Glyph node = nodes.get(i);
+
+            List<Glyph> glyphs = node.getGlyph();
+
+            ArrayList states = new ArrayList();
+            ArrayList childNodes = new ArrayList();
+
+            for (Glyph glyph : glyphs)
+            {
+                if (glyph.getClazz().equals("unit of information") ||
+                    glyph.getClazz().equals("state variable"))
+                {
+                    states.add(glyph);
+                }
+                else
+                {
+                    childNodes.add(glyph);
+                }
+            }
+
+            for (Port p : node.getPort())
+            {
+                portGlyphMap.put(p.getId(), node);
+            }
+
+            addGlyph(parent, node, states, graph);
+
+            if (childNodes.size() > 0)
+            {
+                traverseAndAddGlyphs(node, childNodes, graph, portGlyphMap);
+            }
+        }
+    }
+
+    private void traverseAndAddEdges(List<Arc> edges, CytoscapeJsGraph graph, java.util.Map<String, Glyph> portGlyphMap)
+    {
+        for (Arc arc : edges)
+        {
+            CytoscapeJsEdge edge = new CytoscapeJsEdge();
+
+            String srcName = "", targetName = "";
+
+            if(arc.getSource() instanceof Port)
+            {
+                srcName = ((Port)arc.getSource()).getId();
+                targetName = ((Port)arc.getTarget()).getId();
+            }
+            else if(arc.getSource() instanceof Glyph)
+            {
+                srcName = ((Glyph)arc.getSource()).getId();
+                targetName = ((Glyph)arc.getTarget()).getId();
+            }
+
+
+            if (portGlyphMap.get(srcName) != null) {
+                srcName = ((Glyph)portGlyphMap.get(srcName)).getId();
+            }
+
+            if (portGlyphMap.get(targetName) != null) {
+                targetName = ((Glyph)portGlyphMap.get(targetName)).getId();
+            }
+
+            edge.setProperty(PropertyKey.SOURCE, srcName);
+            edge.setProperty(PropertyKey.TARGET, targetName);
+            edge.setProperty(PropertyKey.ID, arc.getId());
+            edge.setProperty(PropertyKey.CLAZZ, arc.getClazz());
+
+            graph.getEdges().add(edge);
+        }
+    }
+
+    public CytoscapeJsGraph toSBGNCompoundGraph(Model model, Collection<String> genes)
+    {
         CytoscapeJsGraph graph = new CytoscapeJsGraph();
 
-        /* TODO: This is demo code. Change it to proper conversion */
+
+        L3ToSBGNPDConverter sbgnConverter = new L3ToSBGNPDConverter();
+        Sbgn sbgn = sbgnConverter.createSBGN(model);
+
+        List nodes = sbgn.getMap().getGlyph();
+        List edges = sbgn.getMap().getArc();
+        java.util.Map portGlyphMap = new HashMap();
+
+        traverseAndAddGlyphs(null, nodes, graph, portGlyphMap);
+        traverseAndAddEdges(edges, graph, portGlyphMap);
+/*
 
         Iterator<String> genesIterator = genes.iterator();
         String geneA = genesIterator.next();
         String geneA2 = geneA + "2";
         String geneB = genesIterator.next();
+        System.out.println("deneme");
         String geneB2 = geneB + "2";
         String abCompound = geneA + "compound" + geneB;
         String abInteraction = geneA + "complex" + geneB;
@@ -98,9 +186,8 @@ public class SBGNConverter {
         List<CytoscapeJsEdge> edges = graph.getEdges();
         edges.add(eA1);
         edges.add(eB1);
-        edges.add(eAB2);
-
-        // Done here
+        edges.add(eAB28);
+*/
         return graph;
     }
 }
