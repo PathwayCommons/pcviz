@@ -37,13 +37,13 @@ public enum PropertyKey
     PARENT,
     PUBMED,
     RANK,
-    BBOX,
-    CLAZZ,
-    ENTITY,
-    LABEL,
-    ORIENTATION,
-    PORT,
-    STATESANDINFOS;
+    SBGNBBOX,
+    SBGNCLASS,
+    SBGNENTITY,
+    SBGNLABEL,
+    SBGNORIENTATION,
+    SBGNPORT,
+    SBGNSTATESANDINFOS;
 
     @Override
     public String toString()
