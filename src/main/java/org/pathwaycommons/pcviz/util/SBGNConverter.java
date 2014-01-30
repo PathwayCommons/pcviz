@@ -24,12 +24,12 @@ public class SBGNConverter
         CytoscapeJsNode cNode = new CytoscapeJsNode();
 
         cNode.setProperty(PropertyKey.ID, glyph.getId());
-        cNode.setProperty(PropertyKey.CLAZZ, glyph.getClazz());
-        cNode.setProperty(PropertyKey.BBOX, glyph.getBbox());
+        cNode.setProperty(PropertyKey.SBGNCLASS, glyph.getClazz());
+        cNode.setProperty(PropertyKey.SBGNBBOX, glyph.getBbox());
         String lbl = (glyph.getLabel() == null) ? "unknown" : glyph.getLabel().getText();
-        cNode.setProperty(PropertyKey.LABEL, lbl); 
-        cNode.setProperty(PropertyKey.STATESANDINFOS, states);
-        cNode.setProperty(PropertyKey.ORIENTATION, glyph.getOrientation());
+        cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
+        cNode.setProperty(PropertyKey.SBGNSTATESANDINFOS, states);
+        cNode.setProperty(PropertyKey.SBGNORIENTATION, glyph.getOrientation());
         if(parent == null)
             cNode.setProperty(PropertyKey.PARENT, "");
         else
@@ -108,7 +108,7 @@ public class SBGNConverter
             edge.setProperty(PropertyKey.SOURCE, srcName);
             edge.setProperty(PropertyKey.TARGET, targetName);
             edge.setProperty(PropertyKey.ID, arc.getId());
-            edge.setProperty(PropertyKey.CLAZZ, arc.getClazz());
+            edge.setProperty(PropertyKey.SBGNCLASS, arc.getClazz());
 
             graph.getEdges().add(edge);
         }
@@ -134,7 +134,6 @@ public class SBGNConverter
         String geneA = genesIterator.next();
         String geneA2 = geneA + "2";
         String geneB = genesIterator.next();
-        System.out.println("deneme");
         String geneB2 = geneB + "2";
         String abCompound = geneA + "compound" + geneB;
         String abInteraction = geneA + "complex" + geneB;
