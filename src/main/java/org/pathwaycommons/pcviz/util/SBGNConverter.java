@@ -19,7 +19,8 @@ import org.sbgn.bindings.Sbgn;
 
 public class SBGNConverter
 {
-    public void addGlyph(Glyph parent, Glyph glyph, ArrayList<Glyph> states, CytoscapeJsGraph graph)
+    public void addGlyph(Glyph parent, Glyph glyph, ArrayList<Glyph> states,
+        CytoscapeJsGraph graph, Collection<String> genes)
     {
         CytoscapeJsNode cNode = new CytoscapeJsNode();
 
@@ -30,16 +31,17 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
         cNode.setProperty(PropertyKey.SBGNSTATESANDINFOS, states);
         cNode.setProperty(PropertyKey.SBGNORIENTATION, glyph.getOrientation());
-        if(parent == null)
-            cNode.setProperty(PropertyKey.PARENT, "");
-        else
-            cNode.setProperty(PropertyKey.PARENT, parent.getId());
+        String parentLabel = (parent == null) ? "" : parent.getId();
+        cNode.setProperty(PropertyKey.PARENT, parentLabel);
+        boolean isSeed = (genes.contains(lbl)) ? true : false;
+        cNode.setProperty(PropertyKey.ISSEED, isSeed);
 
         graph.getNodes().add(cNode);
     }
 
     private void traverseAndAddGlyphs(Glyph parent, List<Glyph> nodes,
-        CytoscapeJsGraph graph, java.util.Map<String, Glyph> portGlyphMap)
+        CytoscapeJsGraph graph, java.util.Map<String, Glyph> portGlyphMap,
+        Collection<String> genes)
     {
         for (int i = 0; i < nodes.size(); i++)
         {
@@ -53,7 +55,7 @@ public class SBGNConverter
             for (Glyph glyph : glyphs)
             {
                 if (glyph.getClazz().equals("unit of information") ||
-                    glyph.getClazz().equals("state variable"))
+                        glyph.getClazz().equals("state variable"))
                 {
                     states.add(glyph);
                 }
@@ -68,16 +70,17 @@ public class SBGNConverter
                 portGlyphMap.put(p.getId(), node);
             }
 
-            addGlyph(parent, node, states, graph);
+            addGlyph(parent, node, states, graph, genes);
 
             if (childNodes.size() > 0)
             {
-                traverseAndAddGlyphs(node, childNodes, graph, portGlyphMap);
+                traverseAndAddGlyphs(node, childNodes, graph, portGlyphMap, genes);
             }
         }
     }
 
-    private void traverseAndAddEdges(List<Arc> edges, CytoscapeJsGraph graph, java.util.Map<String, Glyph> portGlyphMap)
+    private void traverseAndAddEdges(List<Arc> edges, CytoscapeJsGraph graph,
+        java.util.Map<String, Glyph> portGlyphMap)
     {
         for (Arc arc : edges)
         {
@@ -126,7 +129,7 @@ public class SBGNConverter
         List edges = sbgn.getMap().getArc();
         java.util.Map portGlyphMap = new HashMap();
 
-        traverseAndAddGlyphs(null, nodes, graph, portGlyphMap);
+        traverseAndAddGlyphs(null, nodes, graph, portGlyphMap, genes);
         traverseAndAddEdges(edges, graph, portGlyphMap);
 /*
 
