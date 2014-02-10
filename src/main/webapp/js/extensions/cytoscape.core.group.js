@@ -41,33 +41,105 @@
 		{
 			var graph = {nodes: [], edges: []};
 
-			var grouped = new Set();
+			var node2group = new Map();
 
+			// find grouped nodes
 			groups.forEach(function (group)
 			{
-				grouped.insertAll(group);
+				group.forEach(function(node)
+				{
+					node2group.insert(node.id(), group);
+				});
 			});
 
+			// directly copy ungrouped nodes
 			visibleNodes.each(function (i, node)
 			{
-				if (!grouped.contains(node))
+				if (!node2group.contains(node.id()))
 				{
 					var data = $$.util.extend(true, {}, node.data());
 					graph.nodes.push({"data": data});
 				}
 			});
 
+			var group2node = new Map();
+
+			// create group nodes for cy graph
 			groups.forEach(function (group)
 			{
 				var groupID = generateGroupID(group);
 				var data = {id: groupID};
 				graph.nodes.push({"data": data});
+				group2node.insert(group, data);
 
 				group.forEach(function(node)
 				{
 					var data = $$.util.extend(true, {}, node.data());
 					data.parent = groupID;
 					graph.nodes.push({"data": data});
+				});
+			});
+
+			var edgeMemo = new Set();
+			var group2labels = new Map();
+
+			visibleEdges.each(function (i, edge)
+			{
+				var data = $$.util.extend(true, {}, edge.data());
+				var source = node2group.get(edge.source().id());
+				var target = node2group.get(edge.target().id());
+
+				// copy edges from simple node to simple node
+				if (source == null && target == null)
+				{
+					graph.edges.push({"data": data});
+				}
+				// if source or target is in a group (but not same group), redirect edge.
+				else if (source != target)
+				{
+					if (source != null)
+					{
+						data.source = group2node.get(source).id;
+					}
+					if (target != null)
+					{
+						data.target = group2node.get(target).id;
+					}
+
+					data.id = data.source + "-" + data.type + "-" + data.target;
+
+					var key = data.source + data.type + data.target;
+
+					if (!edgeMemo.contains(key))
+					{
+						graph.edges.push({"data": data});
+						edgeMemo.insert(key);
+					}
+				}
+				else // source and target are same
+				{
+					if (!group2labels.contains(source))
+					{
+						group2labels.insert(source, new Set());
+					}
+
+					group2labels.get(source).insert(data.type);
+				}
+			});
+
+			// write compound node labels
+			group2labels.forEach(function(group, labels)
+			{
+				labels.forEach(function(label)
+				{
+					if (group2node.get(group).label == null)
+					{
+						group2node.get(group).label = label;
+					}
+					else
+					{
+						group2node.get(group).label += ", " + label;
+					}
 				});
 			});
 
@@ -134,13 +206,28 @@
 			return groups;
 		}
 
+		/**
+		 *
+		 * @param groups Set<Set<node>>
+		 * @param group  Set<node>
+		 * @return {boolean}
+		 */
 		function contains(groups, group)
 		{
-			groups.each(function (i, g)
+			var contains = false;
+
+			groups.forEach(function (g)
 			{
-				if (g.getCount() == group.getCount() && g.containsAll(group)) return true;
+				if (!contains)
+				{
+					if (g.getCount() == group.getCount() && g.containsAll(group))
+					{
+						contains = true;
+						return false;
+					}
+				}
 			});
-			return false;
+			return contains;
 		}
 
 		function getSimilarNodes(node, nodes, incomingMap, outgoingMap)
