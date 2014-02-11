@@ -205,8 +205,6 @@ var NodesSliderView = Backbone.View.extend({
                             }
                         }
                     );
-
-	                console.log("%o", cy.groupNodes());
                 }
             });
 

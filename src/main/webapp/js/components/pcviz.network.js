@@ -103,7 +103,7 @@ var pcVizLayoutOptions = {
     name: 'pcvizarbor',
     liveUpdate: true,
     nodeMass: function(e) { return e.isseed ? 2.5 : 0.2; },
-    edgeLength: function(e) { 
+    edgeLength: function(e) {
 	return edgeLengthArray[e.id];
     },
     repulsion: 1800,
@@ -116,6 +116,9 @@ var pcVizLayoutOptions = {
     },
     precision: 0
 }; // end of pcVizLayoutOptions
+var coseLayoutOptions = {
+	name: 'cose'
+};
 
 var NetworkView = Backbone.View.extend({
 	// div id for the initial display before the actual network loaded
@@ -131,7 +134,7 @@ var NetworkView = Backbone.View.extend({
 	// cytoscape web visual style object
 	cyStyle: pcVizStyleSheet,
 
-	render: function() 
+	render: function()
 	{
 		// reference to the NetworkView instance itself, this is required since
 		// 'this' doesn't refer to the actual instance for callback functions
@@ -149,7 +152,7 @@ var NetworkView = Backbone.View.extend({
 		// get gene names from the input field
 		var names = $(self.tagsInputField).val().toUpperCase();
 
-		if(names.length < 1) 
+		if(names.length < 1)
 		{
 		    networkLoading.hide();
 		    container.html("");
@@ -170,11 +173,11 @@ var NetworkView = Backbone.View.extend({
 		// This will run the validation on the side track
 		var geneValidations = new GeneValidations({ genes: names });
 		geneValidations.fetch({
-			success: function() 
+			success: function()
 			{
 				var geneValidationsView = new GeneValidationsView({ model: geneValidations });
 				geneValidationsView.render();
-				if(!geneValidationsView.isAllValid()) 
+				if(!geneValidationsView.isAllValid())
 				{
 					(new NotyView({
 						template: "#noty-invalid-symbols-template",
@@ -182,10 +185,10 @@ var NetworkView = Backbone.View.extend({
 						model: {}
 					})).render();
 				}
-			
+
 				var networkType = $("#query-type").val();
 
-				if(networkType == "pathsbetween" && names.split(",").length < 2) 
+				if(networkType == "pathsbetween" && names.split(",").length < 2)
 				{
 				    (new NotyView({
 				        template: "#noty-invalid-pathsbetween-template",
@@ -194,137 +197,153 @@ var NetworkView = Backbone.View.extend({
 				    })).render();
 				}
 
-				window.setTimeout(function() 
+				window.setTimeout(function()
 				{
 				    $(self.tooSlowMessage).slideDown();
 				}, 5000);
 
+				var dataCallback = function (data)
+				{
+					networkLoading.hide();
+					container.html("");
+					container.show();
+					$(self.detailsInfo).show();
+					controlsContainer.show();
+					$(self.tooSlowMessage).hide();
+
+					var windowSize = self.options.windowSize;
+					if(windowSize == undefined)
+						windowSize = {};
+
+					var cyOptions = {
+						elements: data,
+						style: self.cyStyle,
+						showOverlay: false,
+						layout: pcVizLayoutOptions,
+						//layout: coseLayoutOptions,
+						minZoom: 0.125,
+						maxZoom: 16,
+
+						ready: function()
+						{
+							window.cy = this; // for debugging
+
+							// We don't need this, so better disable
+							cy.boxSelectionEnabled(false);
+
+							// add pan zoom control panel
+							container.cytoscapePanzoom();
+
+							// we are gonna use 'tap' to handle events for multiple devices
+							// add click listener on nodes
+							cy.on('tap', 'node', function(evt){
+								var node = this;
+								self.updateNodeDetails(evt, node);
+							});
+
+							cy.on('tap', 'edge', function(evt){
+								var edge = this;
+								self.updateEdgeDetails(evt, edge);
+							});
+
+
+							// add click listener to core (for background clicks)
+							cy.on('tap', function(evt) {
+								// if click on background, hide details
+								if(evt.cyTarget === cy)
+								{
+									$(self.detailsContent).hide();
+									$(self.detailsInfo).show();
+								}
+							});
+
+							// When a node is moved, saved its new location
+							cy.on('free', 'node', function(evt) {
+								var node = this;
+								var position = node.position();
+								localStorage.setItem(node.id(), JSON.stringify(position));
+							});
+							var numberOfNodes = cy.nodes().length;
+							// update the edgeLengthArray according to citation distribution
+							calcEdgeDistribution(data, numberOfNodes);
+							// make the canvas is size propotoinal to the square root of the number of nodes
+							// see extensions.cytoscape.layout.pcvix.arbor.js
+							// so the zoom level should change accordingly
+							var w = cy.container().clientWidth;
+							var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
+							// 0.9 is multiplied to get rid of the overlap as before
+							var zoomLevel = 0.9 * (w / width);
+							cy.zoom(zoomLevel);
+
+							// Run the ranker on this graph
+							cy.rankNodes();
+
+							(new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
+
+							var edgeTypes = [
+								"catalysis-precedes",
+								"controls-degradation-of",
+								"controls-state-change-of",
+								"controls-expression-of",
+								"in-complex-with",
+								"interacts-with"
+							];
+
+							_.each(edgeTypes, function(type)
+							{
+								var numOfEdges = cy.$("edge[type='" + type + "']").length;
+								if(numOfEdges > 0)
+								{
+									$("#" + type + "-count").text(numOfEdges);
+								}
+								else
+								{
+									$("#row-" + type).hide();
+								}
+							});
+
+							(new NodesSliderView({
+								model:
+								{
+									min: cy.nodes("[?isseed]").length,
+									max: numberOfNodes
+								}
+							})).render();
+						} // end of ready: function()
+					}; // end of cyOptions
+
+					container.cy(cyOptions);
+
+					(new NotyView({
+						template: "#noty-network-loaded-template",
+						model:
+						{
+							nodes: data.nodes.length,
+							edges: data.edges.length,
+							type: networkType.capitalize(),
+							timeout: 4000
+						}
+					})).render();
+				}; // end of function(data)
+
+
+
 				// TODO: change graph type dynamically! (nhood)
 				$.getJSON("graph/simple/" + networkType + "/" + geneValidations.getPrimaryNames(),
-				    function(data) 
+				    function(data)
 				    {
-				        networkLoading.hide();
-				        container.html("");
-				        container.show();
-				        $(self.detailsInfo).show();
-				        controlsContainer.show();
-				        $(self.tooSlowMessage).hide();
-
-				        var windowSize = self.options.windowSize;
-				        if(windowSize == undefined)
-				            windowSize = {};
-
-				        var cyOptions = {
-				            elements: data,
-				            style: self.cyStyle,
-				            showOverlay: false,
-				            layout: pcVizLayoutOptions,
-				            minZoom: 0.125,
-				            maxZoom: 16,
-
-				            ready: function()
-				            {
-				                window.cy = this; // for debugging
-
-				                // We don't need this, so better disable
-				                cy.boxSelectionEnabled(false);
-
-				                // add pan zoom control panel
-				                container.cytoscapePanzoom();
-
-				                // we are gonna use 'tap' to handle events for multiple devices
-				                // add click listener on nodes
-				                cy.on('tap', 'node', function(evt){
-				                    var node = this;
-				                    self.updateNodeDetails(evt, node);
-				                });
-
-				                cy.on('tap', 'edge', function(evt){
-				                    var edge = this;
-				                    self.updateEdgeDetails(evt, edge);
-				                });
-
-
-				                // add click listener to core (for background clicks)
-				                cy.on('tap', function(evt) {
-				                    // if click on background, hide details
-				                    if(evt.cyTarget === cy)
-				                    {
-				                        $(self.detailsContent).hide();
-				                        $(self.detailsInfo).show();
-				                    }
-				                });
-
-				                // When a node is moved, saved its new location
-				                cy.on('free', 'node', function(evt) {
-				                    var node = this;
-				                    var position = node.position();
-				                    localStorage.setItem(node.id(), JSON.stringify(position));
-				                });
-				                var numberOfNodes = cy.nodes().length;
-						// update the edgeLengthArray according to citation distribution
-						calcEdgeDistribution(data, numberOfNodes);
-				                // make the canvas is size propotoinal to the square root of the number of nodes
-				                // see extensions.cytoscape.layout.pcvix.arbor.js
-				                // so the zoom level should change accordingly
-				                var w = cy.container().clientWidth;
-				                var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
-				                // 0.9 is multiplied to get rid of the overlap as before
-				                var zoomLevel = 0.9 * (w / width);
-				                cy.zoom(zoomLevel);
-
-				                // Run the ranker on this graph
-				                cy.rankNodes();
-
-				                (new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
-
-				                var edgeTypes = [
-				                    "catalysis-precedes",
-				                    "controls-degradation-of",
-				                    "controls-state-change-of",
-				                    "controls-expression-of",
-				                    "in-complex-with",
-				                    "interacts-with"
-				                ];
-
-				                _.each(edgeTypes, function(type)
-						{
-							var numOfEdges = cy.$("edge[type='" + type + "']").length;
-							if(numOfEdges > 0)
-							{
-								$("#" + type + "-count").text(numOfEdges);
-							}
-							else
-							{
-								$("#row-" + type).hide();
-							}
-						});
-
-						(new NodesSliderView({
-							model: 
-							{
-						                min: cy.nodes("[?isseed]").length,
-						                max: numberOfNodes
-							}
-						})).render();
-				            } // end of ready: function()
-				        }; // end of cyOptions
-
-						  container.cy(cyOptions);
-
-				        (new NotyView({
-			        		template: "#noty-network-loaded-template",
-			        		model: 
-						{
-						        nodes: data.nodes.length,
-						        edges: data.edges.length,
-						        type: networkType.capitalize(),
-						        timeout: 4000
-						 }
-				        })).render();
-				} // end of function(data) 
-			); // end of $.getJSON
-		} // end of success: function() 
+					    container.cy(
+						    {elements: data,
+							    renderer: {name: "null"},
+							    ready: function()
+							    {
+								    window.cyBg = this;
+								    dataCallback(this.groupNodes());
+							    }
+						    });
+					} // end of function(data)
+				); // end of $.getJSON
+			} // end of success: function()
         }); // end of geneValidations.fetch({
 
         return this;
@@ -335,7 +354,7 @@ var NetworkView = Backbone.View.extend({
     * @param evt
     * @param node
     */
-    updateNodeDetails: function(evt, node) 
+    updateNodeDetails: function(evt, node)
     {
  	var self = this;
 	var container = $(self.detailsContent);
@@ -348,14 +367,14 @@ var NetworkView = Backbone.View.extend({
 	container.show();
 
 	// request json data from BioGene service
-	$.getJSON("biogene/human/" + node.id(), function(queryResult) 
+	$.getJSON("biogene/human/" + node.id(), function(queryResult)
 	{
 		container.empty();
 
 		if (queryResult.returnCode != "SUCCESS")
 		{
 			container.append(
-            		_.template($("#biogene-retrieve-error-template").html(), 
+            		_.template($("#biogene-retrieve-error-template").html(),
 				{
 	                		returnCode: queryResult.returnCode
             			})
@@ -417,7 +436,7 @@ var EmbedNetworkView = Backbone.View.extend({
     // cytoscape web visual style object
     cyStyle: pcVizStyleSheet,
 
-    render: function() 
+    render: function()
     {
         var self = this;
 
@@ -432,7 +451,7 @@ var EmbedNetworkView = Backbone.View.extend({
         var networkType = this.model.networkType;
 
         $.getJSON("graph/simple/" + networkType + "/" + names,
-            function(data) 
+            function(data)
             {
                 networkLoading.hide();
                 container.html("");
@@ -450,7 +469,7 @@ var EmbedNetworkView = Backbone.View.extend({
                     minZoom: 0.25,
                     maxZoom: 16,
 
-                    ready: function() 
+                    ready: function()
                     {
                         window.cy = this; // for debugging
 
@@ -476,7 +495,7 @@ var EmbedNetworkView = Backbone.View.extend({
                 }; // end of cyOptions
 
                 container.cy(cyOptions);
-            } // end of success method: function(data) 
+            } // end of success method: function(data)
         ); // end of JSON query
 
         return this;
@@ -486,14 +505,14 @@ var EmbedNetworkView = Backbone.View.extend({
 
 /**
  * distribution of citation of edges is calculated here
- * 
+ *
  * edges connected to seed nodes:
  * for each seed node
  * get the distribution of all edges connected to that seed node
  * place the 8 largest cited edges on the first radius (smallest edge length)
- * then the next 2^4 will go on the second radius, 
+ * then the next 2^4 will go on the second radius,
  * next 2^5 on the third... so on
- * 
+ *
  * for edges not connected to seed nodes
  * their length should be proportional to the radius size of the seed-edges
  * (edges connected to seed nodes)
@@ -526,7 +545,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 			var nID = nodes[i].data.id;
 			for (var j = 0 ; j < edges.length; j++)
 			{
-				if (edges[j].data.target == nID || 
+				if (edges[j].data.target == nID ||
 				    edges[j].data.source == nID)
 				{
 					citedDis.push(parseInt(edges[j].data.cited, 10));
@@ -554,7 +573,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 					edgeLengthArray[e.id] = length;
 					// mark this edge as processed
 					nonSeedEdges[e.id] = false;
-					
+
 					// here hop statistics are updated to later calculate non-seed edge length
 					// accordingly, hopAverage holds sums, not average till here, I will update it later
 					// if this hop level is new, define it
@@ -566,10 +585,10 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 					// otherwise just add it up
 					else
 					{
-						hopAverage[hop - 1] += e.cited; 
-						hopCount[hop - 1] += 1; 
+						hopAverage[hop - 1] += e.cited;
+						hopCount[hop - 1] += 1;
 					}
-					
+
 				}
 			}
 		}
@@ -581,7 +600,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 	{
 		hopAverage[i] /= hopCount[i];
 	}
-	
+
 	var maxHop = hopAverage.length;
 	// so the edge length should be proportional to radiuses of seed nodes
 	for (var i = 0; i < edges.length; i++)
@@ -591,7 +610,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 			var e = edges[i].data;
 			var hop = 0;
 			// hop till average hop is reached
-			while ( hop < maxHop && 
+			while ( hop < maxHop &&
 				e.cited < hopAverage[hop])
 			{
 				hop++;
