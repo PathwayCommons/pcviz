@@ -43,7 +43,8 @@ public enum PropertyKey
     SBGNLABEL,
     SBGNORIENTATION,
     SBGNPORT,
-    SBGNSTATESANDINFOS;
+    SBGNSTATESANDINFOS,
+    SBGNCOMPARTMENTREF;
 
     @Override
     public String toString()
