@@ -19,6 +19,17 @@ import org.sbgn.bindings.Sbgn;
 
 public class SBGNConverter
 {
+    public void setStateAndInfoPos(Glyph glyph, ArrayList<Glyph> states){
+        float xPos = glyph.getBbox().getX();
+        float yPos = glyph.getBbox().getY();
+
+        for(Glyph state : states)
+        {
+            state.getBbox().setX(state.getBbox().getX() - xPos);
+            state.getBbox().setY(state.getBbox().getY() - yPos);
+        }
+    }
+
     public void addGlyph(Glyph parent, Glyph glyph, ArrayList<Glyph> states,
         CytoscapeJsGraph graph, Collection<String> genes)
     {
@@ -29,12 +40,14 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.SBGNBBOX, glyph.getBbox());
         String lbl = (glyph.getLabel() == null) ? "unknown" : glyph.getLabel().getText();
         cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
+        setStateAndInfoPos(glyph, states);
         cNode.setProperty(PropertyKey.SBGNSTATESANDINFOS, states);
         cNode.setProperty(PropertyKey.SBGNORIENTATION, glyph.getOrientation());
         String parentLabel = (parent == null) ? "" : parent.getId();
         cNode.setProperty(PropertyKey.PARENT, parentLabel);
         boolean isSeed = (genes.contains(lbl)) ? true : false;
         cNode.setProperty(PropertyKey.ISSEED, isSeed);
+        cNode.setProperty(PropertyKey.SBGNCOMPARTMENTREF, glyph.getCompartmentRef());
 
         graph.getNodes().add(cNode);
     }
