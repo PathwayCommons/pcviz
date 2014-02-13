@@ -69,8 +69,9 @@
 			{
 				var groupID = generateGroupID(group);
 				var data = {id: groupID};
-				graph.nodes.push({"data": data});
-				group2node.insert(group, data);
+				var node = {"data": data};
+				graph.nodes.push(node);
+				group2node.insert(group, node);
 
 				group.forEach(function(node)
 				{
@@ -99,11 +100,11 @@
 				{
 					if (source != null)
 					{
-						data.source = group2node.get(source).id;
+						data.source = group2node.get(source).data.id;
 					}
 					if (target != null)
 					{
-						data.target = group2node.get(target).id;
+						data.target = group2node.get(target).data.id;
 					}
 
 					data.id = data.source + "-" + data.type + "-" + data.target;
@@ -132,13 +133,13 @@
 			{
 				labels.forEach(function(label)
 				{
-					if (group2node.get(group).label == null)
+					if (group2node.get(group).data.label == null)
 					{
-						group2node.get(group).label = label;
+						group2node.get(group).data.label = label;
 					}
 					else
 					{
-						group2node.get(group).label += ", " + label;
+						group2node.get(group).data.label += ", " + label;
 					}
 				});
 			});

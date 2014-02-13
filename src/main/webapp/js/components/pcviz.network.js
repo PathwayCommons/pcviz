@@ -34,6 +34,11 @@ var pcVizStyleSheet = cytoscape.stylesheet()
             "font-weight": "bold",
             "font-size": "17"
         })
+        .selector("$node > node") // compound nodes
+        .css({
+            "content": "data(label)",
+			"textValign": "bottom"
+		})
         .selector("edge")
         .css({
             "width": "mapData(cited, 5, 50, 0.4, 0.5)",
@@ -118,6 +123,7 @@ var pcVizLayoutOptions = {
 }; // end of pcVizLayoutOptions
 var coseLayoutOptions = {
 	name: 'cose'
+	// TODO fine tune (with options) if necessary
 };
 
 var NetworkView = Backbone.View.extend({
@@ -219,8 +225,8 @@ var NetworkView = Backbone.View.extend({
 						elements: data,
 						style: self.cyStyle,
 						showOverlay: false,
-						layout: pcVizLayoutOptions,
-						//layout: coseLayoutOptions,
+						//layout: pcVizLayoutOptions,
+						layout: coseLayoutOptions,
 						minZoom: 0.125,
 						maxZoom: 16,
 
