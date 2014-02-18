@@ -68,7 +68,7 @@
 			groups.forEach(function (group)
 			{
 				var groupID = generateGroupID(group);
-				var data = {id: groupID};
+				var data = {id: groupID, label: ""};
 				var node = {"data": data};
 				graph.nodes.push(node);
 				group2node.insert(group, node);
@@ -133,9 +133,9 @@
 			{
 				labels.forEach(function(label)
 				{
-					if (group2node.get(group).data.label == null)
+					if (group2node.get(group).data.label == "")
 					{
-						group2node.get(group).data.label = label;
+						group2node.get(group).data.label += label;
 					}
 					else
 					{
