@@ -1231,6 +1231,7 @@
 		points: $$.math.generateUnitNgonPoints(8, 0),
 
 		draw: function(context, node) {
+			/*
 			node._private.style["font-size"].value = 9;
 
 			node._private.style["width"].value = node._private.data.sbgnbbox.w;
@@ -1240,7 +1241,7 @@
 			node._private.style["height"].value = node._private.data.sbgnbbox.h;
 			node._private.style["height"].pxValue = node._private.data.sbgnbbox.h;
 			node._private.style["height"].strValue = node._private.data.sbgnbbox.h + "px";
-
+			*/
 			//var width = node._private.data.sbgnbbox.w;
 			//var height = node._private.data.sbgnbbox.h;
 			var width = node.width();
