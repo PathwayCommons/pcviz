@@ -19,14 +19,28 @@ import org.sbgn.bindings.Sbgn;
 
 public class SBGNConverter
 {
+    public void setGlyphPositionAsCenter(Glyph glyph, ArrayList<Glyph> states){
+        //sbgnml positions are set as the beginning of the shape,
+        //cytoscape.js accept as center, conversion in server side
+        //is better
+        glyph.getBbox().setX(glyph.getBbox().getX() + glyph.getBbox().getW()/2);
+        glyph.getBbox().setY(glyph.getBbox().getY() + glyph.getBbox().getH()/2);
+
+        //states position are set according to the center of the glyph itself.
+        //it prevents recalculating it again and again when user moves the glyph
+        setStateAndInfoPos(glyph,states);
+    }
+
     public void setStateAndInfoPos(Glyph glyph, ArrayList<Glyph> states){
         float xPos = glyph.getBbox().getX();
         float yPos = glyph.getBbox().getY();
 
         for(Glyph state : states)
         {
-            state.getBbox().setX(state.getBbox().getX() - xPos);
-            state.getBbox().setY(state.getBbox().getY() - yPos);
+            state.getBbox().setX(state.getBbox().getX() +
+                    state.getBbox().getW()/2 - xPos);
+            state.getBbox().setY(state.getBbox().getY() +
+                    state.getBbox().getH()/2 - yPos);
         }
     }
 
@@ -38,16 +52,25 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.ID, glyph.getId());
         cNode.setProperty(PropertyKey.SBGNCLASS, glyph.getClazz());
         cNode.setProperty(PropertyKey.SBGNBBOX, glyph.getBbox());
+        cNode.setProperty(PropertyKey.SBGNORIENTATION, glyph.getOrientation());
+        cNode.setProperty(PropertyKey.SBGNCOMPARTMENTREF, glyph.getCompartmentRef());
+
         String lbl = (glyph.getLabel() == null) ? "unknown" : glyph.getLabel().getText();
         cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
-        setStateAndInfoPos(glyph, states);
+
+        setGlyphPositionAsCenter(glyph, states);
         cNode.setProperty(PropertyKey.SBGNSTATESANDINFOS, states);
-        cNode.setProperty(PropertyKey.SBGNORIENTATION, glyph.getOrientation());
+
         String parentLabel = (parent == null) ? "" : parent.getId();
-        cNode.setProperty(PropertyKey.PARENT, parentLabel);
+        Glyph compartment = ((Glyph)glyph.getCompartmentRef());
+        String compartmentLabel = (compartment == null) ? "" : compartment.getId();
+
+        String parentId = (!parentLabel.equals("")) ? parentLabel : compartmentLabel;
+
+        cNode.setProperty(PropertyKey.PARENT, parentId);
+
         boolean isSeed = (genes.contains(lbl)) ? true : false;
         cNode.setProperty(PropertyKey.ISSEED, isSeed);
-        cNode.setProperty(PropertyKey.SBGNCOMPARTMENTREF, glyph.getCompartmentRef());
 
         graph.getNodes().add(cNode);
     }
@@ -67,6 +90,8 @@ public class SBGNConverter
 
             for (Glyph glyph : glyphs)
             {
+                if(glyph.getId().equals(node.getId()))
+                    continue;
                 if (glyph.getClazz().equals("unit of information") ||
                         glyph.getClazz().equals("state variable"))
                 {
@@ -137,7 +162,6 @@ public class SBGNConverter
 
         L3ToSBGNPDConverter sbgnConverter = new L3ToSBGNPDConverter();
         Sbgn sbgn = sbgnConverter.createSBGN(model);
-
         List nodes = sbgn.getMap().getGlyph();
         List edges = sbgn.getMap().getArc();
         java.util.Map portGlyphMap = new HashMap();

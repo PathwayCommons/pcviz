@@ -17,14 +17,39 @@
  * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var pcVizStyleSheet = cytoscape.stylesheet()
+var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
-            "content": "data(id)",
-            "border-width": 3,
+            //"content": "data(sbgnlabel)",
+            "border-width": 1,
             "shape": "circle",
             "border-color": "#555",
-            "font-size": "15"
+            "font-size": "11",
+            "background-color": "#ffffff"
+            //"width": "data(sbgnbbox(w))",
+            //"height": "data(sbgnbbox(h))"
+        })
+        .selector("node[sbgnclass='macromolecule']")
+        .css({
+            "shape": "macromolecule",
+            "text-valign": "center",
+            "text-halign": "center"
+        })
+        .selector("node[sbgnclass='process']")
+        .css({
+            "shape": "roundrectangle"
+        })
+        .selector("node[sbgnclass='complex']")
+        .css({
+            "shape": "ellipse" 
+            //"content": "data(sbgnlabel)",
+            //"text-valign" : "bottom"
+        })
+        .selector("node[sbgnclass='compartment']")
+        .css({
+            "shape": "ellipse"
+            //"content": "data(sbgnlabel)",
+            //"text-valign" : "bottom"
         })
         .selector("edge")
         .css({
@@ -57,15 +82,14 @@ var pcVizStyleSheet = cytoscape.stylesheet()
             "shape": "rectangle",
             "width": 15,
             "height": 15
-         })
-    ; // end of pcVizStyleSheet
+         }); // end of sbgnStyleSheet
 
 var SBGNView = Backbone.View.extend({
-	cyStyle: pcVizStyleSheet,
+    cyStyle: sbgnStyleSheet,
     template: _.template( $("#sbgn-container-template").html() ),
     el: "#sbgn-view-container",
 
-	render: function() {
+    render: function() {
         var thatEl = this.$el;
         var thatTmpl = this.template;
 
@@ -84,16 +108,65 @@ var SBGNView = Backbone.View.extend({
                 function(data) {
                     var container = $("#sbgn-viewer");
 
+                    //TODO : add position to data
+                    /*
+                    for (var i = 0 ; i < data.nodes.length ; i++){
+                        var xPos = data.nodes[i].data.sbgnbbox.x;
+                        var yPos = data.nodes[i].data.sbgnbbox.y;
+                        data.nodes[i].renderedPosition = {'x':xPos, 'y':yPos};
+                    }
+                    */
+
                     var cyOptions = {
                         elements: data,
-                        style: pcVizStyleSheet,
-                        layout: { name: 'arbor' },
-                        showOverlay: false
+                        style: sbgnStyleSheet,
+                        //layout: { name: 'arbor' },
+                        showOverlay: false,
+
+                        ready: function()
+                        {
+                            var allNodes = this.nodes();
+
+                            for (var i = 0 ; i < data.nodes.length ; i++){
+                                var xPos = data.nodes[i].data.sbgnbbox.x;
+                                var yPos = data.nodes[i].data.sbgnbbox.y;
+                                allNodes[i]._private.position = {'x':xPos, 'y':yPos};
+                            }
+
+                            window.cy = this;
+                             // we are gonna use 'tap' to handle events for multiple devices
+                                // add click listener on nodes
+
+                                cy.on('tap', 'node', function(evt){
+                                    var node = this;
+                                });
+/*
+                                cy.on('tap', 'edge', function(evt){
+                                    var edge = this;
+                                });
+
+
+                                // add click listener to core (for background clicks)
+                                cy.on('tap', function(evt) {
+                                    
+                                });
+
+                                // When a node is dragged, saved its new location
+                                cy.on('drag', 'node', function(evt) {
+
+                                    //TODO : DRAG ALL SELECTED BOXES
+                                    var nodes = evt.cy.nodes();
+                                    var node = this;
+                                    var zoom = evt.cy.zoom();
+                                    var xDis = evt.originalEvent.mozMovementX/zoom;
+                                    var yDis = evt.originalEvent.mozMovementY/zoom;
+                                });
+*/
+                        }
                     };
 
                     container.html("");
                     container.cy(cyOptions);
-
                 } // end of function(data)
             ); // end of $.getJSON
 
