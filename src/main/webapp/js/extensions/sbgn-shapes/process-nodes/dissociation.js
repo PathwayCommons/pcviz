@@ -1,62 +1,71 @@
 ;(function($$){"use strict";
 
-	sbgnShapes["source and sink"] = true;
+	sbgnShapes["dissociation"] = true;
 
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
-	
+
 	//default node shapes are in nodeShape array,
 	//all different types must be added
 	var nodeShape = $$.style.types.nodeShape.enums;
-	nodeShape.push("source and sink");
-
+	nodeShape.push("dissociation");
+	
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	nodeShapes["source and sink"] = {
-		points: $$.math.generateUnitNgonPoints(4, 0),
+	nodeShapes["dissociation"] = {
 
 		draw: function(context, node) {
-			nodeShapes["source and sink"].drawPath(context, node);
+			nodeShapes["dissociation"].drawPath(context, node);
 			context.fill();
-
 		},
 
 		drawPath: function(context, node) {
+
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
 			var width = node.width();
 			var height = node.height();
-			var label = node._private.data.sbgnlabel;
-			var pts = nodeShapes["source and sink"].points;
 
-			nodeShapes["ellipse"].drawPath(context, centerX, centerY,
-				width, height);
+			context.beginPath();
+			context.translate(centerX, centerY);
+			context.scale(width / 4, height / 4);
+			
+			// At origin, radius 1, 0 to 2pi
+			context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
+			
+			context.closePath();
+			context.scale(4/width, 4/height);
+			context.translate(-centerX, -centerY);
 
 			context.stroke();
 
 			context.beginPath();
 			context.translate(centerX, centerY);
-			context.scale(width * Math.sqrt(2) / 2, height * Math.sqrt(2) / 2);
+			context.scale(width / 2, height / 2);
 
-			context.moveTo(pts[2], pts[3]);
-			context.lineTo(pts[6], pts[7]);
+			// At origin, radius 1, 0 to 2pi
+			context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
+			
 			context.closePath();
-
-			context.scale(2/(width * Math.sqrt(2)), 2/(height * Math.sqrt(2)));
-			context.translate(-centerX, -centerY);	
+			context.scale(2/width, 2/height);
+			context.translate(-centerX, -centerY);
 
 		},
 
 		intersectLine: function(node, x, y) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
+
+			var nodeX = node._private.position.x;
+			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
-				height, x, y, padding);
-
+			return $$.math.intersectLineEllipse(
+				x, y,
+				nodeX,
+				nodeY,
+				width / 2 + padding,
+				height / 2 + padding);
 		},
 
 		intersectBox: function(x1, y1, x2, y2, node) {
@@ -66,21 +75,13 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].intersectBox(x1, y1, x2, y2, width, height, 
-				centerX, centerY, padding);
+			return $$.math.boxIntersectEllipse(
+				x1, y1, x2, y2, padding, width, height, centerX, centerY);
 
 		},
 
 		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width() + threshold;
-			var height = node.height() + threshold;
-			var padding = node._private.style["border-width"].pxValue / 2;
-
-			return nodeShapes["ellipse"].checkPointRough(x, y, padding, width, height, 
-				centerX, centerY);
-
+			return true;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -90,10 +91,14 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].checkPoint(x, y, padding, width, 
-				height, centerX, centerY)
+			x -= centerX;
+			y -= centerY;
 
+			x /= (width / 2 + padding);
+			y /= (height / 2 + padding);
+
+			return (Math.pow(x, 2) + Math.pow(y, 2) <= 1);
 		}
 	}
-
+	
 })( cytoscape );

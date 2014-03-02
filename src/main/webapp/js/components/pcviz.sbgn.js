@@ -24,30 +24,40 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "border-width": 1,
             "shape": "circle",
             "border-color": "#555",
-            "font-size": "11",
             "background-color": "#ffffff"
-            //"width": "data(sbgnbbox(w))",
-            //"height": "data(sbgnbbox(h))"
         })
         .selector("node[sbgnclass='macromolecule']")
         .css({
             "shape": "macromolecule",
-            "text-valign": "center",
-            "text-halign": "center"
+            "width": "data(sbgnbbox.w)",
+            "height": "data(sbgnbbox.h)",
+        })
+        .selector("node[sbgnclass='source and sink']")
+        .css({
+            "shape": "source and sink",
+            "width": "data(sbgnbbox.w)",
+            "height": "data(sbgnbbox.h)",
         })
         .selector("node[sbgnclass='process']")
         .css({
-            "shape": "roundrectangle"
+            "shape": "process",
+            "content": "",
+            "text-valign" : "center",
+            "text-halign" : "center",
+            "width": "data(sbgnbbox.w)",
+            "height": "data(sbgnbbox.h)",
+            //"width": 15,
+            //"height": 15,
+            "font-size": 11,
+            //"background-color": "#000"
         })
         .selector("node[sbgnclass='complex']")
         .css({
-            "shape": "ellipse" 
-            //"content": "data(sbgnlabel)",
-            //"text-valign" : "bottom"
+            "shape": "complex",
         })
         .selector("node[sbgnclass='compartment']")
         .css({
-            "shape": "ellipse"
+            "shape": "roundrectangle"
             //"content": "data(sbgnlabel)",
             //"text-valign" : "bottom"
         })
@@ -55,11 +65,10 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .css({
             "line-color": "#444",
             "target-arrow-shape": "triangle"
-
         })
         .selector(":selected")
         .css({
-            "background-color": "#000",
+            "background-color": "#ffffff",
             "line-color": "#000",
             "source-arrow-color": "#000",
             "target-arrow-color": "#000"
@@ -109,13 +118,13 @@ var SBGNView = Backbone.View.extend({
                     var container = $("#sbgn-viewer");
 
                     //TODO : add position to data
-                    /*
+ /*                  
                     for (var i = 0 ; i < data.nodes.length ; i++){
                         var xPos = data.nodes[i].data.sbgnbbox.x;
                         var yPos = data.nodes[i].data.sbgnbbox.y;
-                        data.nodes[i].renderedPosition = {'x':xPos, 'y':yPos};
-                    }
-                    */
+                        data.nodes[i].position = {'x':xPos, 'y':yPos};
+                    }                  
+*/
 
                     var cyOptions = {
                         elements: data,

@@ -1,4 +1,7 @@
 ;(function($$){"use strict";
+
+	sbgnShapes["complex"] = true;
+
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 	
@@ -132,14 +135,14 @@
 			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.polygonIntersectLine(
 					x, y, 
 					nodeShapes["complex"].points,
 					nodeX,
 					nodeY,
-					width, height,
+					width/2, height/2,
 					padding);
 		},
 
@@ -148,7 +151,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			var points = nodeShapes["complex"].points;
 
@@ -162,7 +165,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			// This check is OK because it assumes the round rectangle
 			// has sharp edges for the rough check 
@@ -176,7 +179,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width() + threshold;
 			var height = node.height() + threshold;
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.pointInsidePolygon(x, y, nodeShapes["complex"].points,
 				centerX, centerY, width, height, [0, -1], padding);

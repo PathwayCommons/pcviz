@@ -1,4 +1,7 @@
 ;(function($$){"use strict";
+
+	sbgnShapes["perturbing agent"] = true;
+	
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 
@@ -55,7 +58,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return renderer.polygonIntersectLine(
 				x, y,
@@ -73,7 +76,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
 					points, width, height, centerX, centerY, [0, -1], padding);
@@ -85,7 +88,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 			
 			return $$.math.checkInBoundingBox(
 				x, y, nodeShapes["perturbing agent"].points, 
@@ -97,7 +100,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.pointInsidePolygon(x, y, nodeShapes["perturbing agent"].points,
 				centerX, centerY, width, height, [0, -1], padding);

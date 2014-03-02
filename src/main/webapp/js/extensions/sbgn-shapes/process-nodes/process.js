@@ -1,86 +1,86 @@
 ;(function($$){"use strict";
 
-	sbgnShapes["source and sink"] = true;
+	sbgnShapes["process"] = true;
 
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
-	
+
 	//default node shapes are in nodeShape array,
 	//all different types must be added
 	var nodeShape = $$.style.types.nodeShape.enums;
-	nodeShape.push("source and sink");
-
+	nodeShape.push("process");
+	
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	nodeShapes["source and sink"] = {
-		points: $$.math.generateUnitNgonPoints(4, 0),
+	nodeShapes["process"] = {
+		points: $$.math.generateUnitNgonPointsFitToSquare(4, 0),
 
 		draw: function(context, node) {
-			nodeShapes["source and sink"].drawPath(context, node);
-			context.fill();
+			var width = node.width();
+			var height = node.height();
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var label = node._private.data.sbgnlabel;
 
+			renderer.drawPolygon(context,
+				centerX, centerY,
+				width, height,
+				nodeShapes["process"].points);
 		},
 
 		drawPath: function(context, node) {
+
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
-			var pts = nodeShapes["source and sink"].points;
 
-			nodeShapes["ellipse"].drawPath(context, centerX, centerY,
-				width, height);
-
-			context.stroke();
-
-			context.beginPath();
-			context.translate(centerX, centerY);
-			context.scale(width * Math.sqrt(2) / 2, height * Math.sqrt(2) / 2);
-
-			context.moveTo(pts[2], pts[3]);
-			context.lineTo(pts[6], pts[7]);
-			context.closePath();
-
-			context.scale(2/(width * Math.sqrt(2)), 2/(height * Math.sqrt(2)));
-			context.translate(-centerX, -centerY);	
-
+			renderer.drawPolygonPath(context,
+				centerX, centerY,
+				width, height,
+				nodeShapes["process"].points);
 		},
 
 		intersectLine: function(node, x, y) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
+
+			var nodeX = node._private.position.x;
+			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
-				height, x, y, padding);
-
+			return $$.math.polygonIntersectLine(
+					x, y, 
+					nodeShapes["process"].points,
+					nodeX,
+					nodeY,
+					width/2, height/2,
+					padding);
 		},
 
 		intersectBox: function(x1, y1, x2, y2, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
+			var points = nodeShapes["process"].points;
+			var nodeX = node._private.position.x;
+			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].intersectBox(x1, y1, x2, y2, width, height, 
-				centerX, centerY, padding);
-
+			return $$.math.boxIntersectPolygon(x1, y1, x2, y2, 
+				points, width, height, nodeX, nodeY, [0, -1], padding);
 		},
 
 		checkPointRough: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var width = node.width() + threshold;
-			var height = node.height() + threshold;
+			var width = node.width();
+			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].checkPointRough(x, y, padding, width, height, 
-				centerX, centerY);
-
+			return $$.math.checkInBoundingBox(
+				x, y, nodeShapes["process"].points, 
+					padding, width, height, centerX, centerY);
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -90,10 +90,9 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].checkPoint(x, y, padding, width, 
-				height, centerX, centerY)
-
+			return $$.math.pointInsidePolygon(x, y, nodeShapes["process"].points,
+				centerX, centerY, width, height, [0, -1], padding);
 		}
 	}
-
+	
 })( cytoscape );
