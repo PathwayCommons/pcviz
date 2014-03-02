@@ -63,6 +63,7 @@
             (new HomeView({ model: { terms: randomGene, networkType: networkType }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
+            this.trackClicks();
         },
 
         gene: function(type, terms) {
@@ -75,6 +76,7 @@
             }})).render();
             (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
+            this.trackClicks();
         },
 
         emptyGene: function(type) {
@@ -86,6 +88,12 @@
                 .replace(new RegExp("<", "g"), "")
                 .replace(new RegExp(">", "g"), "")
                 .toUpperCase();
+        },
+
+        trackClicks: function() {
+            $("a, button").on('click', function(e) {
+                ga('send', 'event', 'link', window.location.href, $(this).attr("href"));
+            });
         }
     });
 
