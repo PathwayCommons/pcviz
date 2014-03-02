@@ -199,6 +199,10 @@ var NetworkView = Backbone.View.extend({
 				    $(self.tooSlowMessage).slideDown();
 				}, 5000);
 
+
+                // log this event on google analytics
+                ga('send', 'event', 'main', networkType, geneValidations.getPrimaryNames());
+
 				// TODO: change graph type dynamically! (nhood)
 				$.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
 				    function(data) 
@@ -218,7 +222,7 @@ var NetworkView = Backbone.View.extend({
 				            elements: data,
 				            style: self.cyStyle,
 				            showOverlay: false,
-                            layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "null" },
+                            layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
                             minZoom: 0.125,
 				            maxZoom: 16,
 
@@ -271,9 +275,7 @@ var NetworkView = Backbone.View.extend({
 				                var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
 				                // 0.9 is multiplied to get rid of the overlap as before
 				                var zoomLevel = 0.9 * (w / width);
-                                if(numberOfNodes > 1) {
-				                    cy.zoom(zoomLevel);
-                                }
+                                cy.zoom(zoomLevel);
 
 				                // Run the ranker on this graph
 				                cy.rankNodes();
@@ -429,6 +431,9 @@ var EmbedNetworkView = Backbone.View.extend({
         var names = this.model.genes;
         var networkType = this.model.networkType;
 
+        // log this event on google analytics
+        ga('send', 'event', 'widget', networkType, names);
+
         $.getJSON("graph/" + networkType + "/" + names,
             function(data) 
             {
@@ -444,7 +449,7 @@ var EmbedNetworkView = Backbone.View.extend({
                     elements: data,
                     style: self.cyStyle,
                     showOverlay: false,
-                    layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "null" },
+                    layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
                     minZoom: 0.25,
                     maxZoom: 16,
 
