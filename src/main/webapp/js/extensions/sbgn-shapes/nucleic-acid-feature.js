@@ -1,4 +1,8 @@
 ;(function($$){"use strict";
+
+	sbgnShapes["nucleic acid feature"] = true;
+
+
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 
@@ -42,7 +46,6 @@
 
 			context.closePath();
 			context.translate(-centerX, -centerY);
-
 		},
 
 		intersectLine: function(node, x, y) {
@@ -50,7 +53,7 @@
 			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
 
 
@@ -162,7 +165,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 			var points = nodeShapes["square"].points;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
 
@@ -186,7 +189,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
 
 			//rough selection?
@@ -205,7 +208,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
 
 			//check rectangle at top

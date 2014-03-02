@@ -1,5 +1,7 @@
 ;(function($$){"use strict";
 
+	sbgnShapes["macromolecule"] = true;
+
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 
@@ -135,7 +137,7 @@
 			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.roundRectangleIntersectLine(
 					x, y,
@@ -150,7 +152,7 @@
 			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.roundRectangleIntersectBox(
 				x1, y1, x2, y2, 
@@ -163,7 +165,7 @@
 			var nodeY = node._private.position.y;
 			var width = node.width() + threshold;
 			var height = node.height() + threshold;
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.checkInBoundingBox(
 				x, y, nodeShapes["macromolecule"].points, 
@@ -176,7 +178,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width() + threshold;
 			var height = node.height() + threshold;
-			var padding = node._private.style["border-width"].value / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return nodeShapes["roundrectangle"].checkPoint(x, y, padding, width, height,
 				centerX, centerY);			

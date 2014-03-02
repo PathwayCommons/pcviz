@@ -3,10 +3,3 @@
 
 var sbgnShapes = new Object();
 
-sbgnShapes["macromolecule"] = true;
-sbgnShapes["process"] = true;
-sbgnShapes["complex"] = true;
-sbgnShapes["compartment"] = true;
-sbgnShapes["source and sink"] = true;
-sbgnShapes["perturbing agent"] = true;
-sbgnShapes["nucleic acid feature"] = true;
