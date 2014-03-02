@@ -114,7 +114,7 @@ var HomeView = Backbone.View.extend({
             e.preventDefault();
             $("#download-network").trigger('click');
 
-            var pngContent = cy.png();
+            var pngContent = cy.png({ full: true });
 
             _.each($("#main-network-view canvas"), function(canvas) {
                 if($(canvas).data("id").indexOf("buffer") == 0) {
