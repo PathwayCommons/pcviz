@@ -126,8 +126,28 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge")
         .css({
-            "line-color": "#444",
+            "line-color": "#000",
             "target-arrow-shape": "triangle"
+        })
+        .selector("edge[sbgnclass='modulation']")
+        .css({
+            "target-arrow-shape": "diamond"
+        })
+        .selector("edge[sbgnclass='stimulation']")
+        .css({
+            "target-arrow-shape": "triangle"
+        })
+        .selector("edge[sbgnclass='catalysis']")
+        .css({
+            "target-arrow-color": "#fff",
+            "line-color": "#000",
+            "target-arrow-shape": "circle"
+        })
+        .selector("edge[sbgnclass='inhibition']")
+        .css({
+            "target-arrow-color": "#fff",
+            "line-color": "#fff",
+            "target-arrow-shape": "tee"
         })
         .selector(":selected")
         .css({
