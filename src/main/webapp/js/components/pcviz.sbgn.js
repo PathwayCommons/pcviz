@@ -131,7 +131,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector(":selected")
         .css({
-            "background-color": "#ffffff",
+            "background-color": "#000",
+            "background-opacity" : "0.3",
             "line-color": "#000",
             "source-arrow-color": "#000",
             "target-arrow-color": "#000"
