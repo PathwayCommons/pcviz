@@ -24,42 +24,105 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "border-width": 1,
             "shape": "circle",
             "border-color": "#555",
-            "background-color": "#ffffff"
+            "background-color": "#ffffff",
+            "font-size": 11,
+        })
+        .selector("node[sbgnclass!='complex'][sbgnclass!='compartment']")
+        .css({
+            "width": "data(sbgnbbox.w)",
+            "height": "data(sbgnbbox.h)"
         })
         .selector("node[sbgnclass='macromolecule']")
         .css({
-            "shape": "macromolecule",
-            "width": "data(sbgnbbox.w)",
-            "height": "data(sbgnbbox.h)",
+            "shape": "macromolecule"
         })
         .selector("node[sbgnclass='source and sink']")
         .css({
-            "shape": "source and sink",
-            "width": "data(sbgnbbox.w)",
-            "height": "data(sbgnbbox.h)",
-        })
-        .selector("node[sbgnclass='process']")
-        .css({
-            "shape": "process",
-            "content": "",
-            "text-valign" : "center",
-            "text-halign" : "center",
-            "width": "data(sbgnbbox.w)",
-            "height": "data(sbgnbbox.h)",
-            //"width": 15,
-            //"height": 15,
-            "font-size": 11,
-            //"background-color": "#000"
+            "shape": "source and sink"
         })
         .selector("node[sbgnclass='complex']")
         .css({
-            "shape": "complex",
+            "shape": "complex"
         })
         .selector("node[sbgnclass='compartment']")
         .css({
             "shape": "roundrectangle"
-            //"content": "data(sbgnlabel)",
-            //"text-valign" : "bottom"
+        })
+        .selector("node[sbgnclass='unspecified entity']")
+        .css({
+            "shape": "ellipse",
+            "content": "data(sbgnlabel)",
+            "text-valign" : "center",
+            "text-halign" : "center"
+        })
+        .selector("node[sbgnclass='simple chemical']")
+        .css({
+            "shape": "circle",
+            "content": "data(sbgnlabel)",
+            "text-valign" : "center",
+            "text-halign" : "center"
+        })
+        .selector("node[sbgnclass='simple chemical']")
+        .css({
+            "shape": "circle",
+            "content": "data(sbgnlabel)",
+            "text-valign" : "center",
+            "text-halign" : "center"
+        })
+        .selector("node[sbgnclass='process']")
+        .css({
+            "shape": "square",
+            "content": "",
+            "text-valign" : "center",
+            "text-halign" : "center",
+        })
+        .selector("node[sbgnclass='omitted process']")
+        .css({
+            "shape": "square",
+            "content": "\\\\",
+            "text-valign" : "center",
+            "text-halign" : "center",
+        })
+        .selector("node[sbgnclass='uncertain process']")
+        .css({
+            "shape": "square",
+            "content": "?",
+            "text-valign" : "center",
+            "text-halign" : "center",
+        })
+        .selector("node[sbgnclass='association']")
+        .css({
+            "shape": "circle",
+            "background-color": "#000000"
+        })
+        .selector("node[sbgnclass='dissociation']")
+        .css({
+            "shape": "dissociation",
+        })
+        .selector("node[sbgnclass='phenotype']")
+        .css({
+            "shape": "phenotype",
+        })
+        .selector("node[sbgnclass='and operator']")
+        .css({
+            "shape": "circle",
+            "content": "AND",
+            "text-valign" : "center",
+            "text-halign" : "center",
+        })
+        .selector("node[sbgnclass='or operator']")
+        .css({
+            "shape": "circle",
+            "content": "OR",
+            "text-valign" : "center",
+            "text-halign" : "center",
+        })
+        .selector("node[sbgnclass='not operator']")
+        .css({
+            "shape": "circle",
+            "content": "NOT",
+            "text-valign" : "center",
+            "text-halign" : "center",
         })
         .selector("edge")
         .css({
