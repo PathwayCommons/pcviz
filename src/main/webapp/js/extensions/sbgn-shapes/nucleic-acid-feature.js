@@ -12,13 +12,37 @@
 	nodeShape.push("nucleic acid feature");
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
-	
+
 	nodeShapes["nucleic acid feature"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
-		cornerRadius:5,
+		cornerRadius:4,
+		multimerPadding:2,
 
 		draw: function(context, node) {
-			nodeShapes["nucleic acid feature"].drawPath(context, node);
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var label = node._private.data.sbgnlabel;
+			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var sbgnClass = node._private.data.sbgnclass;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
+
+			var halfWidth = width / 2;
+			var halfHeight = height / 2;
+
+			//check whether sbgn class includes multimer substring or not
+			if(sbgnClass.indexOf("multimer") != -1){
+				//add multimer shape
+				drawNucAcidFeature(context, halfWidth, halfHeight, 
+					centerX + multimerPadding, 
+					centerY + multimerPadding, 
+					cornerRadius);
+			}
+
+			drawNucAcidFeature(context, halfWidth, halfHeight, centerX, 
+				centerY, cornerRadius);
+
 			context.fill();
 		},
 
@@ -29,23 +53,28 @@
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var sbgnClass = node._private.data.sbgnclass;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
 			var halfWidth = width / 2;
 			var halfHeight = height / 2;
-			
-			context.translate(centerX, centerY);
-			context.beginPath();
 
-			context.moveTo(-halfWidth, -halfHeight);
-			context.lineTo(halfWidth, -halfHeight);
-			context.lineTo(halfWidth, 0);
-			context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
-			context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
-			context.lineTo(-halfWidth, -halfHeight);
-			
+			//check whether sbgn class includes multimer substring or not
+			if(sbgnClass.indexOf("multimer") != -1){
+				//add multimer shape
+				drawNucAcidFeature(context, halfWidth, halfHeight, 
+					centerX + multimerPadding, 
+					centerY + multimerPadding, 
+					cornerRadius);
 
-			context.closePath();
-			context.translate(-centerX, -centerY);
+				context.stroke();
+				context.fill();
+			}
+
+			drawNucAcidFeature(context, halfWidth, halfHeight, centerX, 
+				centerY, cornerRadius);
+
+			context.fill();
 		},
 
 		intersectLine: function(node, x, y) {

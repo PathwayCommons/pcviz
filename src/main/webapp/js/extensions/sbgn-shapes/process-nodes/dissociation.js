@@ -37,18 +37,11 @@
 			context.scale(4/width, 4/height);
 			context.translate(-centerX, -centerY);
 
+			drawEllipsePath(context, centerX, centerY, width/2, height/2);
+
 			context.stroke();
 
-			context.beginPath();
-			context.translate(centerX, centerY);
-			context.scale(width / 2, height / 2);
-
-			// At origin, radius 1, 0 to 2pi
-			context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-			
-			context.closePath();
-			context.scale(2/width, 2/height);
-			context.translate(-centerX, -centerY);
+			drawEllipsePath(context, centerX, centerY, width, height);
 
 		},
 

@@ -29,14 +29,6 @@
 				centerX, centerY,
 				width, height,
 				nodeShapes["perturbing agent"].points);
-
-			context.font = "10px Arial";
-			context.textAlign = "center";
-			context.textBaseline = "middle";
-			context.fillStyle = "#000000";
-			context.fillText("" + label, centerX, centerY);
-			context.fillStyle = "#ffffff";
-
 		},
 
 		drawPath: function(context, node) {
