@@ -1,7 +1,4 @@
 ;(function($$){"use strict";
-
-	sbgnShapes["complex"] = true;
-
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 	
@@ -9,29 +6,55 @@
 	//all different types must be added
 	var nodeShape = $$.style.types.nodeShape.enums;
 	nodeShape.push("complex");
+	sbgnShapes["complex"] = true;
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	var complexPoints = new Array(-0.75, -1, -1, -0.75, -1, 0.75, -0.75, 
-		1, 0.75, 1, 1, 0.75, 1, -0.75, 0.75, -1);
+	//this function is created to have same corner length when
+	//complex's width or height is changed
+	function generateComplexShapePoints(cornerLength, width, height){
+		//cp stands for corner proportion
+		var cpX = cornerLength / width;
+		var cpY = cornerLength / height;
+
+		var complexPoints = new Array(-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX, 
+			1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1);	
+
+		return complexPoints;
+	}
 
 	nodeShapes["complex"] = {
-		points: complexPoints,
-
+		points: new Array(),
+		multimerPadding:3,
+		cornerLength:12,
+		
 		draw: function(context, node) {
 			var width = node.width();
 			var height = node.height();
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var stateAndInfos = node._private.data.sbgnstatesandinfos;
-	
-			renderer.drawPolygon(context,
+			var sbgnClass = node._private.data.sbgnclass;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+
+
+			nodeShapes["complex"].points = generateComplexShapePoints(cornerLength, 
+				width, height);
+
+			//check whether sbgn class includes multimer substring or not
+			if(sbgnClass.indexOf("multimer") != -1){
+				//add multimer shape
+				renderer.drawPolygonPath(context,
+					centerX + multimerPadding, centerY + multimerPadding,
+					width, height, nodeShapes["complex"].points);
+			}
+
+			renderer.drawPolygonPath(context,
 				centerX, centerY,
 				width, height, nodeShapes["complex"].points);
 
-			context.stroke();
-			context.fillStyle = "#ffffff";
-
+			context.fill();
 			var stateCount = 0, infoCount = 0;
 
 			for(var i = 0 ; i < stateAndInfos.length ; i++){
@@ -43,36 +66,14 @@
 				var stateLabel = state.state.value;
 
 				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					context.beginPath();
-					context.translate(stateCenterX, stateCenterY);
-					context.scale(stateWidth / 2, stateHeight / 2);
-					context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-					context.closePath();
-
-					context.scale(2/stateWidth, 2/stateHeight);
-					context.translate(-stateCenterX, -stateCenterY);
-					context.fill();
-
-					context.fillStyle = "#000000";
-					renderer.drawSbgnText(context, node, stateLabel, stateCenterX, stateCenterY);
-					//renderer.drawText(context, node, centerX, centerY);
-					context.fillStyle = "#ffffff";
-
-
+					drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
 					stateCount++;
-
 				}
 				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectangle(context,
+					renderer.drawRoundRectanglePath(context,
 						stateCenterX, stateCenterY,
 						stateWidth, stateHeight,
 						5);
-
-					context.fillStyle = "#000000";
-					renderer.drawSbgnText(context, node, stateLabel, stateCenterX, stateCenterY);
-					context.fillStyle = "#ffffff";
-
-
 					infoCount++;
 				}
 				context.stroke();
@@ -81,19 +82,33 @@
 		},
 
 		drawPath: function(context, node) {
-			
-			//var width = node._private.data.sbgnbbox.w;
-			//var height = node._private.data.sbgnbbox.h;
 			var width = node.width();
 			var height = node.height();
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var stateAndInfos = node._private.data.sbgnstatesandinfos;
-		
-			renderer.drawPolygonPath(context,
+			var label = node._private.data.sbgnlabel;
+			var sbgnClass = node._private.data.sbgnclass;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+
+			nodeShapes["complex"].points = generateComplexShapePoints(cornerLength, 
+				width, height);
+
+			//check whether sbgn class includes multimer substring or not
+			if(sbgnClass.indexOf("multimer") != -1){
+				//add multimer shape
+				renderer.drawPolygon(context,
+					centerX + multimerPadding, centerY + multimerPadding,
+					width, height, nodeShapes["complex"].points);
+
+				context.stroke();
+			}
+
+			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height, nodeShapes["complex"].points);
-
+			
 			var stateCount = 0, infoCount = 0;
 
 			for(var i = 0 ; i < stateAndInfos.length ; i++){
@@ -102,32 +117,22 @@
 				var stateHeight = state.bbox.h;
 				var stateCenterX = state.bbox.x + centerX;
 				var stateCenterY = state.bbox.y + centerY;
+				var stateLabel = state.state.value;
 
 				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					context.beginPath();
-					context.translate(stateCenterX, stateCenterY);
-					context.scale(stateWidth / 2, stateHeight / 2);
-					context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-					context.closePath();
-
-					context.scale(2/stateWidth, 2/stateHeight);
-					context.translate(-stateCenterX, -stateCenterY);
-					//context.fill();
-
+					drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
+					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
 					stateCount++;
-
 				}
 				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectanglePath(context,
+					renderer.drawRoundRectangle(context,
 						stateCenterX, stateCenterY,
 						stateWidth, stateHeight,
 						5);
-
+					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
 					infoCount++;
 				}
-				//context.stroke();
 			}
-
 		},
 
 		intersectLine: function(node, x, y) {

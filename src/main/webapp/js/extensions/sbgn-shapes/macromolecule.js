@@ -14,30 +14,33 @@
 
 	nodeShapes["macromolecule"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
-		
-		draw: function(context, node) {
+		multimerPadding:3,
 
+		draw: function(context, node) {
 			var width = node.width();
 			var height = node.height();
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var stateAndInfos = node._private.data.sbgnstatesandinfos;
-
 			var label = node._private.data.sbgnlabel;
+			var sbgnClass = node._private.data.sbgnclass;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
-			renderer.drawRoundRectangle(context,
+			//check whether sbgn class includes multimer substring or not
+			if(sbgnClass.indexOf("multimer") != -1){
+				//add multimer shape
+				renderer.drawRoundRectanglePath(context,
+					centerX + multimerPadding, centerY + multimerPadding,
+					width, height,
+					4);
+			}
+
+			renderer.drawRoundRectanglePath(context,
 				centerX, centerY,
 				width, height,
 				4);
 
-			context.font = "10px Arial";
-			context.textAlign = "center";
-			context.textBaseline = "middle";
-			context.fillStyle = "#000000";
-			context.fillText("" + label, centerX, centerY);
-			context.fillStyle = "#ffffff";
-
-			context.stroke();
+			context.fill();
 
 			var stateCount = 0, infoCount = 0;
 
@@ -50,42 +53,20 @@
 				var stateLabel = state.state.value;
 
 				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					context.beginPath();
-					context.translate(stateCenterX, stateCenterY);
-					context.scale(stateWidth / 2, stateHeight / 2);
-					context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-					context.closePath();
-
-					context.scale(2/stateWidth, 2/stateHeight);
-					context.translate(-stateCenterX, -stateCenterY);
-					context.fill();
-					context.font = "10px Arial";
-
-					context.textAlign = "center";
-					context.textBaseline = "middle";
-					context.fillStyle = "#000000";
-					context.fillText("" + stateLabel, stateCenterX, stateCenterY);
-					context.fillStyle = "#ffffff";
-
+					drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
 					stateCount++;
-
 				}
 				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectangle(context,
+					renderer.drawRoundRectanglePath(context,
 						stateCenterX, stateCenterY,
 						stateWidth, stateHeight,
 						5);
-					context.font = "10px Arial";
-					context.textAlign = "center";
-					context.textBaseline = "middle";
-					context.fillStyle = "#000000";
-					context.fillText("" + stateLabel, stateCenterX, stateCenterY);
-					context.fillStyle = "#ffffff";
 
 					infoCount++;
 				}
 				context.stroke();
 			}
+
 		},
 		
 		drawPath: function(context, node) {
@@ -94,39 +75,50 @@
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var stateAndInfos = node._private.data.sbgnstatesandinfos;
+			var label = node._private.data.sbgnlabel;
+			var sbgnClass = node._private.data.sbgnclass;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
-			renderer.drawRoundRectanglePath(context,
+
+			//check whether sbgn class includes multimer substring or not
+			if(sbgnClass.indexOf("multimer") != -1){
+				//add multimer shape
+				renderer.drawRoundRectangle(context,
+					centerX + multimerPadding, centerY + multimerPadding,
+					width, height,
+					4);
+
+				context.stroke();
+			}
+
+			renderer.drawRoundRectangle(context,
 				centerX, centerY,
 				width, height,
 				5);
 
+			drawSbgnText(context, label, centerX, centerY - 2);
+
 			var stateCount = 0, infoCount = 0;
+			
 			for(var i = 0 ; i < stateAndInfos.length ; i++){
 				var state = stateAndInfos[i];
 				var stateWidth = state.bbox.w;
 				var stateHeight = state.bbox.h;
 				var stateCenterX = state.bbox.x + centerX;
 				var stateCenterY = state.bbox.y + centerY;
+				var stateLabel = state.state.value;
 
 				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					context.beginPath();
-					context.translate(stateCenterX, stateCenterY);
-					context.scale(stateWidth / 2, stateHeight / 2);
-					context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-					context.closePath();
-
-					context.scale(2/stateWidth, 2/stateHeight);
-					context.translate(-stateCenterX, -stateCenterY);
-
+					drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
+					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY)
 					stateCount++;
-
 				}
 				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectanglePath(context,
+					renderer.drawRoundRectangle(context,
 						stateCenterX, stateCenterY,
 						stateWidth, stateHeight,
 						5);
-
+					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
 					infoCount++;
 				}
 			}

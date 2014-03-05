@@ -32,17 +32,30 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "width": "data(sbgnbbox.w)",
             "height": "data(sbgnbbox.h)"
         })
-        .selector("node[sbgnclass='macromolecule']")
+        .selector("node[sbgnclass='macromolecule'],[sbgnclass='macromolecule multimer']")
         .css({
             "shape": "macromolecule"
+        })
+        .selector("node[sbgnclass='complex'],[sbgnclass='complex multimer']")
+        .css({
+            "shape": "complex",
+            "background-opacity" : "1",
+        })
+        .selector("node[sbgnclass='nucleic acid feature'],[sbgnclass='nucleic acid feature multimer']")
+        .css({
+            "shape": "nucleic acid feature",
+            "content": "data(sbgnlabel)"
+        })
+        .selector("node[sbgnclass='simple chemical'],[sbgnclass='simple chemical multimer']")
+        .css({
+            "shape": "simple chemical",
+            "content": "data(sbgnlabel)",
+            "text-valign" : "center",
+            "text-halign" : "center"
         })
         .selector("node[sbgnclass='source and sink']")
         .css({
             "shape": "source and sink"
-        })
-        .selector("node[sbgnclass='complex']")
-        .css({
-            "shape": "complex"
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -51,20 +64,6 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node[sbgnclass='unspecified entity']")
         .css({
             "shape": "ellipse",
-            "content": "data(sbgnlabel)",
-            "text-valign" : "center",
-            "text-halign" : "center"
-        })
-        .selector("node[sbgnclass='simple chemical']")
-        .css({
-            "shape": "circle",
-            "content": "data(sbgnlabel)",
-            "text-valign" : "center",
-            "text-halign" : "center"
-        })
-        .selector("node[sbgnclass='simple chemical']")
-        .css({
-            "shape": "circle",
             "content": "data(sbgnlabel)",
             "text-valign" : "center",
             "text-halign" : "center"
@@ -135,13 +134,13 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='stimulation']")
         .css({
-            "target-arrow-shape": "triangle"
+            "target-arrow-shape": "diamond"
         })
         .selector("edge[sbgnclass='catalysis']")
         .css({
-            "target-arrow-color": "#fff",
-            "line-color": "#000",
-            "target-arrow-shape": "circle"
+            //"target-arrow-color": "#fff",
+            //"line-color": "#000",
+            "target-arrow-shape": "diamond"
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
@@ -151,8 +150,17 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector(":selected")
         .css({
-            "background-color": "#000",
-            "background-opacity" : "0.3",
+            "background-color": "#00ff00",
+            "background-opacity" : "1",
+            "color":"#000000",
+            "line-color": "#000",
+            "source-arrow-color": "#000",
+            "target-arrow-color": "#000"
+        })
+        .selector(":active")
+        .css({
+            "background-color": "#00ff00",
+            "background-opacity" : "1",
             "line-color": "#000",
             "source-arrow-color": "#000",
             "target-arrow-color": "#000"
