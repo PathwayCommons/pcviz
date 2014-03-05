@@ -21,7 +21,6 @@
 			var height = node.height();
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var stateAndInfos = node._private.data.sbgnstatesandinfos;
 			var label = node._private.data.sbgnlabel;
 			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
@@ -39,34 +38,8 @@
 				centerX, centerY,
 				width, height,
 				4);
-
 			context.fill();
-
-			var stateCount = 0, infoCount = 0;
-
-			for(var i = 0 ; i < stateAndInfos.length ; i++){
-				var state = stateAndInfos[i];
-				var stateWidth = state.bbox.w;
-				var stateHeight = state.bbox.h;
-				var stateCenterX = state.bbox.x + centerX;
-				var stateCenterY = state.bbox.y + centerY;
-				var stateLabel = state.state.value;
-
-				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-					stateCount++;
-				}
-				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectanglePath(context,
-						stateCenterX, stateCenterY,
-						stateWidth, stateHeight,
-						5);
-
-					infoCount++;
-				}
-				context.stroke();
-			}
-
+			drawStateAndInfos(node, context, centerX, centerY);
 		},
 		
 		drawPath: function(context, node) {
@@ -74,11 +47,9 @@
 			var height = node.height();
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var stateAndInfos = node._private.data.sbgnstatesandinfos;
 			var label = node._private.data.sbgnlabel;
 			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
-
 
 			//check whether sbgn class includes multimer substring or not
 			if(sbgnClass.indexOf("multimer") != -1){
@@ -95,33 +66,9 @@
 				centerX, centerY,
 				width, height,
 				5);
-
 			drawSbgnText(context, label, centerX, centerY - 2);
+			drawPathStateAndInfos(node, context, centerX, centerY);
 
-			var stateCount = 0, infoCount = 0;
-			
-			for(var i = 0 ; i < stateAndInfos.length ; i++){
-				var state = stateAndInfos[i];
-				var stateWidth = state.bbox.w;
-				var stateHeight = state.bbox.h;
-				var stateCenterX = state.bbox.x + centerX;
-				var stateCenterY = state.bbox.y + centerY;
-				var stateLabel = state.state.value;
-
-				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY)
-					stateCount++;
-				}
-				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectangle(context,
-						stateCenterX, stateCenterY,
-						stateWidth, stateHeight,
-						5);
-					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
-					infoCount++;
-				}
-			}
 		},
 		
 		intersectLine: function(node, x, y) {

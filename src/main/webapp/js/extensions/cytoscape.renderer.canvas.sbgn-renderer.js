@@ -31,6 +31,6 @@ document.writeln("<script src='js/extensions/sbgn-shapes/nucleic-acid-feature.js
 document.writeln("<script src='js/extensions/sbgn-shapes/perturbing-agent.js'></script>");
 document.writeln("<script src='js/extensions/sbgn-shapes/simple-chemical.js'></script>");
 document.writeln("<script src='js/extensions/sbgn-shapes/source-and-sink.js'></script>");
-//document.writeln("<script src='js/extensions/sbgn-shapes/process-nodes/process.js'></script>");
+document.writeln("<script src='js/extensions/sbgn-shapes/unspecified-entity.js'></script>");
 document.writeln("<script src='js/extensions/sbgn-shapes/process-nodes/dissociation.js'></script>");
 document.writeln("<script src='js/extensions/sbgn-shapes/process-nodes/phenotype.js'></script>");
