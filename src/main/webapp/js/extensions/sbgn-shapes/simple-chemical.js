@@ -12,18 +12,6 @@
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	function drawCircle(context, width, height, centerX, centerY){
-		context.beginPath();
-		context.translate(centerX, centerY);
-		context.scale(width / 2, height / 2);
-		// At origin, radius 1, 0 to 2pi
-		context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-		context.closePath();
-
-		context.scale(2/width, 2/height);
-		context.translate(-centerX, -centerY);
-	}
-
 	nodeShapes["simple chemical"] = {
 		multimerPadding:3,
 
@@ -33,15 +21,17 @@
 			var width = node.width();
 			var height = node.height();
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
+			var sbgnClass = node._private.data.sbgnclass;
 
 			if(sbgnClass.indexOf("multimer") != -1){
 				//add multimer shape
-				drawCircle(context, width, height, centerX + multimerPadding, 
-					centerY + multimerPadding);
+				drawCircle(context, centerX + multimerPadding, 
+					centerY + multimerPadding, width, height);
 			}
 
-			drawCircle(context, width, height, centerX, centerY);
+			drawCircle(context, centerX, centerY, width, height);
 			context.fill();
+			drawStateAndInfos(node, context, centerX, centerY);
 
 		},
 
@@ -51,20 +41,25 @@
 			var width = node.width();
 			var height = node.height();
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
+			var sbgnClass = node._private.data.sbgnclass;
+			var label = node._private.data.sbgnlabel;
 
 			if(sbgnClass.indexOf("multimer") != -1){
 				//add multimer shape
-				drawCircle(context, width, height, centerX + multimerPadding,
-				 centerY + multimerPadding);
+				drawCircle(context, centerX + multimerPadding,
+				 centerY + multimerPadding, width, height);
 			
 				context.stroke();
 				context.fill();
 			}
 
-			drawCircle(context, width, height, centerX, centerY);
+			drawCircle(context, centerX, centerY, width, height);
 
-			context.stroke();
+			//context.stroke();
 			context.fill();
+			drawSbgnText(context, label, centerX, centerY - 2);
+			drawPathStateAndInfos(node, context, centerX, centerY);
+
 		},
 
 		intersectLine: function(node, x, y) {

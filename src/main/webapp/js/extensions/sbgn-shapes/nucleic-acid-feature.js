@@ -42,8 +42,8 @@
 
 			drawNucAcidFeature(context, halfWidth, halfHeight, centerX, 
 				centerY, cornerRadius);
-
 			context.fill();
+			drawStateAndInfos(node, context, centerX, centerY);
 		},
 
 		drawPath: function(context, node) {
@@ -75,6 +75,9 @@
 				centerY, cornerRadius);
 
 			context.fill();
+
+			drawSbgnText(context, label, centerX, centerY - 2);
+			drawPathStateAndInfos(node, context, centerX, centerY);
 		},
 
 		intersectLine: function(node, x, y) {

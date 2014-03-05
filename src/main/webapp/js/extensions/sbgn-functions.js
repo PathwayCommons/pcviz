@@ -44,3 +44,71 @@ function drawNucAcidFeature(context, halfWidth, halfHeight,
     context.closePath();
     context.translate(-centerX, -centerY);
 }
+
+function drawCircle(context, x, y, width, height){
+		context.beginPath();
+		context.translate(x, y);
+		context.scale(width / 2, height / 2);
+		// At origin, radius 1, 0 to 2pi
+		context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
+		context.closePath();
+
+		context.scale(2/width, 2/height);
+		context.translate(-x, -y);
+}
+
+function drawStateAndInfos(node, context, centerX, centerY){
+	var stateAndInfos = node._private.data.sbgnstatesandinfos;
+	var stateCount = 0, infoCount = 0;
+
+	for(var i = 0 ; i < stateAndInfos.length ; i++){
+		var state = stateAndInfos[i];
+		var stateWidth = state.bbox.w;
+		var stateHeight = state.bbox.h;
+		var stateCenterX = state.bbox.x + centerX;
+		var stateCenterY = state.bbox.y + centerY;
+		var stateLabel = state.state.value;
+
+		if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
+			drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
+			stateCount++;
+		}
+		else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
+			renderer.drawRoundRectanglePath(context,
+				stateCenterX, stateCenterY,
+				stateWidth, stateHeight,
+				5);
+
+			infoCount++;
+		}
+		context.stroke();
+	}
+}
+
+function drawPathStateAndInfos(node, context, centerX, centerY){
+	var stateAndInfos = node._private.data.sbgnstatesandinfos;
+	var stateCount = 0, infoCount = 0;
+			
+	for(var i = 0 ; i < stateAndInfos.length ; i++){
+		var state = stateAndInfos[i];
+		var stateWidth = state.bbox.w;
+		var stateHeight = state.bbox.h;
+		var stateCenterX = state.bbox.x + centerX;
+		var stateCenterY = state.bbox.y + centerY;
+		var stateLabel = state.state.value;
+
+		if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
+			drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
+			drawSbgnText(context, stateLabel, stateCenterX, stateCenterY)
+			stateCount++;
+		}
+		else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
+			renderer.drawRoundRectangle(context,
+				stateCenterX, stateCenterY,
+				stateWidth, stateHeight,
+				5);
+			drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+			infoCount++;
+		}
+	}
+}
