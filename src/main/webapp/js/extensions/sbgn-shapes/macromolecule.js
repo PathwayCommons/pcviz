@@ -35,11 +35,10 @@
 			}
 
 			renderer.drawRoundRectanglePath(context,
-				centerX, centerY,
-				width, height,
+				centerX, centerY, width, height,
 				4);
-			context.fill();
-			drawStateAndInfos(node, context, centerX, centerY);
+			//context.fill();
+			//drawStateAndInfos(node, context, centerX, centerY);
 		},
 		
 		drawPath: function(context, node) {
@@ -66,9 +65,10 @@
 				centerX, centerY,
 				width, height,
 				5);
-			drawSbgnText(context, label, centerX, centerY - 2);
-			drawPathStateAndInfos(node, context, centerX, centerY);
 
+			drawSbgnText(context, label, centerX, centerY - 2);
+
+			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 		
 		intersectLine: function(node, x, y) {
