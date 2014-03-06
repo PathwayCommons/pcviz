@@ -67,25 +67,26 @@ function drawStateAndInfos(node, context, centerX, centerY){
 		var stateHeight = state.bbox.h;
 		var stateCenterX = state.bbox.x + centerX;
 		var stateCenterY = state.bbox.y + centerY;
-		var stateLabel = state.state.value;
 
 		if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-			drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
+			var stateLabel = state.state.value;
+			//drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
 			stateCount++;
 		}
 		else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-			renderer.drawRoundRectanglePath(context,
-				stateCenterX, stateCenterY,
-				stateWidth, stateHeight,
-				5);
+			var stateLabel = state.label.text;
+			//renderer.drawRoundRectanglePath(context,
+			//	stateCenterX, stateCenterY,
+			//	stateWidth, stateHeight,
+			//	5);
 
 			infoCount++;
 		}
-		context.stroke();
+		//context.stroke();
 	}
 }
 
-function drawPathStateAndInfos(node, context, centerX, centerY){
+function drawPathStateAndInfos(renderer, node, context, centerX, centerY){
 	var stateAndInfos = node._private.data.sbgnstatesandinfos;
 	var stateCount = 0, infoCount = 0;
 			
@@ -95,14 +96,15 @@ function drawPathStateAndInfos(node, context, centerX, centerY){
 		var stateHeight = state.bbox.h;
 		var stateCenterX = state.bbox.x + centerX;
 		var stateCenterY = state.bbox.y + centerY;
-		var stateLabel = state.state.value;
 
 		if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
+			var stateLabel = state.state.value;
 			drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-			drawSbgnText(context, stateLabel, stateCenterX, stateCenterY)
+			drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
 			stateCount++;
 		}
 		else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
+			var stateLabel = state.label.text;
 			renderer.drawRoundRectangle(context,
 				stateCenterX, stateCenterY,
 				stateWidth, stateHeight,
@@ -110,5 +112,28 @@ function drawPathStateAndInfos(node, context, centerX, centerY){
 			drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
 			infoCount++;
 		}
+		context.stroke();
 	}
+}
+
+//this function is created to have same corner length when
+//complex's width or height is changed
+function generateComplexShapePoints(cornerLength, width, height){
+	//cp stands for corner proportion
+	var cpX = cornerLength / width;
+	var cpY = cornerLength / height;
+
+	var complexPoints = new Array(-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX, 
+		1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1);	
+
+	return complexPoints;
+}
+
+//use this function to sort states according to their x positions
+function compareStates(st1, st2){
+	if(st1.bbox.x < st2.bbox.x)
+		return -1;
+	if(st1.bbox.x > st2.bbox.x)
+		return 1;
+	return 0;
 }

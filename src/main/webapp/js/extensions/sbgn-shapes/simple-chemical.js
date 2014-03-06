@@ -30,9 +30,8 @@
 			}
 
 			drawCircle(context, centerX, centerY, width, height);
-			context.fill();
-			drawStateAndInfos(node, context, centerX, centerY);
-
+			//context.fill();
+			//drawStateAndInfos(node, context, centerX, centerY);
 		},
 
 		drawPath: function(context, node) {
@@ -54,11 +53,10 @@
 			}
 
 			drawCircle(context, centerX, centerY, width, height);
-
-			//context.stroke();
 			context.fill();
+
 			drawSbgnText(context, label, centerX, centerY - 2);
-			drawPathStateAndInfos(node, context, centerX, centerY);
+			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
 		},
 

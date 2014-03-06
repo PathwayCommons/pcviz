@@ -10,19 +10,6 @@
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	//this function is created to have same corner length when
-	//complex's width or height is changed
-	function generateComplexShapePoints(cornerLength, width, height){
-		//cp stands for corner proportion
-		var cpX = cornerLength / width;
-		var cpY = cornerLength / height;
-
-		var complexPoints = new Array(-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX, 
-			1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1);	
-
-		return complexPoints;
-	}
-
 	nodeShapes["complex"] = {
 		points: new Array(),
 		multimerPadding:3,
@@ -37,7 +24,6 @@
 			var sbgnClass = node._private.data.sbgnclass;
 			var cornerLength = nodeShapes["complex"].cornerLength;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
-
 
 			nodeShapes["complex"].points = generateComplexShapePoints(cornerLength, 
 				width, height);
@@ -54,30 +40,60 @@
 				centerX, centerY,
 				width, height, nodeShapes["complex"].points);
 
-			context.fill();
-			var stateCount = 0, infoCount = 0;
+//			context.fill();
+/*
+			//complex state and info drawing
+			var upWidth = 0, downWidth = 0;
+			var boxPadding = 10, betweenBoxPadding = 5;
+			var beginPosY = height / 2, beginPosX = width / 2;
+
+
+			stateAndInfos.sort(compareStates);
 
 			for(var i = 0 ; i < stateAndInfos.length ; i++){
 				var state = stateAndInfos[i];
 				var stateWidth = state.bbox.w;
 				var stateHeight = state.bbox.h;
-				var stateCenterX = state.bbox.x + centerX;
-				var stateCenterY = state.bbox.y + centerY;
-				var stateLabel = state.state.value;
 
-				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-					stateCount++;
+				if(stateCenterY < 0 ){
+					if(upWidth + stateWidth < width){
+						var stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth/2;
+						var stateCenterY = centerY - beginPosY;
+						if(state.clazz == "state variable"){//draw ellipse
+							drawEllipsePath(context,
+								stateCenterX, stateCenterY, 
+								stateWidth, stateHeight);
+						}
+						else if(state.clazz == "unit of information"){//draw rectangle
+							renderer.drawRoundRectanglePath(context,
+								stateCenterX, stateCenterY,
+								stateWidth, stateHeight,
+								5);
+						}
+					}
+					upWidth = upWidth + width + boxPadding;
 				}
-				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectanglePath(context,
-						stateCenterX, stateCenterY,
-						stateWidth, stateHeight,
-						5);
-					infoCount++;
+				if(stateCenterY > 0 ){
+					if(downWidth + stateWidth < width){
+						var stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth/2;
+						var stateCenterY = centerY + beginPosY;
+						if(state.clazz == "state variable"){//draw ellipse
+							drawEllipsePath(context,
+								stateCenterX, stateCenterY, 
+								stateWidth, stateHeight);
+						}
+						else if(state.clazz == "unit of information"){//draw rectangle
+							renderer.drawRoundRectanglePath(context,
+								stateCenterX, stateCenterY,
+								stateWidth, stateHeight,
+								5);
+						}
+					}
+					downWidth = downWidth + width + boxPadding;
 				}
 				context.stroke();
 			}
+*/
 
 		},
 
@@ -108,31 +124,65 @@
 			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height, nodeShapes["complex"].points);
+
+			context.stroke();
 			
-			var stateCount = 0, infoCount = 0;
+			//complex state and info drawing
+			var upWidth = 0, downWidth = 0;
+			var boxPadding = 10, betweenBoxPadding = 5;
+			var beginPosY = height / 2, beginPosX = width / 2;
+
+			stateAndInfos.sort(compareStates);
 
 			for(var i = 0 ; i < stateAndInfos.length ; i++){
 				var state = stateAndInfos[i];
 				var stateWidth = state.bbox.w;
 				var stateHeight = state.bbox.h;
-				var stateCenterX = state.bbox.x + centerX;
-				var stateCenterY = state.bbox.y + centerY;
 				var stateLabel = state.state.value;
+				var relativeYPos = state.bbox.y;
 
-				if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-					drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
-					stateCount++;
+				if(relativeYPos < 0 ){
+					if(upWidth + stateWidth < width){
+						var stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth/2;
+						var stateCenterY = centerY - beginPosY;
+						if(state.clazz == "state variable"){//draw ellipse
+							drawEllipse(context,
+								stateCenterX, stateCenterY, 
+								stateWidth, stateHeight);
+							drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						}
+						else if(state.clazz == "unit of information"){//draw rectangle
+							renderer.drawRoundRectangle(context,
+								stateCenterX, stateCenterY,
+								stateWidth, stateHeight,
+								5);
+							drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						}
+					}
+					upWidth = upWidth + width + boxPadding;
 				}
-				else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-					renderer.drawRoundRectangle(context,
-						stateCenterX, stateCenterY,
-						stateWidth, stateHeight,
-						5);
-					drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
-					infoCount++;
+				else if(relativeYPos > 0 ){
+					if(downWidth + stateWidth < width){
+						var stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth/2;
+						var stateCenterY = centerY + beginPosY;
+						if(state.clazz == "state variable"){//draw ellipse
+							drawEllipse(context,
+								stateCenterX, stateCenterY, 
+								stateWidth, stateHeight);
+							drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						}
+						else if(state.clazz == "unit of information"){//draw rectangle
+							renderer.drawRoundRectangle(context,
+								stateCenterX, stateCenterY,
+								stateWidth, stateHeight,
+								5);
+							drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						}
+					}
+					downWidth = downWidth + width + boxPadding;
 				}
-			}
+				context.stroke();
+			}	
 		},
 
 		intersectLine: function(node, x, y) {

@@ -24,8 +24,8 @@
 			var sbgnClass = node._private.data.sbgnclass;
 
 			drawCircle(context, centerX, centerY, width, height);
-			context.fill();
-			drawStateAndInfos(node, context, centerX, centerY);
+			//context.fill();
+			//drawStateAndInfos(node, context, centerX, centerY);
 
 		},
 
@@ -43,7 +43,7 @@
 			//context.stroke();
 			context.fill();
 			drawSbgnText(context, label, centerX, centerY - 2);
-			drawPathStateAndInfos(node, context, centerX, centerY);
+			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
 		},
 
