@@ -28,22 +28,17 @@
 			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
-			var halfWidth = width / 2;
-			var halfHeight = height / 2;
-
 			//check whether sbgn class includes multimer substring or not
 			if(sbgnClass.indexOf("multimer") != -1){
 				//add multimer shape
-				drawNucAcidFeature(context, halfWidth, halfHeight, 
+				drawNucAcidFeature(context, width, height, 
 					centerX + multimerPadding, 
 					centerY + multimerPadding, 
 					cornerRadius);
 			}
 
-			drawNucAcidFeature(context, halfWidth, halfHeight, centerX, 
+			drawNucAcidFeature(context, width, height, centerX, 
 				centerY, cornerRadius);
-			//context.fill();
-			//drawStateAndInfos(node, context, centerX, centerY);
 		},
 
 		drawPath: function(context, node) {
@@ -56,25 +51,24 @@
 			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
-			var halfWidth = width / 2;
-			var halfHeight = height / 2;
-
 			//check whether sbgn class includes multimer substring or not
 			if(sbgnClass.indexOf("multimer") != -1){
 				//add multimer shape
-				drawNucAcidFeature(context, halfWidth, halfHeight, 
+				drawNucAcidFeature(context, width, height, 
 					centerX + multimerPadding, 
 					centerY + multimerPadding, 
 					cornerRadius);
-
-				context.stroke();
 				context.fill();
+				context.stroke();
 			}
 
-			drawNucAcidFeature(context, halfWidth, halfHeight, centerX, 
+			drawNucAcidFeature(context, width, height, centerX, 
 				centerY, cornerRadius);
 			context.fill();
 
+			context.stroke();
+
+			drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, width, height, cornerRadius, "");
 			drawSbgnText(context, label, centerX, centerY - 2);
 			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
@@ -86,7 +80,6 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
-
 
 			var halfWidth = width / 2;
 			var halfHeight = height / 2;

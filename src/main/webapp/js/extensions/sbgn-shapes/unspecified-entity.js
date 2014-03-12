@@ -23,7 +23,7 @@
 			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
 
-			drawCircle(context, centerX, centerY, width, height);
+			drawCirclePath(context, centerX, centerY, width, height);
 			//context.fill();
 			//drawStateAndInfos(node, context, centerX, centerY);
 
@@ -40,11 +40,8 @@
 
 			drawCircle(context, centerX, centerY, width, height);
 
-			//context.stroke();
-			context.fill();
 			drawSbgnText(context, label, centerX, centerY - 2);
 			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
-
 		},
 
 		intersectLine: function(node, x, y) {

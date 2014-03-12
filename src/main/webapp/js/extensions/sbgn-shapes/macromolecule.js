@@ -14,7 +14,8 @@
 
 	nodeShapes["macromolecule"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
-		multimerPadding:3,
+		cornerRadius:4,
+		multimerPadding:2,
 
 		draw: function(context, node) {
 			var width = node.width();
@@ -22,6 +23,7 @@
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var label = node._private.data.sbgnlabel;
+			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
 			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
@@ -31,12 +33,12 @@
 				renderer.drawRoundRectanglePath(context,
 					centerX + multimerPadding, centerY + multimerPadding,
 					width, height,
-					4);
+					cornerRadius);
 			}
 
 			renderer.drawRoundRectanglePath(context,
 				centerX, centerY, width, height,
-				4);
+				cornerRadius);
 			//context.fill();
 			//drawStateAndInfos(node, context, centerX, centerY);
 		},
@@ -47,6 +49,7 @@
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var label = node._private.data.sbgnlabel;
+			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
 			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
@@ -56,7 +59,7 @@
 				renderer.drawRoundRectangle(context,
 					centerX + multimerPadding, centerY + multimerPadding,
 					width, height,
-					4);
+					cornerRadius);
 
 				context.stroke();
 			}
@@ -64,10 +67,12 @@
 			renderer.drawRoundRectangle(context,
 				centerX, centerY,
 				width, height,
-				5);
+				cornerRadius);
 
+			context.stroke();
+			
+			drawMacromoleculeCloneMarker(context, centerX, centerY, width, height, cornerRadius, "");
 			drawSbgnText(context, label, centerX, centerY - 2);
-
 			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 		

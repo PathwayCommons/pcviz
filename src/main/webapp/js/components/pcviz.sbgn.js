@@ -34,7 +34,9 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("node[sbgnclass='macromolecule'],[sbgnclass='macromolecule multimer']")
         .css({
-            "shape": "macromolecule"
+            "shape": "macromolecule",
+            //"width": "50",
+            //"height": "50"
         })
         .selector("node[sbgnclass='complex'],[sbgnclass='complex multimer']")
         .css({
@@ -44,12 +46,12 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node[sbgnclass='nucleic acid feature'],[sbgnclass='nucleic acid feature multimer']")
         .css({
             "shape": "nucleic acid feature",
-            "content": "data(sbgnlabel)"
+            //"content": "data(sbgnlabel)"
         })
         .selector("node[sbgnclass='simple chemical'],[sbgnclass='simple chemical multimer']")
         .css({
             "shape": "simple chemical",
-            "content": "data(sbgnlabel)",
+            //"content": "data(sbgnlabel)",
             "text-valign" : "center",
             "text-halign" : "center"
         })
@@ -161,6 +163,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .css({
             "background-color": "#00ff00",
             "background-opacity" : "1",
+            "color":"#000000",
             "line-color": "#000",
             "source-arrow-color": "#000",
             "target-arrow-color": "#000"

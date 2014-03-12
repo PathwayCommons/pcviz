@@ -22,16 +22,16 @@
 			var height = node.height();
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
+			var padding = node._private.style["border-width"].pxValue;
 
 			if(sbgnClass.indexOf("multimer") != -1){
 				//add multimer shape
-				drawCircle(context, centerX + multimerPadding, 
+				drawCirclePath(context, centerX + multimerPadding, 
 					centerY + multimerPadding, width, height);
 			}
 
-			drawCircle(context, centerX, centerY, width, height);
-			//context.fill();
-			//drawStateAndInfos(node, context, centerX, centerY);
+			drawCirclePath(context, centerX, centerY, width, height);
+
 		},
 
 		drawPath: function(context, node) {
@@ -42,19 +42,20 @@
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
 			var label = node._private.data.sbgnlabel;
+			var padding = node._private.style["border-width"].pxValue;
 
 			if(sbgnClass.indexOf("multimer") != -1){
 				//add multimer shape
 				drawCircle(context, centerX + multimerPadding,
 				 centerY + multimerPadding, width, height);
-			
 				context.stroke();
-				context.fill();
 			}
 
 			drawCircle(context, centerX, centerY, width, height);
-			context.fill();
 
+			context.stroke();
+
+			drawSimpleChemicalCloneMarker(context, centerX, centerY, width, height, "");
 			drawSbgnText(context, label, centerX, centerY - 2);
 			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
@@ -66,7 +67,6 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-
 
 			return nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
 				height, x, y, padding);

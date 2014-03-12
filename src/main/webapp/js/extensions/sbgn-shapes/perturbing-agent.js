@@ -47,6 +47,9 @@
 
 			context.fill();
 
+			context.stroke();
+
+			drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, width, height, "");
 			drawSbgnText(context, label, centerX, centerY - 2);
 			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
