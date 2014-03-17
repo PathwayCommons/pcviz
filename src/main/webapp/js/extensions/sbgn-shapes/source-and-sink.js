@@ -23,10 +23,8 @@
 			var label = node._private.data.sbgnlabel;
 			var pts = nodeShapes["source and sink"].points;
 
-			drawCirclePath(context, centerX, centerY,
+			$$.sbgn.drawCirclePath(context, centerX, centerY,
 				width, height);
-
-			//context.stroke();
 
 			context.beginPath();
 			context.translate(centerX, centerY);
@@ -49,7 +47,7 @@
 			var label = node._private.data.sbgnlabel;
 			var pts = nodeShapes["source and sink"].points;
 
-			drawCircle(context, centerX, centerY,
+			$$.sbgn.drawCircle(context, centerX, centerY,
 				width, height);
 
 			context.stroke();
@@ -67,7 +65,7 @@
 
 			context.stroke();
 
-			drawSourceSinkCloneMarker(context, centerX, centerY, 
+			$$.sbgn.drawSourceSinkCloneMarker(context, centerX, centerY, 
 				width, height, "");
 
 		},

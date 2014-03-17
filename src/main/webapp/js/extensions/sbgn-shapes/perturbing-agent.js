@@ -49,9 +49,9 @@
 
 			context.stroke();
 
-			drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, width, height, "");
-			drawSbgnText(context, label, centerX, centerY - 2);
-			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
+			$$.sbgn.drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, width, height, "");
+			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
 		},
 
@@ -62,13 +62,20 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return renderer.polygonIntersectLine(
+			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+				node, x, y);
+
+			var nodeIntersectLines = renderer.polygonIntersectLine(
 				x, y,
 				nodeShapes["perturbing agent"].points,
 				centerX,
 				centerY,
 				width / 2, height / 2,
 				padding);
+
+			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
+
+			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
 
 		},
 
@@ -80,8 +87,13 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
+			var nodeIntersectBox = renderer.boxIntersectPolygon(x1, y1, x2, y2,
 					points, width, height, centerX, centerY, [0, -1], padding);
+
+			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
+				x1, y1, x2, y2, node);
+
+			return nodeIntersectBox || stateAndInfoIntersectBox;
 
 		},
 
@@ -91,10 +103,15 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-			
-			return $$.math.checkInBoundingBox(
+
+			var nodeCheckPointRough = $$.math.checkInBoundingBox(
 				x, y, nodeShapes["perturbing agent"].points, 
 					padding, width, height, centerX, centerY);
+
+			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
+				x, y, centerX, centerY);
+
+			return nodeCheckPointRough || stateAndInfoCheckPointRough;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -104,8 +121,14 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return $$.math.pointInsidePolygon(x, y, nodeShapes["perturbing agent"].points,
+			var nodeCheckPoint = $$.math.pointInsidePolygon(x, y, 
+				nodeShapes["perturbing agent"].points,
 				centerX, centerY, width, height, [0, -1], padding);
+
+			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
+				threshold);
+
+			return nodeCheckPoint || stateAndInfoCheckPoint;
 
 		}
 	}

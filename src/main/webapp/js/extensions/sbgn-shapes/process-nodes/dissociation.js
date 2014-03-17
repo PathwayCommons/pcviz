@@ -37,11 +37,11 @@
 			context.scale(4/width, 4/height);
 			context.translate(-centerX, -centerY);
 
-			drawEllipsePath(context, centerX, centerY, width/2, height/2);
+			$$.sbgn.drawEllipsePath(context, centerX, centerY, width/2, height/2);
 
 			context.stroke();
 
-			drawEllipsePath(context, centerX, centerY, width, height);
+			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
 
 		},
 
