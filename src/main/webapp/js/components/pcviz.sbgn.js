@@ -128,7 +128,13 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("edge")
         .css({
             "line-color": "#000",
-            "target-arrow-shape": "triangle"
+            "target-arrow-shape": "triangle",
+            "target-arrow-fill": "hollow",
+            "target-arrow-color": "#fff",
+            //"source-arrow-shape": "triangle",
+            //"source-arrow-fill": "hollow",
+            //"source-arrow-color": "#fff",
+            'background-opacity': 1
         })
         .selector("edge[sbgnclass='modulation']")
         .css({
@@ -136,19 +142,30 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='stimulation']")
         .css({
-            "target-arrow-shape": "diamond"
         })
         .selector("edge[sbgnclass='catalysis']")
         .css({
-            //"target-arrow-color": "#fff",
-            //"line-color": "#000",
-            "target-arrow-shape": "diamond"
+            "target-arrow-shape": "circle"
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
-            "target-arrow-color": "#fff",
-            "line-color": "#fff",
             "target-arrow-shape": "tee"
+        })
+        .selector("edge[sbgnclass='logic arc'],[sbgnclass='equivalence arc']")
+        .css({
+            "target-arrow-shape": "none"
+        })
+        .selector("edge[sbgnclass='consumption']")
+        .css({
+            "target-arrow-shape": "consumption"
+        })
+        .selector("edge[sbgnclass='production']")
+        .css({
+            "target-arrow-shape": "production"
+        })
+        .selector("edge[sbgnclass='necessary stimulation']")
+        .css({
+            "target-arrow-shape": "necessary stimulation"
         })
         .selector(":selected")
         .css({

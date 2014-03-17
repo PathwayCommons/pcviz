@@ -23,7 +23,7 @@
 			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
 
-			drawCirclePath(context, centerX, centerY, width, height);
+			$$.sbgn.drawCirclePath(context, centerX, centerY, width, height);
 			//context.fill();
 			//drawStateAndInfos(node, context, centerX, centerY);
 
@@ -38,10 +38,10 @@
 			var sbgnClass = node._private.data.sbgnclass;
 			var label = node._private.data.sbgnlabel;
 
-			drawCircle(context, centerX, centerY, width, height);
+			$$.sbgn.drawCircle(context, centerX, centerY, width, height);
 
-			drawSbgnText(context, label, centerX, centerY - 2);
-			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
+			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 
 		intersectLine: function(node, x, y) {
@@ -51,8 +51,15 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
+			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+				node, x, y);
+
+			var nodeIntersectLines = nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
 				height, x, y, padding);
+
+			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
+			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
+
 		},
 
 		intersectBox: function(x1, y1, x2, y2, node) {
@@ -62,8 +69,14 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].intersectBox(x1, y1, x2, y2, width, 
+			var nodeIntersectBox = nodeShapes["ellipse"].intersectBox(
+				x1, y1, x2, y2, width, 
 				height, centerX, centerY, padding);
+
+			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
+				x1, y1, x2, y2, node);
+
+			return nodeIntersectBox || stateAndInfoIntersectBox;
 
 		},
 
@@ -74,8 +87,13 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return nodeShapes["ellipse"].checkPointRough(x, y, padding, width, height, 
-				centerX, centerY);
+			var nodeCheckPointRough = nodeShapes["ellipse"].checkPointRough(x, y, 
+				padding, width, height, centerX, centerY);
+
+			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
+				x, y, centerX, centerY);
+
+			return nodeCheckPointRough || stateAndInfoCheckPointRough;
 
 		},
 
@@ -85,9 +103,15 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-
-			return nodeShapes["ellipse"].checkPoint(x, y, padding, width, height, 
+			
+			var nodeCheckPoint =  nodeShapes["ellipse"].checkPoint(x, y, 
+				padding, width, height, 
 				centerX, centerY);
+
+			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
+				threshold);
+
+			return nodeCheckPoint || stateAndInfoCheckPoint;
 		}
 	}
 

@@ -25,19 +25,18 @@
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
-			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
 			//check whether sbgn class includes multimer substring or not
-			if(sbgnClass.indexOf("multimer") != -1){
+			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				drawNucAcidFeature(context, width, height, 
+				$$.sbgn.drawNucAcidFeature(context, width, height, 
 					centerX + multimerPadding, 
 					centerY + multimerPadding, 
 					cornerRadius);
 			}
 
-			drawNucAcidFeature(context, width, height, centerX, 
+			$$.sbgn.drawNucAcidFeature(context, width, height, centerX, 
 				centerY, cornerRadius);
 		},
 
@@ -48,13 +47,12 @@
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
-			var sbgnClass = node._private.data.sbgnclass;
 			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
 			//check whether sbgn class includes multimer substring or not
-			if(sbgnClass.indexOf("multimer") != -1){
+			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				drawNucAcidFeature(context, width, height, 
+				$$.sbgn.drawNucAcidFeature(context, width, height, 
 					centerX + multimerPadding, 
 					centerY + multimerPadding, 
 					cornerRadius);
@@ -62,150 +60,62 @@
 				context.stroke();
 			}
 
-			drawNucAcidFeature(context, width, height, centerX, 
+			$$.sbgn.drawNucAcidFeature(context, width, height, centerX, 
 				centerY, cornerRadius);
 			context.fill();
 
 			context.stroke();
 
-			drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, width, height, cornerRadius, "");
-			drawSbgnText(context, label, centerX, centerY - 2);
-			drawPathStateAndInfos(renderer, node, context, centerX, centerY);
+			$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, width, height, cornerRadius, "");
+			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 
 		intersectLine: function(node, x, y) {
-			var nodeX = node._private.position.x;
-			var nodeY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			var halfWidth = width / 2;
-			var halfHeight = height / 2;
+			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+				node, x, y);
 
-			var straightLineIntersections;
+			var nodeIntersectLines = $$.sbgn.nucleicAcidIntersectionLine(node, 
+				x, y, centerX, centerY);
 
-			// Top segment, left to right
-			{
-				var topStartX = nodeX - halfWidth - padding;
-				var topStartY = nodeY - halfHeight - padding;
-				var topEndX = nodeX + halfWidth + padding;
-				var topEndY = topStartY;
-			
-				straightLineIntersections = $$.math.finiteLinesIntersect(
-					x, y, nodeX, nodeY, topStartX, topStartY, topEndX, topEndY, false);
-			
-				if (straightLineIntersections.length > 0) {
-					return straightLineIntersections;
-				}
+			//check whether sbgn class includes multimer substring or not
+			var multimerIntersectionLines = new Array();
+			if($$.sbgn.isMultimer(node)){
+				multimerIntersectionLines = $$.sbgn.nucleicAcidIntersectionLine(node, 
+					x, y, centerX + multimerPadding, centerY + multimerPadding);
 			}
 
-			// Right segment, top to bottom
-			{
-				var rightStartX = nodeX + halfWidth + padding;
-				var rightStartY = nodeY - halfHeight - padding;
-				var rightEndX = rightStartX;
-				var rightEndY = nodeY + halfHeight - cornerRadius + padding;
-				
-				straightLineIntersections = $$.math.finiteLinesIntersect(
-					x, y, nodeX, nodeY, rightStartX, rightStartY, rightEndX, rightEndY, false);
-				
-				if (straightLineIntersections.length > 0) {
-					return straightLineIntersections;
-				}
-			}
+			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines, 
+				multimerIntersectionLines);
 
-			// Bottom segment, left to right
-			{
-				var bottomStartX = nodeX - halfWidth + cornerRadius - padding;
-				var bottomStartY = nodeY + halfHeight + padding;
-				var bottomEndX = nodeX + halfWidth - cornerRadius + padding;
-				var bottomEndY = bottomStartY;
-				
-				straightLineIntersections = $$.math.finiteLinesIntersect(
-					x, y, nodeX, nodeY, bottomStartX, bottomStartY, bottomEndX, bottomEndY, false);
-				
-				if (straightLineIntersections.length > 0) {
-					return straightLineIntersections;
-				}
-			}
-
-			// Left segment, top to bottom
-			{
-				var leftStartX = nodeX - halfWidth - padding;
-				var leftStartY = nodeY - halfHeight - padding;
-				var leftEndX = leftStartX;
-				var leftEndY = nodeY + halfHeight - cornerRadius + padding;
-			
-				straightLineIntersections = $$.math.finiteLinesIntersect(
-					x, y, nodeX, nodeY, leftStartX, leftStartY, leftEndX, leftEndY, false);
-				
-				if (straightLineIntersections.length > 0) {
-					return straightLineIntersections;
-				}
-			}
-
-			// Check intersections with arc segments, we have only two arcs for
-			//nucleic acid features
-			var arcIntersections;
-
-			// Bottom Right
-			{
-				var bottomRightCenterX = nodeX + halfWidth - cornerRadius;
-				var bottomRightCenterY = nodeY + halfHeight - cornerRadius
-				arcIntersections = $$.math.intersectLineCircle(
-					x, y, nodeX, nodeY, 
-					bottomRightCenterX, bottomRightCenterY, cornerRadius + padding);
-				
-				// Ensure the intersection is on the desired quarter of the circle
-				if (arcIntersections.length > 0
-					&& arcIntersections[0] >= bottomRightCenterX
-					&& arcIntersections[1] >= bottomRightCenterY) {
-					return [arcIntersections[0], arcIntersections[1]];
-				}
-			}
-			
-			// Bottom Left
-			{
-				var bottomLeftCenterX = nodeX - halfWidth + cornerRadius;
-				var bottomLeftCenterY = nodeY + halfHeight - cornerRadius
-				arcIntersections = $$.math.intersectLineCircle(
-					x, y, nodeX, nodeY, 
-					bottomLeftCenterX, bottomLeftCenterY, cornerRadius + padding);
-				
-				// Ensure the intersection is on the desired quarter of the circle
-				if (arcIntersections.length > 0
-					&& arcIntersections[0] <= bottomLeftCenterX
-					&& arcIntersections[1] >= bottomLeftCenterY) {
-					return [arcIntersections[0], arcIntersections[1]];
-				}
-			}
-			return []; // if nothing
+			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
 		},
 
 		intersectBox: function(x1, y1, x2, y2, node) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var points = nodeShapes["square"].points;
-			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			//we have a rectangle at top and a roundrectangle at bottom
+			var nodeIntersectBox = $$.sbgn.nucleicAcidIntersectionBox(
+				x1, y1, x2, y2, centerX, centerY, node);
 
-			var rectIntersectBoxResult = $$.math.boxIntersectPolygon(
-				x1, y1, x2, y2,
-				points, width, height - cornerRadius, centerX, 
-				centerY - cornerRadius/2 , [0, -1], padding);
+			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
+				x1, y1, x2, y2, node);
 
-			var roundRectIntersectBoxResult = $$.math.roundRectangleIntersectBox(
-				x1, y1, x2, y2, 
-				width, 2 * cornerRadius, centerX, 
-				centerY + height/2 - cornerRadius, padding);
+			//check whether sbgn class includes multimer substring or not
+			var multimerIntersectBox = false;
+			if($$.sbgn.isMultimer(node)){
+				multimerIntersectBox = $$.sbgn.nucleicAcidIntersectionBox(
+					x1, y1, x2, y2, 
+					centerX + multimerPadding, centerY + multimerPadding, 
+					node);
+			}
 
-			return rectIntersectBoxResult || roundRectIntersectBoxResult;
+			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
 		},
 
 		checkPointRough: function(x, y, node, threshold) {
@@ -215,70 +125,46 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			//rough selection?
-			/*
-			return $$.math.checkInBoundingBox(
+			var nodeCheckPointRough = $$.math.checkInBoundingBox(
 				x, y, nodeShapes["nucleic acid feature"].points, 
-					padding, width, height - cornerRadius, centerX, centerY - cornerRadius/2);
-			*/
+					padding, width, height, centerX, centerY);
 
-			return nodeShapes["nucleic acid feature"].checkPoint(x,y,node,threshold);
+			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
+				x, y, centerX, centerY);
 
+			//check whether sbgn class includes multimer substring or not
+			var multimerCheckPointRough = false;
+			if($$.sbgn.isMultimer(node)){
+				multimerCheckPointRough = $$.math.checkInBoundingBox(
+				x, y, nodeShapes["nucleic acid feature"].points, 
+					padding, width, height, 
+					centerX + multimerPadding, centerY + multimerPadding);
+			}
+
+			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
-			//check rectangle at top
-			if ($$.math.pointInsidePolygon(x, y, nodeShapes["roundrectangle"].points,
-				centerX, centerY -  cornerRadius/2, width, height - cornerRadius, [0, -1], 
-				padding)) {
-				return true;
+			var nodeCheckPoint = $$.sbgn.nucleicAcidCheckPoint(x, y, centerX, centerY,
+				node, threshold);
+			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
+				threshold);
+
+			//check whether sbgn class includes multimer substring or not
+			var multimerCheckPoint = false;
+			if($$.sbgn.isMultimer(node)){
+				multimerCheckPoint = $$.sbgn.nucleicAcidCheckPoint(x, y, 
+					centerX + multimerPadding, centerY + multimerPadding,
+					node, threshold);
 			}
 
-			//check rectangle at bottom
-			if ($$.math.pointInsidePolygon(x, y, nodeShapes["roundrectangle"].points,
-				centerX, centerY + height/2 -  cornerRadius/2, width - 2*cornerRadius, cornerRadius, [0, -1], 
-				padding)) {
-				return true;
-			}
-
-			//check ellipses
-			var checkInEllipse = function(x, y, centerX, centerY, width, height, padding) {
-				x -= centerX;
-				y -= centerY;
-
-				x /= (width / 2 + padding);
-				y /= (height / 2 + padding);
-
-				return (Math.pow(x, 2) + Math.pow(y, 2) <= 1);
-			}
-
-			// Check bottom right quarter circle
-			if (checkInEllipse(x, y,
-				centerX + width / 2 - cornerRadius,
-				centerY + height / 2 - cornerRadius,
-				cornerRadius * 2, cornerRadius * 2, padding)) {
-
-				return true;
-			}
-
-			// Check bottom left quarter circle
-			if (checkInEllipse(x, y,
-				centerX - width / 2 + cornerRadius,
-				centerY + height / 2 - cornerRadius,
-				cornerRadius * 2, cornerRadius * 2, padding)) {
-
-				return true;
-			}
-
-			return false;
+			return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
 		}
 	}
 
