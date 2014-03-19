@@ -46,6 +46,7 @@
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
 			var pts = nodeShapes["source and sink"].points;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			$$.sbgn.drawCircle(context, centerX, centerY,
 				width, height);
@@ -66,8 +67,7 @@
 			context.stroke();
 
 			$$.sbgn.drawSourceSinkCloneMarker(context, centerX, centerY, 
-				width, height, "");
-
+				width, height, cloneMarker);
 		},
 
 		intersectLine: function(node, x, y) {

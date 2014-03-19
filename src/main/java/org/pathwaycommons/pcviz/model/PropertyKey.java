@@ -44,7 +44,8 @@ public enum PropertyKey
     SBGNORIENTATION,
     SBGNPORT,
     SBGNSTATESANDINFOS,
-    SBGNCOMPARTMENTREF;
+    SBGNCOMPARTMENTREF,
+    SBGNCLONEMARKER;
 
     @Override
     public String toString()

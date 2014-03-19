@@ -364,8 +364,8 @@ h4.pcviz-embed-logo small {
 
 #sbgn-viewer {
     position: fixed;
-    width: 300px;
-    height: 300px;
+    width: 600px;
+    height: 450px;
     right: 0;
     bottom: 0;
     background-color: white;

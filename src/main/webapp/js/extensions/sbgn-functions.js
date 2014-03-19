@@ -220,115 +220,121 @@
 	}
 
 	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneLabel){
-		//TODO: add cloneLabel
-		var oldColor  = context.fillStyle;
-		context.fillStyle = "#000000";
+		width, height, cloneMarker){
+		if(cloneMarker != null){
+			var oldColor  = context.fillStyle;
+			context.fillStyle = "#000000";
 
-		context.beginPath();
-		context.translate(centerX, centerY);
-		context.scale(width / 2, height / 2);
+			context.beginPath();
+			context.translate(centerX, centerY);
+			context.scale(width / 2, height / 2);
 
-		var markerBeginX = - 1 * Math.sin(Math.PI/3);
-		var markerBeginY = Math.cos(Math.PI/3);
-		var markerEndX = 1 * Math.sin(Math.PI/3);
-		var markerEndY = markerBeginY;
+			var markerBeginX = - 1 * Math.sin(Math.PI/3);
+			var markerBeginY = Math.cos(Math.PI/3);
+			var markerEndX = 1 * Math.sin(Math.PI/3);
+			var markerEndY = markerBeginY;
 
-		context.moveTo(markerBeginX,markerBeginY);
-		context.lineTo(markerEndX,markerEndY);
-		context.arc(0, 0, 1, Math.PI/6, 5*Math.PI/6);
-		context.closePath();
-				
-		context.scale(2/width, 2/height);
-		context.translate(-centerX, -centerY);
-		context.fill();
+			context.moveTo(markerBeginX,markerBeginY);
+			context.lineTo(markerEndX,markerEndY);
+			context.arc(0, 0, 1, Math.PI/6, 5*Math.PI/6);
+			context.closePath();
+					
+			context.scale(2/width, 2/height);
+			context.translate(-centerX, -centerY);
+			context.fill();
 
-	 	context.fillStyle = oldColor;
+		 	context.fillStyle = oldColor;
+
+		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
+		}
 	}
 
 	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneLabel){
+		width, height, cloneMarker){
 		$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
-		width, height, cloneLabel);
+		width, height, cloneMarker);
 	}
 
 	$$.sbgn.drawSourceSinkCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneLabel){
+		width, height, cloneMarker){
 		$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
-		width, height, cloneLabel);
+		width, height, cloneMarker);
 	}
 
 	$$.sbgn.drawNucleicAcidFeatureCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerRadius, cloneLabel){
-		//TODO: add cloneLabel
-		var cloneWidth = width;
-		var cloneHeight = height / 4;
-		var cloneX = centerX;
-		var cloneY = centerY + 3 * height / 8;
+		width, height, cornerRadius, cloneMarker){
+		if(cloneMarker != null){
+			var cloneWidth = width;
+			var cloneHeight = height / 4;
+			var cloneX = centerX;
+			var cloneY = centerY + 3 * height / 8;
+			var oldColor  = context.fillStyle;
+			context.fillStyle = "#000000";
 
-		var oldColor  = context.fillStyle;
-		context.fillStyle = "#000000";
+			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
+			context.fill();
+		 	context.fillStyle = oldColor;
 
-		$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
-		
-		context.fill();
-
-	 	context.fillStyle = oldColor;
+		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
+		}
 	}
 
 	$$.sbgn.drawMacromoleculeCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerRadius, cloneLabel){
+		width, height, cornerRadius, cloneMarker){
 		$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
-			width, height, cornerRadius, cloneLabel);
+			width, height, cornerRadius, cloneMarker);
 	}
 
 	$$.sbgn.drawComplexCloneMarker = function(renderer, context, centerX, centerY, 
-		width, height, cornerLength, cloneLabel){
-		//cp stands for corner proportion
-		var cpX = cornerLength / width;
-		var cpY = cornerLength / height;
-		var cloneWidth = width - 2;
-		var cloneHeight = height * cpY / 2;
-		var cloneX = centerX;
-		var cloneY = centerY + height/2 - cloneHeight/2;
+		width, height, cornerLength, cloneMarker){
+		if(cloneMarker != null){
+			var cpX = cornerLength / width;
+			var cpY = cornerLength / height;
+			var cloneWidth = width - 2;
+			var cloneHeight = height * cpY / 2;
+			var cloneX = centerX;
+			var cloneY = centerY + height/2 - cloneHeight/2;
 
-		var markerPoints = new Array(-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1);
+			var markerPoints = new Array(-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1);
 
-		var oldColor  = context.fillStyle;
-		context.fillStyle = "#000000";
+			var oldColor  = context.fillStyle;
+			context.fillStyle = "#000000";
 
-		renderer.drawPolygon(context,
-			cloneX, cloneY,
-			cloneWidth, cloneHeight, markerPoints);
+			renderer.drawPolygon(context,
+				cloneX, cloneY,
+				cloneWidth, cloneHeight, markerPoints);
 
-		context.fill();
+			context.fill();
 
-	 	context.fillStyle = oldColor;
+		 	context.fillStyle = oldColor;
 
-	 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
+		}
 	}
 
 	$$.sbgn.drawPerturbingAgentCloneMarker = function(renderer, context, centerX, centerY, 
-		width, height, cloneLabel){
-		var cloneWidth = width;
-		var cloneHeight = height / 4;
-		var cloneX = centerX;
-		var cloneY = centerY + height/2 - height/8;
+		width, height, cloneMarker){
+		if(cloneMarker != null){
+			var cloneWidth = width;
+			var cloneHeight = height / 4;
+			var cloneX = centerX;
+			var cloneY = centerY + height/2 - height/8;
 
-		var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
+			var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
 
-		var oldColor  = context.fillStyle;
-		context.fillStyle = "#000000";
+			var oldColor  = context.fillStyle;
+			context.fillStyle = "#000000";
 
-		renderer.drawPolygon(context,
-			cloneX, cloneY,
-			cloneWidth, cloneHeight, markerPoints);
+			renderer.drawPolygon(context,
+				cloneX, cloneY,
+				cloneWidth, cloneHeight, markerPoints);
 
-		context.fill();
+			context.fill();
 
-	 	context.fillStyle = oldColor;
+		 	context.fillStyle = oldColor;
 
-	 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
+		}
 	}
 
 	$$.sbgn.isMultimer = function(node){
