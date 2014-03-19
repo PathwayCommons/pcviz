@@ -228,32 +228,35 @@ var SBGNView = Backbone.View.extend({
             $.getJSON("graph/detailed/pathsbetween/" + genesStr,
                 function(data) {
                     var container = $("#sbgn-viewer");
+                    var positionMap = new Object();
 
                     //TODO : add position to data
- /*                  
                     for (var i = 0 ; i < data.nodes.length ; i++){
                         var xPos = data.nodes[i].data.sbgnbbox.x;
                         var yPos = data.nodes[i].data.sbgnbbox.y;
-                        data.nodes[i].position = {'x':xPos, 'y':yPos};
+                        positionMap[data.nodes[i].data.id] = {'x':xPos, 'y':yPos};
                     }                  
-*/
 
                     var cyOptions = {
                         elements: data,
                         style: sbgnStyleSheet,
-                        //layout: { name: 'arbor' },
+                        //layout: { name: 'cose' },
+                        layout: { 
+                            name: 'preset',
+                            positions: positionMap
+                         },
                         showOverlay: false,
 
                         ready: function()
                         {
                             var allNodes = this.nodes();
-
+/*
                             for (var i = 0 ; i < data.nodes.length ; i++){
                                 var xPos = data.nodes[i].data.sbgnbbox.x;
                                 var yPos = data.nodes[i].data.sbgnbbox.y;
                                 allNodes[i]._private.position = {'x':xPos, 'y':yPos};
                             }
-
+*/
                             window.cy = this;
                              // we are gonna use 'tap' to handle events for multiple devices
                                 // add click listener on nodes
