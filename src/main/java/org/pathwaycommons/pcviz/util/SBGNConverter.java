@@ -64,13 +64,13 @@ public class SBGNConverter
         String parentLabel = (parent == null) ? "" : parent.getId();
         Glyph compartment = ((Glyph)glyph.getCompartmentRef());
         String compartmentLabel = (compartment == null) ? "" : compartment.getId();
-
         String parentId = (!parentLabel.equals("")) ? parentLabel : compartmentLabel;
-
         cNode.setProperty(PropertyKey.PARENT, parentId);
 
         boolean isSeed = (genes.contains(lbl)) ? true : false;
         cNode.setProperty(PropertyKey.ISSEED, isSeed);
+
+        cNode.setProperty(PropertyKey.SBGNCLONEMARKER, glyph.getClone());
 
         graph.getNodes().add(cNode);
     }

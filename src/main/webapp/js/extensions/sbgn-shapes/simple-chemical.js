@@ -41,6 +41,7 @@
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 			var label = node._private.data.sbgnlabel;
 			var padding = node._private.style["border-width"].pxValue;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
@@ -52,8 +53,9 @@
 			$$.sbgn.drawCircle(context, centerX, centerY, width, height);
 
 			context.stroke();
-
-			$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, width, height, "");
+			
+			$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
+				width, height, cloneMarker);
 			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 

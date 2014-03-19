@@ -37,9 +37,14 @@
 			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
 			var label = node._private.data.sbgnlabel;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			$$.sbgn.drawCircle(context, centerX, centerY, width, height);
 
+			context.stroke();
+
+			$$.sbgn.drawSourceSinkCloneMarker(context, centerX, centerY, 
+					width, height, cloneMarker);
 			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},

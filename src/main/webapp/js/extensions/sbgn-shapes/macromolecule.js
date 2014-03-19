@@ -50,6 +50,7 @@
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
 			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
@@ -68,8 +69,9 @@
 				cornerRadius);
 
 			context.stroke();
-			
-			$$.sbgn.drawMacromoleculeCloneMarker(context, centerX, centerY, width, height, cornerRadius, "");
+
+			$$.sbgn.drawMacromoleculeCloneMarker(context, centerX, centerY, 
+				width, height, cornerRadius, cloneMarker);
 			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},

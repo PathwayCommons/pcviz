@@ -39,6 +39,7 @@
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			renderer.drawPolygonPath(context,
 				centerX, centerY,
@@ -49,7 +50,8 @@
 
 			context.stroke();
 
-			$$.sbgn.drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, width, height, "");
+			$$.sbgn.drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, 
+				width, height, cloneMarker);
 			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 

@@ -61,7 +61,10 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("node[sbgnclass='compartment']")
         .css({
-            "shape": "roundrectangle"
+            "content": "data(sbgnlabel)",
+            "shape": "roundrectangle",
+            "text-valign" : "bottom",
+            "text-halign" : "center"
         })
         .selector("node[sbgnclass='unspecified entity']")
         .css({
@@ -128,12 +131,9 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("edge")
         .css({
             "line-color": "#000",
-            "target-arrow-shape": "triangle",
             "target-arrow-fill": "hollow",
+            "source-arrow-fill": "hollow",
             "target-arrow-color": "#fff",
-            //"source-arrow-shape": "triangle",
-            //"source-arrow-fill": "hollow",
-            //"source-arrow-color": "#fff",
             'background-opacity': 1
         })
         .selector("edge[sbgnclass='modulation']")
@@ -142,6 +142,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='stimulation']")
         .css({
+            "target-arrow-shape": "triangle",
         })
         .selector("edge[sbgnclass='catalysis']")
         .css({
@@ -157,7 +158,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='consumption']")
         .css({
-            "target-arrow-shape": "consumption"
+            "source-arrow-shape": "consumption"
         })
         .selector("edge[sbgnclass='production']")
         .css({
@@ -169,7 +170,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector(":selected")
         .css({
-            "background-color": "#00ff00",
+            "background-color": "#939393",
             "background-opacity" : "1",
             "color":"#000000",
             "line-color": "#000",
@@ -178,7 +179,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector(":active")
         .css({
-            "background-color": "#00ff00",
+            "background-color": "#d3d3d3",
             "background-opacity" : "1",
             "color":"#000000",
             "line-color": "#000",

@@ -49,6 +49,7 @@
 			var label = node._private.data.sbgnlabel;
 			var cornerLength = nodeShapes["complex"].cornerLength;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
 				width, height);
@@ -68,9 +69,9 @@
 				width, height, nodeShapes["complex"].points);
 
 			context.stroke();
-			
+
 			$$.sbgn.drawComplexCloneMarker(renderer, context, centerX, centerY, 
-				width, height, cornerLength, "");
+				width, height, cornerLength, cloneMarker);
 			$$.sbgn.drawComplexStateAndInfo(context, stateAndInfos, centerX, centerY, width, height);
 		},
 
@@ -81,6 +82,10 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
 			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
 				node, x, y);
@@ -116,7 +121,11 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
+			var cornerLength = nodeShapes["complex"].cornerLength;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
 			var points = nodeShapes["complex"].points;
 
@@ -146,6 +155,10 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
 			var nodeCheckPointRough = $$.math.checkInBoundingBox(
 				x, y, nodeShapes["complex"].points, 
@@ -173,6 +186,10 @@
 			var height = node.height() + threshold;
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
 			var nodeCheckPoint =  $$.math.pointInsidePolygon(x, y, nodeShapes["complex"].points,
 				centerX, centerY, width, height, [0, -1], padding);

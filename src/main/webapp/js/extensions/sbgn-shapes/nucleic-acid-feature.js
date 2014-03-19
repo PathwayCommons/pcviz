@@ -48,6 +48,7 @@
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
 			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
+			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
@@ -66,7 +67,8 @@
 
 			context.stroke();
 
-			$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, width, height, cornerRadius, "");
+			$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
+				width, height, cornerRadius, cloneMarker);
 			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
