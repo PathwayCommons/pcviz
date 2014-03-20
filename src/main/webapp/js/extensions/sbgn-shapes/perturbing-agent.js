@@ -52,7 +52,7 @@
 
 			$$.sbgn.drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, 
 				width, height, cloneMarker);
-			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+			$$.sbgn.drawLabelText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
 		},

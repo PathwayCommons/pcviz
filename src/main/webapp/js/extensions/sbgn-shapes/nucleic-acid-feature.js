@@ -59,6 +59,12 @@
 					cornerRadius);
 				context.fill();
 				context.stroke();
+
+				$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, 
+					centerX + multimerPadding, centerY + multimerPadding, 
+					width, height, cornerRadius, cloneMarker, true);
+
+				context.stroke();
 			}
 
 			$$.sbgn.drawNucAcidFeature(context, width, height, centerX, 
@@ -68,8 +74,8 @@
 			context.stroke();
 
 			$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
-				width, height, cornerRadius, cloneMarker);
-			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+				width, height, cornerRadius, cloneMarker, false);
+			$$.sbgn.drawLabelText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 

@@ -40,9 +40,17 @@
       		0.15, -0.3
     	],
 
+    	ax : 0,
+    	ay : 0,
+    	awidth : 0,
+    	aheight : 0,
+
 	    collide: function(x, y, centerX, centerY, width, height, direction, padding) {
 	      var points = arrowShapes["production"].trianglePoints;
-	      	      
+	      arrowShapes["production"].ax = centerX;
+	      arrowShapes["production"].ay = centerY;
+	      arrowShapes["production"].awidth = width;
+	      arrowShapes["production"].aheight = height;
 	      return $$.math.pointInsidePolygon(
 	        x, y, points, centerX, centerY, width, height, direction, padding);
 	    },
@@ -66,7 +74,7 @@
 			context.fillStyle = oldColor;
 
 	      	context.moveTo(points[0], points[1]);
-
+/*
 	      	//square
 	      	context.beginPath();
 	    	for (var i = 0; i < points.length / 2 ; i++) {
@@ -74,14 +82,7 @@
 	        		points[(i * 2 + 1)]);
 	      	}
 	      	context.closePath();
-
-	      	//text
-			context.lineJoin="round";
-	      	context.moveTo(textPoints[0], textPoints[1]);
-	      	for (var i = 0; i < textPoints.length / 2 ; i++) {
-	        	context.lineTo(textPoints[(i * 2)], textPoints[(i * 2 + 1)]);
-	      	}
-	      	context.moveTo(textPoints[6], textPoints[7]);
+*/
 
 	    },
 	    

@@ -7,26 +7,30 @@
 	var renderer = CanvasRenderer.prototype;
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	$$.sbgn.drawSbgnText = function(context, label, centerX, centerY){
-		context.font = "10px Arial";
+	$$.sbgn.drawText = function(context, label, centerX, centerY, color, font){
+		context.font = font;
 		context.textAlign = "center";
 		context.textBaseline = "middle";
 		var oldColor  = context.fillStyle;
-		context.fillStyle = "#000000";
+		context.fillStyle = color;
 		context.fillText("" + label, centerX, centerY);
 		context.fillStyle = oldColor;
 		context.stroke();
 	}
 
+	$$.sbgn.drawLabelText = function(context, label, centerX, centerY){
+		$$.sbgn.drawText(context, label, centerX, 
+			centerY,  "#000", "9px Arial");
+	}
+
+	$$.sbgn.drawStateText = function(context, label, centerX, centerY){
+		$$.sbgn.drawText(context, label, centerX, 
+			centerY, "#000", "8px Arial");
+	}
+
 	$$.sbgn.drawCloneMarkerText = function(context, label, centerX, centerY){
-		context.font = "5px Arial";
-		context.textAlign = "center";
-		context.textBaseline = "middle";
-		var oldColor  = context.fillStyle;
-		context.fillStyle = "#ffffff";
-		context.fillText("" + label, centerX, centerY);
-		context.fillStyle = oldColor;
-		context.stroke();
+		$$.sbgn.drawText(context, label, centerX, 
+			centerY, "#fff", "4px Arial");		
 	}
 
 	$$.sbgn.drawEllipsePath = function(context, x, y, width, height){
@@ -122,8 +126,10 @@
 
 			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				var stateLabel = state.state.value;
-				$$.sbgn.drawEllipse(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-				$$.sbgn.drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+				$$.sbgn.drawEllipse(context,stateCenterX, stateCenterY, 
+					stateWidth, stateHeight);
+				$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
+					stateCenterY);
 				stateCount++;
 			}
 			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
@@ -132,8 +138,9 @@
 					stateCenterX, stateCenterY,
 					stateWidth, stateHeight,
 					5);
-				$$.sbgn.drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
-				infoCount++;
+					$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
+						stateCenterY);
+					infoCount++;
 			}
 			context.stroke();
 		}
@@ -170,14 +177,16 @@
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
-						$$.sbgn.drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
+							stateCenterY);
 					}
 					else if(state.clazz == "unit of information"){//draw rectangle
 						$$.sbgn.renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
 							5);
-						$$.sbgn.drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
+							stateCenterY);
 					}
 				}
 				upWidth = upWidth + width + boxPadding;
@@ -190,14 +199,14 @@
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
-						$$.sbgn.drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, stateCenterY);
 					}
 					else if(state.clazz == "unit of information"){//draw rectangle
 						$$.sbgn.renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
 							5);
-						$$.sbgn.drawSbgnText(context, stateLabel, stateCenterX, stateCenterY);
+						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, stateCenterY);
 					}
 				}
 				downWidth = downWidth + width + boxPadding;
@@ -219,7 +228,7 @@
 		return complexPoints;
 	}
 
-	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
+	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
 		if(cloneMarker != null){
 			var oldColor  = context.fillStyle;
@@ -244,25 +253,52 @@
 			context.fill();
 
 		 	context.fillStyle = oldColor;
-
-		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
 		}
 	}
 
-	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
+	$$.sbgn.drawSourceAndSinkCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
 		$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
 		width, height, cloneMarker);
 	}
 
-	$$.sbgn.drawSourceSinkCloneMarker = function(context, centerX, centerY, 
+	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
+		width, height, cloneMarker, isMultimer){
+		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
+			width, height, cloneMarker);
+
+		if(!isMultimer && cloneMarker != null){
+		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+		}
+	}
+
+	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
-		$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
-		width, height, cloneMarker);
+		if(cloneMarker != null){
+			var cloneWidth = width;
+			var cloneHeight = height / 4;
+			var cloneX = centerX;
+			var cloneY = centerY + height/2 - height/8;
+
+			var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
+
+			var oldColor  = context.fillStyle;
+			context.fillStyle = "#000000";
+
+			renderer.drawPolygon(context,
+				cloneX, cloneY,
+				cloneWidth, cloneHeight, markerPoints);
+
+			context.fill();
+
+		 	context.fillStyle = oldColor;
+
+		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+		}
 	}
 
 	$$.sbgn.drawNucleicAcidFeatureCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerRadius, cloneMarker){
+		width, height, cornerRadius, cloneMarker, isMultimer){
 		if(cloneMarker != null){
 			var cloneWidth = width;
 			var cloneHeight = height / 4;
@@ -274,19 +310,20 @@
 			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
 			context.fill();
 		 	context.fillStyle = oldColor;
-
-		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
+		 	if(!isMultimer){
+		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+		 	}
 		}
 	}
 
 	$$.sbgn.drawMacromoleculeCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerRadius, cloneMarker){
+		width, height, cornerRadius, cloneMarker, isMultimer){
 		$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
-			width, height, cornerRadius, cloneMarker);
+			width, height, cornerRadius, cloneMarker, isMultimer);
 	}
 
-	$$.sbgn.drawComplexCloneMarker = function(renderer, context, centerX, centerY, 
-		width, height, cornerLength, cloneMarker){
+	$$.sbgn.drawComplexCloneMarker = function(context, centerX, centerY, 
+		width, height, cornerLength, cloneMarker, isMultimer){
 		if(cloneMarker != null){
 			var cpX = cornerLength / width;
 			var cpY = cornerLength / height;
@@ -308,32 +345,9 @@
 
 		 	context.fillStyle = oldColor;
 
-		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
-		}
-	}
-
-	$$.sbgn.drawPerturbingAgentCloneMarker = function(renderer, context, centerX, centerY, 
-		width, height, cloneMarker){
-		if(cloneMarker != null){
-			var cloneWidth = width;
-			var cloneHeight = height / 4;
-			var cloneX = centerX;
-			var cloneY = centerY + height/2 - height/8;
-
-			var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
-
-			var oldColor  = context.fillStyle;
-			context.fillStyle = "#000000";
-
-			renderer.drawPolygon(context,
-				cloneX, cloneY,
-				cloneWidth, cloneHeight, markerPoints);
-
-			context.fill();
-
-		 	context.fillStyle = oldColor;
-
-		 	$$.sbgn.drawCloneMarkerText(context, cloneMarker.label, cloneX, cloneY);
+		 	if(!isMultimer){
+		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+		 	}
 		}
 	}
 
@@ -647,30 +661,6 @@
 		return [];
 	}
 
-/*
-	$$.sbgn.selectIntersectLinePoint = function(node, x, y, nodePoints, boxPoints){
-		var closestPoint = [nodePoints[0], nodePoints[1]];
-		var stateAndInfos = node._private.data.sbgnstatesandinfos;
-
-		for(var i = 0 ; i < stateAndInfos.length ; i++){
-			var state = stateAndInfos[i];
-			var startX = state.bbox.x + centerX - state.bbox.w/2;
-			var endX = state.bbox.x + centerX + state.bbox.w/2;
-			var stateCenterY = state.bbox.y + centerY;
-
-			if(stateCenterY < centerX){//upper state or info 
-				if(nodePoints[0] > startX && nodePoints[0] < endX)
-					return boxPoints;
-			}
-			else if(stateCenterY > centerX){
-				if(nodePoints[0] > startX && nodePoints[0] < endX)
-					return boxPoints;
-			}
-
-		}
-		return closestPoint;
-	}
-*/
 	$$.sbgn.intersectBoxStateAndInfoBoxes = function(x1, y1, x2, y2, node){
 		var centerX = node._private.position.x;
 		var centerY = node._private.position.y;

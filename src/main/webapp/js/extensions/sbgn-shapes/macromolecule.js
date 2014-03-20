@@ -61,6 +61,12 @@
 					cornerRadius);
 
 				context.stroke();
+
+				$$.sbgn.drawMacromoleculeCloneMarker(context, 
+					centerX + multimerPadding, centerY + multimerPadding, 
+					width, height, cornerRadius, cloneMarker, true);
+
+				context.stroke();
 			}
 
 			renderer.drawRoundRectangle(context,
@@ -71,8 +77,8 @@
 			context.stroke();
 
 			$$.sbgn.drawMacromoleculeCloneMarker(context, centerX, centerY, 
-				width, height, cornerRadius, cloneMarker);
-			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+				width, height, cornerRadius, cloneMarker, false);
+			$$.sbgn.drawLabelText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 		
