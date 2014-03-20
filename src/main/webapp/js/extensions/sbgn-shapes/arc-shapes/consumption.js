@@ -46,7 +46,7 @@
 	    draw: function(context) {
 	    	var points = arrowShapes["consumption"].points;
 	    	var textPoints = arrowShapes["consumption"].textPoints;
-
+/*
 	    	//square
 	    	context.beginPath();
 	    	for (var i = 0; i < points.length / 2 ; i++) {
@@ -55,14 +55,12 @@
 	      	}
 	      	context.closePath();
 
-	      	//text
-			context.lineJoin="round";
-	      	context.moveTo(textPoints[0], textPoints[1]);
-	      	for (var i = 0; i < textPoints.length / 2 ; i++) {
-	        	context.lineTo(textPoints[(i * 2)], textPoints[(i * 2 + 1)]);
-	      	}
-	      	context.moveTo(textPoints[6], textPoints[7]);
+	      	context.scale(1/context.lineWidth, 1/context.lineWidth);
+	      	//context.font = "9px Arial";
 
+	      	context.strokeText("N", 0, 0);
+	      	context.scale(context.lineWidth, context.lineWidth);
+*/
 	    },
 	    
 	    spacing: function(edge) {

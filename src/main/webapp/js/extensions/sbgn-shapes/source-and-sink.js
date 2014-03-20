@@ -66,7 +66,7 @@
 
 			context.stroke();
 
-			$$.sbgn.drawSourceSinkCloneMarker(context, centerX, centerY, 
+			$$.sbgn.drawSourceAndSinkCloneMarker(context, centerX, centerY, 
 				width, height, cloneMarker);
 		},
 

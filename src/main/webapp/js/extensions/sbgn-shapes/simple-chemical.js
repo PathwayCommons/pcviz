@@ -48,6 +48,12 @@
 				$$.sbgn.drawCircle(context, centerX + multimerPadding,
 				 centerY + multimerPadding, width, height);
 				context.stroke();
+
+				$$.sbgn.drawSimpleChemicalCloneMarker(context, 
+					centerX + multimerPadding, centerY + multimerPadding, 
+					width, height, cloneMarker, true);
+
+				context.stroke();
 			}
 
 			$$.sbgn.drawCircle(context, centerX, centerY, width, height);
@@ -55,8 +61,8 @@
 			context.stroke();
 			
 			$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
-				width, height, cloneMarker);
-			$$.sbgn.drawSbgnText(context, label, centerX, centerY - 2);
+				width, height, cloneMarker, false);
+			$$.sbgn.drawLabelText(context, label, centerX, centerY - 2);
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 
 		},

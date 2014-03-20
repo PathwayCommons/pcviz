@@ -62,6 +62,12 @@
 					width, height, nodeShapes["complex"].points);
 
 				context.stroke();
+
+				$$.sbgn.drawComplexCloneMarker(context, 
+					centerX + multimerPadding, centerY + multimerPadding, 
+					width, height, cornerLength, cloneMarker, true);
+
+				context.stroke();
 			}
 
 			renderer.drawPolygon(context,
@@ -70,8 +76,8 @@
 
 			context.stroke();
 
-			$$.sbgn.drawComplexCloneMarker(renderer, context, centerX, centerY, 
-				width, height, cornerLength, cloneMarker);
+			$$.sbgn.drawComplexCloneMarker(context, centerX, centerY, 
+				width, height, cornerLength, cloneMarker, false);
 			$$.sbgn.drawComplexStateAndInfo(context, stateAndInfos, centerX, centerY, width, height);
 		},
 
