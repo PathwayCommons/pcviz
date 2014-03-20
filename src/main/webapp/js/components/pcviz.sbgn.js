@@ -251,14 +251,10 @@ var SBGNView = Backbone.View.extend({
                         ready: function()
                         {
                             var allNodes = this.nodes();
-/*
-                            for (var i = 0 ; i < data.nodes.length ; i++){
-                                var xPos = data.nodes[i].data.sbgnbbox.x;
-                                var yPos = data.nodes[i].data.sbgnbbox.y;
-                                allNodes[i]._private.position = {'x':xPos, 'y':yPos};
-                            }
-*/
+
                             window.cy = this;
+                            
+                            container.cytoscapePanzoom();
                              // we are gonna use 'tap' to handle events for multiple devices
                                 // add click listener on nodes
 
@@ -279,12 +275,6 @@ var SBGNView = Backbone.View.extend({
                                 // When a node is dragged, saved its new location
                                 cy.on('drag', 'node', function(evt) {
 
-                                    //TODO : DRAG ALL SELECTED BOXES
-                                    var nodes = evt.cy.nodes();
-                                    var node = this;
-                                    var zoom = evt.cy.zoom();
-                                    var xDis = evt.originalEvent.mozMovementX/zoom;
-                                    var yDis = evt.originalEvent.mozMovementY/zoom;
                                 });
 */
                         }
