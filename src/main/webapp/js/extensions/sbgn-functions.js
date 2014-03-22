@@ -23,8 +23,14 @@
 			centerY,  "#000", "9px Arial");
 	}
 
-	$$.sbgn.drawStateText = function(context, label, centerX, centerY){
-		$$.sbgn.drawText(context, label, centerX, 
+	$$.sbgn.drawStateText = function(context, state, centerX, centerY){
+		var stateValue = state.value;
+		var stateVariable = state.variable;
+
+		var stateLabel = (stateVariable == null) ? stateValue : 
+			stateValue + "@" + stateVariable;
+
+		$$.sbgn.drawText(context, stateLabel, centerX,
 			centerY, "#000", "8px Arial");
 	}
 
@@ -125,10 +131,10 @@
 			var stateCenterY = state.bbox.y + centerY;
 
 			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-				var stateLabel = state.state.value;
+				//var stateLabel = state.state.value;
 				$$.sbgn.drawEllipse(context,stateCenterX, stateCenterY, 
 					stateWidth, stateHeight);
-				$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
+				$$.sbgn.drawStateText(context, state.state, stateCenterX, 
 					stateCenterY);
 				stateCount++;
 			}
