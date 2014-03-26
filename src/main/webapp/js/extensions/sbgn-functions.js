@@ -173,12 +173,13 @@
 			var stateWidth = state.bbox.w;
 			var stateHeight = state.bbox.h;
 			var stateLabel = state.state.value;
-			var relativeYPos = state.bbox.y;
+			var relativeYPos = state.bbox.y - centerY;
+			var stateCenterX, stateCenterY;
 
 			if(relativeYPos < 0 ){
 				if(upWidth + stateWidth < width){
-					var stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth/2;
-					var stateCenterY = centerY - beginPosY;
+					stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth/2;
+					stateCenterY = centerY - beginPosY;
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
@@ -199,8 +200,8 @@
 			}
 			else if(relativeYPos > 0 ){
 				if(downWidth + stateWidth < width){
-					var stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth/2;
-					var stateCenterY = centerY + beginPosY;
+					stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth/2;
+					stateCenterY = centerY + beginPosY;
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
@@ -218,6 +219,10 @@
 				downWidth = downWidth + width + boxPadding;
 			}
 			context.stroke();
+
+			//update new state and info position(relative to node center)
+			state.bbox.x = stateCenterX - centerX;
+			state.bbox.y = stateCenterY - centerY;
 		}
 	}
 
