@@ -173,7 +173,7 @@
 			var stateWidth = state.bbox.w;
 			var stateHeight = state.bbox.h;
 			var stateLabel = state.state.value;
-			var relativeYPos = state.bbox.y - centerY;
+			var relativeYPos = state.bbox.y;
 			var stateCenterX, stateCenterY;
 
 			if(relativeYPos < 0 ){
