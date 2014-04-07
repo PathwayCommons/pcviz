@@ -43,9 +43,9 @@
 
 			context.stroke();
 
-			$$.sbgn.drawLabelText(context, label, centerX - width/6, centerY);
-
-
+			var nodeProp = {'label':label, 'centerX':centerX - width/6, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value};
+			$$.sbgn.drawLabelText(context, nodeProp);
 		},
 
 		intersectLine: function(node, x, y) {

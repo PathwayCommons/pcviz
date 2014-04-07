@@ -150,6 +150,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
+            "target-arrow-color": "#000",
+            "target-arrow-fill": "filled",
             "target-arrow-shape": "tee"
         })
         .selector("edge[sbgnclass='logic arc'],[sbgnclass='equivalence arc']")
@@ -162,6 +164,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='production']")
         .css({
+            "target-arrow-color": "#000",
+            "target-arrow-fill": "filled",
             "target-arrow-shape": "production"
         })
         .selector("edge[sbgnclass='necessary stimulation']")
@@ -206,6 +210,91 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "height": 15
          }); // end of sbgnStyleSheet
 
+var notHighlightNode = {'border-opacity': 0.3, 'text-opacity' : 0.3};
+var notHighlightEdge = {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3};
+
+function highlightGraph(cy, nodes, edges){
+    cy.nodes().css(notHighlightNode);
+    cy.edges().css(notHighlightEdge);
+    nodes.removeCss(notHighlightNode);
+    edges.removeCss(notHighlightEdge);
+}
+
+function removeHighlights(nodes, edges){
+    nodes.removeCss(notHighlightNode);
+    edges.removeCss(notHighlightEdge);
+}
+
+function highlightNeighborsOfSelected(cy){
+    var selectedEles = cy.elements(":selected");
+    selectedEles = selectedEles.add(selectedEles.parents("node[sbgnclass='complex']"));
+    selectedEles = selectedEles.add(selectedEles.descendants());
+    var neighborhoodEles = selectedEles.neighborhood();
+    var nodesToHighlight = selectedEles.add(neighborhoodEles);
+    nodesToHighlight = nodesToHighlight.add(nodesToHighlight.descendants());
+    highlightGraph(cy, nodesToHighlight.nodes(), nodesToHighlight.edges());
+}
+
+function expandNodes(nodesToShow){
+    //add complex parents
+    nodesToShow = nodesToShow.add(nodesToShow.parents("node[sbgnclass='complex']"));
+    //add children
+    nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
+
+    var processes = nodesToShow.nodes("node[sbgnclass='process']");
+    var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
+    var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
+
+    nodesToShow = nodesToShow.add(processes.neighborhood());
+    nodesToShow = nodesToShow.add(neighborProcesses);
+    nodesToShow = nodesToShow.add(neighborProcesses.neighborhood());
+
+    //add parents
+    nodesToShow = nodesToShow.add(nodesToShow.nodes().parents("node[sbgnclass='complex']"));
+    //add children
+    nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
+
+    return nodesToShow;
+}
+
+function expandRemainingNodes(nodesToFilter, allNodes){
+    nodesToFilter = expandNodes(nodesToFilter);
+    var nodesToShow = allNodes.not(nodesToFilter);
+    nodesToShow = expandNodes(nodesToShow);
+    return nodesToShow;
+}
+
+function applyFilter(nodesToFilterOut){
+    nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
+    nodesToFilterOut.hide();
+    nodesToFilterOut.data("manually-filtered", 'true');
+}
+
+function highlightProcessesOfSelected(cy){
+    var selectedEles = cy.elements(":selected");
+    selectedEles = expandNodes(selectedEles);
+    highlightGraph(cy, selectedEles.nodes(), selectedEles.edges());
+}
+
+function filterSelectedNodes(cy){
+    var allNodes = cy.nodes("node[sbgnclass!='compartment']");
+    var selectedNodes = cy.nodes(":selected");
+    var nodesToShow = expandRemainingNodes(selectedNodes, allNodes);
+    applyFilter(allNodes.not(nodesToShow));
+}
+
+function filterNonSelectedNodes(cy){
+    var allNodes = cy.nodes("node[sbgnclass!='compartment']");
+    var selectedNodes = cy.nodes(":selected");
+    var nodesToShow = expandNodes(selectedNodes);
+    applyFilter(allNodes.not(nodesToShow));
+}
+
+function showAll(cy){
+    cy.elements("node[manually-filtered='true']").show();
+    cy.elements().removeData('manually-filtered');
+}
+
 var SBGNView = Backbone.View.extend({
     cyStyle: sbgnStyleSheet,
     template: _.template( $("#sbgn-container-template").html() ),
@@ -214,6 +303,42 @@ var SBGNView = Backbone.View.extend({
     render: function() {
         var thatEl = this.$el;
         var thatTmpl = this.template;
+
+        $("#highlight-neighbors-button").click(function(e) {
+            e.preventDefault();
+            var cy = window.cy;
+            highlightNeighborsOfSelected(cy);
+        });
+
+        $("#highlight-process-button").click(function(e) {
+            e.preventDefault();
+            var cy = window.cy;
+            highlightProcessesOfSelected(cy);
+        });
+
+        $("#remove-highlight-button").click(function(e) {
+            e.preventDefault();
+            var cy = window.cy;
+            removeHighlights(cy.nodes(), cy.edges());
+        });
+
+        $("#filter-selected-button").click(function(e) {
+            e.preventDefault();
+            var cy = window.cy;
+            filterSelectedNodes(cy);
+        });
+
+        $("#filter-non-selected-button").click(function(e) {
+            e.preventDefault();
+            var cy = window.cy;
+            filterNonSelectedNodes(cy);
+        });
+
+        $("#show-all-button").click(function(e) {
+            e.preventDefault();
+            var cy = window.cy;
+            showAll(cy);
+        });
 
         $("#show-sbgn-button").click(function(e) {
             e.preventDefault();
@@ -251,7 +376,6 @@ var SBGNView = Backbone.View.extend({
                         ready: function()
                         {
                             var allNodes = this.nodes();
-
                             window.cy = this;
                             
                             container.cytoscapePanzoom();
@@ -278,6 +402,7 @@ var SBGNView = Backbone.View.extend({
                                 });
 */
                         }
+
                     };
 
                     container.html("");

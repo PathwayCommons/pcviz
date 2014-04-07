@@ -68,10 +68,10 @@
 	        		trianglePoints[(i * 2 + 1)% trianglePoints.length]);
 	      	}
 
-			var oldColor  = context.fillStyle;
-			context.fillStyle = "#000000";
+			//var oldColor  = context.fillStyle;
+			//context.fillStyle = "#000000";
 			context.fill();
-			context.fillStyle = oldColor;
+			//context.fillStyle = oldColor;
 
 	      	context.moveTo(points[0], points[1]);
 /*

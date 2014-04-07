@@ -569,6 +569,7 @@
                       </ul>
                   </td>
               </tr>
+
               <tr>
                   <td colspan="2">
                       <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="<%=pcURL%>/graph?source={{source}}&target={{target}}&kind=PATHSFROMTO&format=BIOPAX">
@@ -578,6 +579,7 @@
 
                   </td>
               </tr>
+
               <tr>
                   <td colspan="2">
                       <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
@@ -587,6 +589,67 @@
 
                   </td>
               </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="highlight-neighbors-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Highlight Neighbors of Selected
+                      </a>
+
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="highlight-process-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Highlight Processes of Selected
+                      </a>
+
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="remove-highlight-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Remove Highlight
+                      </a>
+
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="filter-selected-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Filter Selected Nodes
+                      </a>
+
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="filter-non-selected-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Filter Non-Selected Nodes
+                      </a>
+
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="show-all-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                          <i class="icon-download-alt"></i>
+                          Show All
+                      </a>
+
+                  </td>
+              </tr>
+
           </table>
 
 

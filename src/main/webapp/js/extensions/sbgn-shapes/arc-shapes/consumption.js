@@ -55,11 +55,12 @@
 	      	}
 	      	context.closePath();
 
-	      	context.scale(1/context.lineWidth, 1/context.lineWidth);
-	      	//context.font = "9px Arial";
-
-	      	context.strokeText("N", 0, 0);
-	      	context.scale(context.lineWidth, context.lineWidth);
+			//console.log(context.lineWidth);
+	      	context.scale(1/30, 1/30);
+	      	context.rotate(Math.PI /2);
+	      	$$.sbgn.drawLabelText(context, "", -10, -5);
+	      	context.rotate(-Math.PI /2);
+	      	context.scale(30, 30);
 */
 	    },
 	    
