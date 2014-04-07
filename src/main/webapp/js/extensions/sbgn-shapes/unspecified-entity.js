@@ -45,7 +45,11 @@
 
 			$$.sbgn.drawSourceSinkCloneMarker(context, centerX, centerY, 
 					width, height, cloneMarker);
-			$$.sbgn.drawLabelText(context, label, centerX, centerY - 2);
+
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
+				'opacity':node._private.style['text-opacity'].value};
+			$$.sbgn.drawLabelText(context, nodeProp);
+			
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);
 		},
 

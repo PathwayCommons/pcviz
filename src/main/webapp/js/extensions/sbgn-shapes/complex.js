@@ -78,7 +78,8 @@
 
 			$$.sbgn.drawComplexCloneMarker(context, centerX, centerY, 
 				width, height, cornerLength, cloneMarker, false);
-			$$.sbgn.drawComplexStateAndInfo(context, stateAndInfos, centerX, centerY, width, height);
+			$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+			var x = 5;
 		},
 
 		intersectLine: function(node, x, y) {

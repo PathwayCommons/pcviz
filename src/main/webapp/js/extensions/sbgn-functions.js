@@ -6,7 +6,7 @@
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 	var nodeShapes = CanvasRenderer.nodeShapes;
-
+/*
 	$$.sbgn.drawText = function(context, label, centerX, centerY, color, font){
 		context.font = font;
 		context.textAlign = "center";
@@ -37,6 +37,52 @@
 	$$.sbgn.drawCloneMarkerText = function(context, label, centerX, centerY){
 		$$.sbgn.drawText(context, label, centerX, 
 			centerY, "#fff", "4px Arial");		
+	}
+*/
+
+	$$.sbgn.drawText = function(context, textProp){
+		context.font = textProp.font;
+		context.textAlign = "center";
+		context.textBaseline = "middle";
+		var oldColor  = context.fillStyle;
+		context.fillStyle = textProp.color;
+		var oldOpacity = context.globalAlpha;
+		context.globalAlpha = textProp.opacity;
+		context.fillText("" + textProp.label, textProp.centerX, textProp.centerY);
+		context.fillStyle = oldColor;
+		context.globalAlpha = oldOpacity;
+		context.stroke();
+	}
+
+	$$.sbgn.drawLabelText = function(context, textProp){
+		textProp.color = "#000";
+		textProp.font = "9px Arial";
+		$$.sbgn.drawText(context, textProp);
+	}
+
+	$$.sbgn.drawStateText = function(context, textProp){
+		var stateValue = textProp.state.value;
+		var stateVariable = textProp.state.variable;
+
+		var stateLabel = (stateVariable == null) ? stateValue : 
+			stateValue + "@" + stateVariable;
+
+		textProp.label = stateLabel;
+		textProp.color = "#000";
+		textProp.font = "8px Arial";
+		$$.sbgn.drawText(context, textProp);
+	}
+
+	$$.sbgn.drawInfoText = function(context, textProp){
+		textProp.color = "#000";
+		textProp.font = "8px Arial";
+		$$.sbgn.drawText(context, textProp);
+	}
+
+	$$.sbgn.drawCloneMarkerText = function(context, textProp){
+		textProp.color = "#fff";
+		textProp.font = "4px Arial";
+		$$.sbgn.drawText(context, textProp);	
 	}
 
 	$$.sbgn.drawEllipsePath = function(context, x, y, width, height){
@@ -90,35 +136,6 @@
 		context.fill();
 	}
 
-	$$.sbgn.drawStateAndInfos = function(node, context, centerX, centerY){
-		var stateAndInfos = node._private.data.sbgnstatesandinfos;
-		var stateCount = 0, infoCount = 0;
-
-		for(var i = 0 ; i < stateAndInfos.length ; i++){
-			var state = stateAndInfos[i];
-			var stateWidth = state.bbox.w;
-			var stateHeight = state.bbox.h;
-			var stateCenterX = state.bbox.x + centerX;
-			var stateCenterY = state.bbox.y + centerY;
-
-			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-				var stateLabel = state.state.value;
-				//drawEllipsePath(context,stateCenterX, stateCenterY, stateWidth, stateHeight);
-				stateCount++;
-			}
-			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-				var stateLabel = state.label.text;
-				//renderer.drawRoundRectanglePath(context,
-				//	stateCenterX, stateCenterY,
-				//	stateWidth, stateHeight,
-				//	5);
-
-				infoCount++;
-			}
-			//context.stroke();
-		}
-	}
-
 	$$.sbgn.drawPathStateAndInfos = function(renderer, node, context, centerX, centerY){
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
 		var stateCount = 0, infoCount = 0;
@@ -130,22 +147,27 @@
 			var stateCenterX = state.bbox.x + centerX;
 			var stateCenterY = state.bbox.y + centerY;
 
+			var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
+				'opacity':node._private.style['text-opacity'].value};
+
 			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				//var stateLabel = state.state.value;
 				$$.sbgn.drawEllipse(context,stateCenterX, stateCenterY, 
 					stateWidth, stateHeight);
-				$$.sbgn.drawStateText(context, state.state, stateCenterX, 
-					stateCenterY);
+
+				textProp.state = state.state;
+				$$.sbgn.drawStateText(context, textProp);
+
 				stateCount++;
 			}
 			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-				var stateLabel = state.label.text;
 				renderer.drawRoundRectangle(context,
 					stateCenterX, stateCenterY,
 					stateWidth, stateHeight,
 					5);
-					$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
-						stateCenterY);
+
+				textProp.label = state.label.text;
+				$$.sbgn.drawInfoText(context, textProp);
 					infoCount++;
 			}
 			context.stroke();
@@ -161,7 +183,7 @@
 		return 0;
 	}
 
-	$$.sbgn.drawComplexStateAndInfo = function(context, stateAndInfos, centerX, centerY, width, height){
+	$$.sbgn.drawComplexStateAndInfo = function(context, node, stateAndInfos, centerX, centerY, width, height){
 		var upWidth = 0, downWidth = 0;
 		var boxPadding = 10, betweenBoxPadding = 5;
 		var beginPosY = height / 2, beginPosX = width / 2;
@@ -180,20 +202,26 @@
 				if(upWidth + stateWidth < width){
 					stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth/2;
 					stateCenterY = centerY - beginPosY;
+
+					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
+						'opacity':node._private.style['text-opacity'].value};
+
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
-						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
-							stateCenterY);
+
+						textProp.state = state.state;
+						$$.sbgn.drawStateText(context, textProp);
 					}
 					else if(state.clazz == "unit of information"){//draw rectangle
 						$$.sbgn.renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
 							5);
-						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, 
-							stateCenterY);
+
+						textProp.label = state.label.text;
+						$$.sbgn.drawInfoText(context, textProp);
 					}
 				}
 				upWidth = upWidth + width + boxPadding;
@@ -202,18 +230,25 @@
 				if(downWidth + stateWidth < width){
 					stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth/2;
 					stateCenterY = centerY + beginPosY;
+
+					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
+						'opacity':node._private.style['text-opacity'].value};
+
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
-						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, stateCenterY);
+
+						textProp.state = state.state;
+						$$.sbgn.drawStateText(context, textProp);
 					}
 					else if(state.clazz == "unit of information"){//draw rectangle
 						$$.sbgn.renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
 							5);
-						$$.sbgn.drawStateText(context, stateLabel, stateCenterX, stateCenterY);
+						textProp.label = state.label.text;
+						$$.sbgn.drawInfoText(context, textProp);
 					}
 				}
 				downWidth = downWidth + width + boxPadding;
