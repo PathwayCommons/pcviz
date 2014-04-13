@@ -404,9 +404,28 @@ var NetworkView = Backbone.View.extend({
         })).render();
         container.show();
 
-        (new SBGNView({
-            model: edge.data()
-        })).render();
+        $("#show-sbgn-button").click({edgeInfo: edge}, function(e) {
+            e.preventDefault();
+            var edgeInfo = e.data.edgeInfo;
+            $.fancybox(
+                _.template($("#sbgn-container-template").html(), {}),
+                {
+                	'edge' : edgeInfo,
+                    'autoDimensions' : false,
+                    'width' : '100%',
+                    'height' : '100%',
+                    'transitionIn' : 'fade',
+                    'transitionOut' : 'fade',
+                    'onStart': function() {
+                        (new SBGNView({
+                        	model: this.edge.data(),
+                        	el: "#sbgn-viewer"
+                        })).render();
+                    }
+                }
+            );
+
+        });
     }
 }); // end of NetworkView = Backbone.View.extend({
 

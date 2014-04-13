@@ -362,14 +362,21 @@ h4.pcviz-embed-logo small {
     padding-right: 5px;
 }
 
-#sbgn-viewer {
-    position: fixed;
-    width: 600px;
-    height: 450px;
-    right: 0;
-    bottom: 0;
-    background-color: white;
-    border: 2px solid black;
+#sbgn-cy {
+    margin-left: -10px;
+    height: 97%;
+    overflow: hidden !important;
+    border: 1px solid gray;
+}
+
+#sbgn-tabs {
+    height: 97%;
+    overflow: hidden !important;
+    border: 1px solid gray;
+}
+
+.highlight {
+    border-color: '#f00';
 }
 
 

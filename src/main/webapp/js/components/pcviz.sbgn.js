@@ -301,119 +301,113 @@ var SBGNView = Backbone.View.extend({
     el: "#sbgn-view-container",
 
     render: function() {
+        var self = this;
         var thatEl = this.$el;
-        var thatTmpl = this.template;
+        //var thatTmpl = this.template;
+        var source = this.model.source;
+        var target = this.model.target;
 
-        $("#highlight-neighbors-button").click(function(e) {
+        var genesStr = source + "," + target;
+
+        $("#highlight-neighbors-button").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             highlightNeighborsOfSelected(cy);
         });
 
-        $("#highlight-process-button").click(function(e) {
+        $("#highlight-processes-button").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             highlightProcessesOfSelected(cy);
         });
 
-        $("#remove-highlight-button").click(function(e) {
+        $("#remove-highlights-button").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             removeHighlights(cy.nodes(), cy.edges());
         });
 
-        $("#filter-selected-button").click(function(e) {
+        $('#filter-selected-button').live('click', function(e){
             e.preventDefault();
             var cy = window.cy;
             filterSelectedNodes(cy);
         });
 
-        $("#filter-non-selected-button").click(function(e) {
+        $("#filter-unselected-button").live('click',function(e) {
             e.preventDefault();
             var cy = window.cy;
             filterNonSelectedNodes(cy);
         });
 
-        $("#show-all-button").click(function(e) {
+        $("#show-all-button").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             showAll(cy);
         });
 
-        $("#show-sbgn-button").click(function(e) {
-            e.preventDefault();
+        $.getJSON("graph/detailed/pathsbetween/" + genesStr,
+            function(data) {
+                var container = $("#sbgn-cy");
+                var positionMap = new Object();
 
-            var source = $(this).data("source-el");
-            var target = $(this).data("target-el");
+                //add position information to data
+                for (var i = 0 ; i < data.nodes.length ; i++){
+                    var xPos = data.nodes[i].data.sbgnbbox.x;
+                    var yPos = data.nodes[i].data.sbgnbbox.y;
+                    positionMap[data.nodes[i].data.id] = {'x':xPos, 'y':yPos};
+                }                  
 
-            // Empty contents and put the new one
-            thatEl.html(thatTmpl());
+                var cyOptions = {
+                    elements: data,
+                    style: self.cyStyle,
+                    layout: { 
+                        name: 'preset',
+                        positions: positionMap
+                    },
+                    showOverlay: false,
 
-            var genesStr = source + "," + target;
-
-            $.getJSON("graph/detailed/pathsbetween/" + genesStr,
-                function(data) {
-                    var container = $("#sbgn-viewer");
-                    var positionMap = new Object();
-
-                    //TODO : add position to data
-                    for (var i = 0 ; i < data.nodes.length ; i++){
-                        var xPos = data.nodes[i].data.sbgnbbox.x;
-                        var yPos = data.nodes[i].data.sbgnbbox.y;
-                        positionMap[data.nodes[i].data.id] = {'x':xPos, 'y':yPos};
-                    }                  
-
-                    var cyOptions = {
-                        elements: data,
-                        style: sbgnStyleSheet,
-                        //layout: { name: 'cose' },
-                        layout: { 
-                            name: 'preset',
-                            positions: positionMap
-                         },
-                        showOverlay: false,
-
-                        ready: function()
-                        {
-                            var allNodes = this.nodes();
-                            window.cy = this;
+                    ready: function()
+                    {
+                        var allNodes = this.nodes();
+                        window.cy = this;
                             
-                            container.cytoscapePanzoom();
-                             // we are gonna use 'tap' to handle events for multiple devices
-                                // add click listener on nodes
+                        container.cytoscapePanzoom();
 
-                                cy.on('tap', 'node', function(evt){
-                                    var node = this;
-                                });
+                        cy.on('tap', 'node', function(evt){
+                                var node = this;
+                        });
 /*
-                                cy.on('tap', 'edge', function(evt){
-                                    var edge = this;
-                                });
+                        cy.on('tap', 'edge', function(evt){
+                           var edge = this;
+                        });
 
-
-                                // add click listener to core (for background clicks)
-                                cy.on('tap', function(evt) {
+                        cy.on('tap', function(evt) {
                                     
-                                });
+                        });
 
-                                // When a node is dragged, saved its new location
-                                cy.on('drag', 'node', function(evt) {
+                        // When a node is dragged, saved its new location
+                        cy.on('drag', 'node', function(evt) {
 
-                                });
+                        });
 */
-                        }
+                    }
 
-                    };
+                };
 
-                    container.html("");
-                    container.cy(cyOptions);
-                } // end of function(data)
-            ); // end of $.getJSON
-
-        });
+                container.html("");
+                container.cy(cyOptions);
+            } // end of function(data)
+        ); // end of $.getJSON
 
         return this;
     } // end of render: function()
+
 }); // end of NetworkView = Backbone.View.extend({
+
+
+
+
+
+
 
 

@@ -576,80 +576,17 @@
                           <i class="icon-download-alt"></i>
                           Download detailed process (BioPAX)
                       </a>
-
                   </td>
               </tr>
 
               <tr>
                   <td colspan="2">
-                      <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
+                      <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#"">
                           <i class="icon-download-alt"></i>
                           Show detailed process (SBGN)
                       </a>
-
                   </td>
               </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="highlight-neighbors-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
-                          <i class="icon-download-alt"></i>
-                          Highlight Neighbors of Selected
-                      </a>
-
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="highlight-process-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
-                          <i class="icon-download-alt"></i>
-                          Highlight Processes of Selected
-                      </a>
-
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="remove-highlight-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
-                          <i class="icon-download-alt"></i>
-                          Remove Highlight
-                      </a>
-
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="filter-selected-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
-                          <i class="icon-download-alt"></i>
-                          Filter Selected Nodes
-                      </a>
-
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="filter-non-selected-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
-                          <i class="icon-download-alt"></i>
-                          Filter Non-Selected Nodes
-                      </a>
-
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="show-all-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#" data-source-el="{{source}}" data-target-el="{{target}}">
-                          <i class="icon-download-alt"></i>
-                          Show All
-                      </a>
-
-                  </td>
-              </tr>
-
           </table>
 
 
@@ -749,7 +686,7 @@
   </script>
 
   <script type="text/template" id="noty-empty-network-template">
-      We couldn't find any genes symbols to query for a network. Please provide a gene symbol.
+      We could not find any genes symbols to query for a network. Please provide a gene symbol.
   </script>
 
   <script type="text/template" id="noty-edges-shown-template">
@@ -834,11 +771,81 @@
       You can deactivate the context by clicking on the cancer study name on the list.
   </script>
 
+    <div id="sbgn-viewer">
+      <!-- reserved for sbgn backbone view -->
+    </div>
+
   <script type="text/template" id="sbgn-container-template">
-      <div id="sbgn-viewer">
+    <div class="container-fluid" style="height:100%">
+      <div class="row-fluid" style="height:100%">
+
+        <div class="span9" id="sbgn-cy">
           <h4>Loading network...</h4>
           <img src="images/loading.gif" alt="loading network...">
+        </div>
+
+        <div class="span3" id="sbgn-tabs">
+          <table class="table table-condensed table-striped">
+              <tr>
+                  <td colspan="2">
+                      <a id="filter-selected-button" class="btn btn-primary btn-block" target="_blank" href="#" >
+                          <i class="icon-download-alt"></i>
+                          Hide Selected
+                      </a>
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="filter-unselected-button" class="btn btn-primary btn-block" target="_blank" href="#" >
+                          <i class="icon-download-alt"></i>
+                          Hide Unselected
+                      </a>
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="show-all-button" class="btn btn-primary btn-block" target="_blank" href="#" >
+                          <i class="icon-download-alt"></i>
+                          Show All
+                      </a>
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="highlight-neighbors-button" class="btn btn-primary btn-block" target="_blank" href="#" >
+                          <i class="icon-download-alt"></i>
+                          Highlight Neighbors Of Selected
+                      </a>
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="highlight-processes-button" class="btn btn-primary btn-block" target="_blank" href="#" >
+                          <i class="icon-download-alt"></i>
+                          Highlight Processes Of Selected
+                      </a>
+                  </td>
+              </tr>
+
+              <tr>
+                  <td colspan="2">
+                      <a id="remove-highlights-button" class="btn btn-primary btn-block" target="_blank" href="#" >
+                          <i class="icon-download-alt"></i>
+                          Remove Highlights
+                      </a>
+                  </td>
+              </tr>
+
+          </table>
+
+        </div>
+
       </div>
+    </div>
   </script>
 
 
