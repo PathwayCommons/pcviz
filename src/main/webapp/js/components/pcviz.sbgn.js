@@ -174,7 +174,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector(":selected")
         .css({
-            "background-color": "#939393",
+            "background-color": "#777777",
             "background-opacity" : "1",
             "color":"#000000",
             "line-color": "#000",
@@ -183,12 +183,22 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector(":active")
         .css({
-            "background-color": "#d3d3d3",
+            "background-color": "#aaaaaa",
             "background-opacity" : "1",
             "color":"#000000",
             "line-color": "#000",
             "source-arrow-color": "#000",
             "target-arrow-color": "#000"
+        })
+        .selector(":selected[sbgnclass='compartment']")
+        .css({
+            "background-opacity" : "0.7",
+            "background-color": "#444444",
+        })
+        .selector(":active[sbgnclass='compartment']")
+        .css({
+            "background-opacity" : "0.5",
+            "background-color": "#777777",
         })
         .selector(".ui-cytoscape-edgehandles-source")
         .css({
@@ -236,10 +246,12 @@ function highlightNeighborsOfSelected(cy){
 }
 
 function expandNodes(nodesToShow){
-    //add complex parents
-    nodesToShow = nodesToShow.add(nodesToShow.parents("node[sbgnclass='complex']"));
     //add children
     nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
+    //add parents
+    nodesToShow = nodesToShow.add(nodesToShow.parents());
+    //add complex children
+    nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
 
     var processes = nodesToShow.nodes("node[sbgnclass='process']");
     var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
@@ -250,9 +262,9 @@ function expandNodes(nodesToShow){
     nodesToShow = nodesToShow.add(neighborProcesses.neighborhood());
 
     //add parents
-    nodesToShow = nodesToShow.add(nodesToShow.nodes().parents("node[sbgnclass='complex']"));
+    nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
     //add children
-    nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
+    nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
 
     return nodesToShow;
 }
@@ -277,14 +289,14 @@ function highlightProcessesOfSelected(cy){
 }
 
 function filterSelectedNodes(cy){
-    var allNodes = cy.nodes("node[sbgnclass!='compartment']");
+    var allNodes = cy.nodes();
     var selectedNodes = cy.nodes(":selected");
     var nodesToShow = expandRemainingNodes(selectedNodes, allNodes);
     applyFilter(allNodes.not(nodesToShow));
 }
 
 function filterNonSelectedNodes(cy){
-    var allNodes = cy.nodes("node[sbgnclass!='compartment']");
+    var allNodes = cy.nodes();
     var selectedNodes = cy.nodes(":selected");
     var nodesToShow = expandNodes(selectedNodes);
     applyFilter(allNodes.not(nodesToShow));
