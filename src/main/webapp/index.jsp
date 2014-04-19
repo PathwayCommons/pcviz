@@ -771,81 +771,126 @@
       You can deactivate the context by clicking on the cancer study name on the list.
   </script>
 
-    <div id="sbgn-viewer">
-      <!-- reserved for sbgn backbone view -->
-    </div>
+  <script type="text/template" id="sbgn-main-template">
+  <div class="container-fluid" style="height:100%">
+      
+      <div class="row-fluid">
+          <div class="span9">
+              <h3>{{gene1}} - {{gene2}}</h3>
+          </div>
+          <div class="span3">
+              <ul class="nav nav-tabs" id="sbgnRightMenu">
+                  <li class="active" id="sbgn-graph-details"><a href="#sbgn-details" data-toggle="tab"><span class="fui-menu-16"></span> Details</a></li>
 
-  <script type="text/template" id="sbgn-container-template">
-    <div class="container-fluid" style="height:100%">
-      <div class="row-fluid" style="height:100%">
-
-        <div class="span9" id="sbgn-cy">
-          <h4>Loading network...</h4>
-          <img src="images/loading.gif" alt="loading network...">
-        </div>
-
-        <div class="span3" id="sbgn-tabs">
-          <table class="table table-condensed table-striped">
-              <tr>
-                  <td colspan="2">
-                      <a id="filter-selected-button" class="btn btn-primary btn-block" target="_blank" href="#" >
-                          <i class="icon-download-alt"></i>
-                          Hide Selected
-                      </a>
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="filter-unselected-button" class="btn btn-primary btn-block" target="_blank" href="#" >
-                          <i class="icon-download-alt"></i>
-                          Hide Unselected
-                      </a>
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="show-all-button" class="btn btn-primary btn-block" target="_blank" href="#" >
-                          <i class="icon-download-alt"></i>
-                          Show All
-                      </a>
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="highlight-neighbors-button" class="btn btn-primary btn-block" target="_blank" href="#" >
-                          <i class="icon-download-alt"></i>
-                          Highlight Neighbors Of Selected
-                      </a>
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="highlight-processes-button" class="btn btn-primary btn-block" target="_blank" href="#" >
-                          <i class="icon-download-alt"></i>
-                          Highlight Processes Of Selected
-                      </a>
-                  </td>
-              </tr>
-
-              <tr>
-                  <td colspan="2">
-                      <a id="remove-highlights-button" class="btn btn-primary btn-block" target="_blank" href="#" >
-                          <i class="icon-download-alt"></i>
-                          Remove Highlights
-                      </a>
-                  </td>
-              </tr>
-
-          </table>
-
-        </div>
-
+                  <li><a href="#sbgn-settings" id="sbgn-graph-settings" data-toggle="tab"><span class="fui-settings-16"></span> Settings</a></li>
+              </ul>
+          </div>
       </div>
-    </div>
+
+      <div class="row-fluid" style="height:90%">
+          <div class="row mainview" style="height:100%">
+              <div class="span9" style="height:100%">
+                  <div id="sbgn-network-loading">
+                      <h4>Loading network...</h4>
+                      <img src="images/loading.gif" alt="loading network...">
+
+                      <div class="help-text palette palette-silver hide" id="sbgn-too-slow-message">
+                          <h5>Taking too long?</h5><br>
+                          Sorry about this!
+                          Based on the genes you enter, we try to contact
+                          <a href="http://pathwaycommons.org" target="_blank">Pathway Commons</a>
+                          to build a network of interest for you;
+                          but some of the querying methods we use can take some time to complete
+                          and we do this dynamically in order to give you the most up-to-date interactions.
+                          Therefore, it sometimes takes too long to create the network,
+                          but we are constantly working to reduce the waiting time.
+                          <br>
+                          <br>
+                      </div>
+                  </div>
+
+                  <div id="sbgn-main-network"></div>
+              </div>
+
+              <div class="span3" style="height:100%">
+                  <div id="sbgnTabs" class="tab-content">
+
+                      <div class="tab-pane fade active in" id="sbgn-details">
+                          <div id="sbgn-graph-details-info" >
+                              <p class="help-text palette palette-silver">
+                                  Click on one of the genes in the network to see more details...
+                              </p>
+                              <img src="images/help-left-arrow.png" width="75">
+                          </div>
+                          <div id="sbgn-graph-details-content">
+                              <!-- reserved for backbone view -->
+                          </div>
+                      </div>
+
+                      <div class="tab-pane fade" id="sbgn-settings">
+                          <div class="share mrl edge-types">
+                              <h4 class="demo-panel-title edge-types-title">Highlighting</h4>
+
+                                  <table class="table table-condensed">
+                                      <tr id="neighbors-of-selected">
+                                          <td>
+                                              <span class="itx-type-on-off label controls-state-change-of">Highlight Neighbors of Selected</span>
+                                          </td>
+                                      </tr>
+
+                                      <tr id="processes-of-selected">
+                                          <td>
+                                              <span class="itx-type-on-off label controls-state-change-of">Highlight Processes of Selected</span>
+                                          </td>
+                                      </tr>
+
+                                      <tr id="remove-highlights">
+                                          <td>
+                                              <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
+                                          </td>
+                                      </tr>
+
+                                  </table>
+                          </div>
+
+                          <hr>
+
+                          <div class="share mrl edge-types">
+                              <h4 class="demo-panel-title edge-types-title">Filtering</h4>
+
+                                  <table class="table table-condensed">
+                                      <tr id="filter-selected">
+                                          <td>
+                                              <span class="itx-type-on-off label controls-state-change-of">Filter Selected Genes </span>
+                                          </td>
+                                      </tr>
+
+                                      <tr id="filter-unselected">
+                                          <td>
+                                              <span class="itx-type-on-off label controls-state-change-of">Filter Unselected Genes</span>
+                                          </td>
+                                      </tr>
+
+                                      <tr id="show-all">
+                                          <td>
+                                              <span class="itx-type-on-off label controls-state-change-of">Show All</span>
+                                          </td>
+                                      </tr>
+
+                                  </table>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  </script>
+
+  <script type="text/template" id="sbgn-entity-details">
+    <h4>{{name}}</h4><hr>
+    Type : {{type}}
   </script>
 
 

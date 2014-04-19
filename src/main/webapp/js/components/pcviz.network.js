@@ -408,22 +408,20 @@ var NetworkView = Backbone.View.extend({
             e.preventDefault();
             var edgeInfo = e.data.edgeInfo;
             $.fancybox(
-                _.template($("#sbgn-container-template").html(), {}),
+                _.template($("#sbgn-main-template").html(), {'gene1' : edge.data().source, 'gene2' : edge.data().target}),
                 {
-                	'edge' : edgeInfo,
                     'autoDimensions' : false,
                     'width' : '100%',
                     'height' : '100%',
                     'transitionIn' : 'fade',
                     'transitionOut' : 'fade',
-                    'onStart': function() {
-                        (new SBGNView({
-                        	model: this.edge.data(),
-                        	el: "#sbgn-viewer"
-                        })).render();
-                    }
                 }
             );
+
+			(new SBGNView({
+				model: edge.data(),
+				el: "#sbgn-main-network",
+				})).render();
 
         });
     }

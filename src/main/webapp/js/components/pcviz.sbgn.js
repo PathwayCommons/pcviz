@@ -21,9 +21,9 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
             //"content": "data(sbgnlabel)",
-            "border-width": 1,
+            "border-width": 0.5,
             "shape": "circle",
-            "border-color": "#555",
+            "border-color": "#0f0f0f",
             "background-color": "#ffffff",
             "font-size": 11,
         })
@@ -130,11 +130,12 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge")
         .css({
-            "line-color": "#000",
+            "line-color": "#0f0f0f",
             "target-arrow-fill": "hollow",
             "source-arrow-fill": "hollow",
-            "target-arrow-color": "#fff",
-            'background-opacity': 1
+            "target-arrow-color": "##919191",
+            'background-opacity': 1,
+            'width': 0.5
         })
         .selector("edge[sbgnclass='modulation']")
         .css({
@@ -150,7 +151,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
-            "target-arrow-color": "#000",
+            "target-arrow-color": "#919191",
             "target-arrow-fill": "filled",
             "target-arrow-shape": "tee"
         })
@@ -164,7 +165,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='production']")
         .css({
-            "target-arrow-color": "#000",
+            "target-arrow-color": "#919191",
             "target-arrow-fill": "filled",
             "target-arrow-shape": "production"
         })
@@ -307,59 +308,89 @@ function showAll(cy){
     cy.elements().removeData('manually-filtered');
 }
 
-var SBGNView = Backbone.View.extend({
-    cyStyle: sbgnStyleSheet,
-    template: _.template( $("#sbgn-container-template").html() ),
-    el: "#sbgn-view-container",
-
+var SBGNSettingsView = Backbone.View.extend({
     render: function() {
-        var self = this;
-        var thatEl = this.$el;
-        //var thatTmpl = this.template;
-        var source = this.model.source;
-        var target = this.model.target;
+        $('#sbgnRightMenu a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
 
-        var genesStr = source + "," + target;
-
-        $("#highlight-neighbors-button").live('click', function(e) {
+        $("#neighbors-of-selected").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             highlightNeighborsOfSelected(cy);
         });
 
-        $("#highlight-processes-button").live('click', function(e) {
+        $("#processes-of-selected").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             highlightProcessesOfSelected(cy);
         });
 
-        $("#remove-highlights-button").live('click', function(e) {
+        $("#remove-highlights").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             removeHighlights(cy.nodes(), cy.edges());
         });
 
-        $('#filter-selected-button').live('click', function(e){
+        $('#filter-selected').live('click', function(e){
             e.preventDefault();
             var cy = window.cy;
             filterSelectedNodes(cy);
         });
 
-        $("#filter-unselected-button").live('click',function(e) {
+        $("#filter-unselected").live('click',function(e) {
             e.preventDefault();
             var cy = window.cy;
             filterNonSelectedNodes(cy);
         });
 
-        $("#show-all-button").live('click', function(e) {
+        $("#show-all").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             showAll(cy);
         });
 
+        return this;
+    }
+});
+
+
+var SBGNView = Backbone.View.extend({
+    cyStyle: sbgnStyleSheet,
+    sbgnNetworkLoading: "#sbgn-network-loading",
+    sbgnTooSlowMessage: "#sbgn-too-slow-message",
+    detailsContent: '#sbgn-graph-details-content',
+    detailsInfo: '#sbgn-graph-details-info',
+
+    render: function() {
+
+        (new SBGNSettingsView()).render();
+
+        var self = this;
+
+        var source = this.model.source;
+        var target = this.model.target;
+
+        var container = $(self.el);
+        var sbgnNetworkLoading = $(self.sbgnNetworkLoading);
+        var genesStr = source + "," + target;
+
+        sbgnNetworkLoading.slideDown();
+        container.hide();
+
+        window.setTimeout(function() 
+        {
+            $(self.sbgnTooSlowMessage).slideDown();
+        }, 5000);
+
         $.getJSON("graph/detailed/pathsbetween/" + genesStr,
             function(data) {
-                var container = $("#sbgn-cy");
+                sbgnNetworkLoading.hide();
+                container.html("");
+                container.show();
+                $(self.sbgnTooSlowMessage).hide();
+
                 var positionMap = new Object();
 
                 //add position information to data
@@ -377,44 +408,213 @@ var SBGNView = Backbone.View.extend({
                         positions: positionMap
                     },
                     showOverlay: false,
+                    minZoom: 0.125,
+                    maxZoom: 16,
 
                     ready: function()
                     {
-                        var allNodes = this.nodes();
                         window.cy = this;
-                            
+                        cy.boxSelectionEnabled(false);   
                         container.cytoscapePanzoom();
 
+                        cy.on('tap', function(evt){
+                            if(!evt.cyTarget.data() || evt.cyTarget.edges()){
+                                self.putDetailsHelp();
+                            }
+                        });
+
                         cy.on('tap', 'node', function(evt){
-                                var node = this;
-                        });
-/*
-                        cy.on('tap', 'edge', function(evt){
-                           var edge = this;
+                            var node = this;
+                            self.updateSBGNDetails(evt, node);
                         });
 
-                        cy.on('tap', function(evt) {
-                                    
-                        });
-
-                        // When a node is dragged, saved its new location
-                        cy.on('drag', 'node', function(evt) {
-
-                        });
-*/
                     }
 
                 };
-
-                container.html("");
                 container.cy(cyOptions);
             } // end of function(data)
         ); // end of $.getJSON
 
         return this;
-    } // end of render: function()
+    }, // end of render: function()
 
-}); // end of NetworkView = Backbone.View.extend({
+    putDetailsHelp: function(){
+        var container = $(this.detailsContent);
+        var info = $(this.detailsInfo);
+
+        container.hide();
+        info.show();
+    },
+
+    updateSBGNDetails: function(evt, node)
+    {
+        var processTypes = ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"];
+        var biogeneTypes = ["unspecified entity", "macromolecule", "nucleic acid feature", "simple chemical", "perturbing agent"];
+
+        var type = node.data("sbgnclass");
+        var name = node.data("sbgnlabel");
+
+        if(type == "complex"){
+            this.updateComplexDetails(evt, node);
+        }
+        else if(biogeneTypes.indexOf(type) != -1){
+            this.updateNodeDetails(evt, node);
+        }
+        else if(processTypes.indexOf(type) != -1){
+            this.updateEntityDetails("Process", type);
+        }
+        else if(type == "compartment"){
+            this.updateEntityDetails(name, type);
+        }
+        else if(type == "source and sink"){
+            this.updateEntityDetails("--", type);
+        }
+        else{
+            this.updateEntityDetails(name, type);
+        }    
+    },
+
+    updateEntityDetails : function(name, type)
+    {
+        var self = this;
+        var container = $(self.detailsContent);
+        var info = $(self.detailsInfo);
+
+        info.hide();
+        container.empty();
+        container.append(_.template($("#sbgn-entity-details").html(), {'name' : name, 'type' : type}));
+        container.show();
+    },
+
+    updateNodeDetails: function(evt, node) 
+    {
+        var self = this;
+        var container = $(self.detailsContent);
+        var info = $(self.detailsInfo);
+
+        // remove previous content
+        info.hide();
+        container.empty();
+        container.append(_.template($("#loading-biogene-template").html(), {}));
+        container.show();
+
+        // request json data from BioGene service
+        $.getJSON("biogene/human/" + node.data("sbgnlabel"), function(queryResult) 
+        {
+            container.empty();
+
+            if (queryResult.returnCode != "SUCCESS")
+            {
+                container.append(
+                        _.template($("#biogene-retrieve-error-template").html(), 
+                    {
+                                returnCode: queryResult.returnCode
+                            })
+                    );
+            }
+            else
+            {
+                if (queryResult.count > 0)
+                {
+                    // generate the view by using backbone
+                    var geneInfo = queryResult.geneInfo[0];
+                    geneInfo["isseed"] = node.data("isseed");
+                    geneInfo["altered"] = parseInt(node.data("altered") * 100);
+
+                    var biogeneView = new BioGeneView({
+                    el: self.detailsContent,
+                    model: geneInfo
+                    });
+                    biogeneView.render();
+                }
+                else
+                {
+                    container.append(
+                        _.template($("#biogene-noinfo-error-template").html(), {})
+                    );
+                }
+            }
+        }); // end of JSON query result
+    },
+
+    updateComplexDetails: function(evt, node) 
+    {
+        var self = this;
+        var container = $(self.detailsContent);
+        var info = $(self.detailsInfo);
+
+        // remove previous content
+        info.hide();
+        container.empty();
+
+        function handleEachBiogeneInfo(node){
+            var divId = '#' + node.data("sbgnlabel");
+            var subContainer = $(divId);
+
+            self.nodeBiogeneInfo(node, subContainer, divId);
+            
+        }
+
+        var childNodes = node.descendants("node[sbgnclass!='complex']");
+
+        container.append("<h4>Complex's Components</h4><hr>");
+
+        for(var i = 0 ; i < childNodes.length ; i++){
+            var divId = '#' + childNodes[i].data("sbgnlabel");
+            container.append("<button type='button' class='btn btn-primary label controls-state-change-of' data-toggle='collapse' data-target='#" + 
+                childNodes[i].data("sbgnlabel") + "'>" + 
+                childNodes[i].data("sbgnlabel") + 
+                "</button><div id='" + childNodes[i].data("sbgnlabel") + "' class='collapse out'>" + _.template($("#loading-biogene-template").html(), {}) + "</div><hr class='listView'>"); 
+
+            handleEachBiogeneInfo(childNodes[i]);
+        }
+    },
+
+    nodeBiogeneInfo : function(node, container, content){
+        $(content).on("shown",function(e){
+            e.preventDefault();
+                
+            // request json data from BioGene service
+            $.getJSON("biogene/human/" + node.data("sbgnlabel"), function(queryResult) 
+            {
+                container.empty();
+
+                if (queryResult.returnCode != "SUCCESS")
+                {
+                    container.append(
+                        _.template($("#biogene-retrieve-error-template").html(), 
+                        {
+                            returnCode: queryResult.returnCode
+                        }));
+                }
+                else
+                {
+                    if (queryResult.count > 0)
+                    {
+                        // generate the view by using backbone
+                        var geneInfo = queryResult.geneInfo[0];
+                        geneInfo["isseed"] = node.data("isseed");
+                        geneInfo["altered"] = parseInt(node.data("altered") * 100);
+
+                        var biogeneView = new BioGeneView({
+                        el: content,
+                        model: geneInfo
+                        });
+                        biogeneView.render();
+                    }
+                    else
+                    {
+                        container.append(
+                            _.template($("#biogene-noinfo-error-template").html(), {})
+                        );
+                    }
+                }
+            }); // end of JSON query result
+
+        });
+    }
+
+}); // end of SbgnView = Backbone.View.extend({
 
 
 

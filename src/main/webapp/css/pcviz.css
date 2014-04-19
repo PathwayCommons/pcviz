@@ -362,21 +362,40 @@ h4.pcviz-embed-logo small {
     padding-right: 5px;
 }
 
-#sbgn-cy {
-    margin-left: -10px;
-    height: 97%;
+#sbgn-main-network {
+    border: 1px solid #424242;
+    height: 100%;
+    width: 100%;
     overflow: hidden !important;
-    border: 1px solid gray;
+    border-radius: 0.25em;
+    float: left;
+    width: 99%;
 }
 
-#sbgn-tabs {
-    height: 97%;
+#sbgn-network-loading{
+    border: 1px solid #424242;
+    height: 100%;
+    width: 100%;
     overflow: hidden !important;
-    border: 1px solid gray;
+    border-radius: 0.25em;
+    float: left;
+    width: 99%;
+}
+
+#sbgnRightMenu a {
+    font-size: 15px;
+    text-decoration: none;
 }
 
 .highlight {
     border-color: '#f00';
 }
 
+#sbgnTabs {
+    height: 97%;
+}
+
+.listView {
+     margin:10px !important;
+}
 
