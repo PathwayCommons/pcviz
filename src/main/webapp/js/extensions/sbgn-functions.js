@@ -55,7 +55,7 @@
 	}
 
 	$$.sbgn.drawLabelText = function(context, textProp){
-		textProp.color = "#000";
+		textProp.color = "#0f0f0f";
 		textProp.font = "9px Arial";
 		$$.sbgn.drawText(context, textProp);
 	}
@@ -68,13 +68,13 @@
 			stateValue + "@" + stateVariable;
 
 		textProp.label = stateLabel;
-		textProp.color = "#000";
+		textProp.color = "#0f0f0f";
 		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
 	}
 
 	$$.sbgn.drawInfoText = function(context, textProp){
-		textProp.color = "#000";
+		textProp.color = "#0f0f0f";
 		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
 	}
@@ -278,7 +278,7 @@
 		width, height, cloneMarker){
 		if(cloneMarker != null){
 			var oldColor  = context.fillStyle;
-			context.fillStyle = "#000000";
+			context.fillStyle = "#0f0f0f";
 
 			context.beginPath();
 			context.translate(centerX, centerY);
@@ -329,7 +329,7 @@
 			var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
 
 			var oldColor  = context.fillStyle;
-			context.fillStyle = "#000000";
+			context.fillStyle = "#0f0f0f";
 
 			renderer.drawPolygon(context,
 				cloneX, cloneY,
@@ -351,7 +351,7 @@
 			var cloneX = centerX;
 			var cloneY = centerY + 3 * height / 8;
 			var oldColor  = context.fillStyle;
-			context.fillStyle = "#000000";
+			context.fillStyle = "#0f0f0f";
 
 			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
 			context.fill();
@@ -381,7 +381,7 @@
 			var markerPoints = new Array(-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1);
 
 			var oldColor  = context.fillStyle;
-			context.fillStyle = "#000000";
+			context.fillStyle = "#0f0f0f";
 
 			renderer.drawPolygon(context,
 				cloneX, cloneY,
