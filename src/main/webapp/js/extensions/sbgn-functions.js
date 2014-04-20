@@ -6,39 +6,18 @@
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 	var nodeShapes = CanvasRenderer.nodeShapes;
-/*
-	$$.sbgn.drawText = function(context, label, centerX, centerY, color, font){
-		context.font = font;
-		context.textAlign = "center";
-		context.textBaseline = "middle";
-		var oldColor  = context.fillStyle;
-		context.fillStyle = color;
-		context.fillText("" + label, centerX, centerY);
-		context.fillStyle = oldColor;
-		context.stroke();
+
+	function truncateText(textProp, context) {
+	    var width;
+	    var text = textProp.label;
+	    var len = text.length;
+	    var ellipsis = "...";
+	    while ((width = context.measureText(text).width) > textProp.width) {
+	        --len;
+	        text = text.substring(0, len) + ellipsis;
+	    }
+	    return text;
 	}
-
-	$$.sbgn.drawLabelText = function(context, label, centerX, centerY){
-		$$.sbgn.drawText(context, label, centerX, 
-			centerY,  "#000", "9px Arial");
-	}
-
-	$$.sbgn.drawStateText = function(context, state, centerX, centerY){
-		var stateValue = state.value;
-		var stateVariable = state.variable;
-
-		var stateLabel = (stateVariable == null) ? stateValue : 
-			stateValue + "@" + stateVariable;
-
-		$$.sbgn.drawText(context, stateLabel, centerX,
-			centerY, "#000", "8px Arial");
-	}
-
-	$$.sbgn.drawCloneMarkerText = function(context, label, centerX, centerY){
-		$$.sbgn.drawText(context, label, centerX, 
-			centerY, "#fff", "4px Arial");		
-	}
-*/
 
 	$$.sbgn.drawText = function(context, textProp){
 		context.font = textProp.font;
@@ -48,7 +27,7 @@
 		context.fillStyle = textProp.color;
 		var oldOpacity = context.globalAlpha;
 		context.globalAlpha = textProp.opacity;
-		context.fillText("" + textProp.label, textProp.centerX, textProp.centerY);
+		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
 		context.fillStyle = oldColor;
 		context.globalAlpha = oldOpacity;
 		context.stroke();
@@ -148,7 +127,7 @@
 			var stateCenterY = state.bbox.y + centerY;
 
 			var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
-				'opacity':node._private.style['text-opacity'].value};
+				'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
 			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				//var stateLabel = state.state.value;
@@ -204,7 +183,7 @@
 					stateCenterY = centerY - beginPosY;
 
 					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
-						'opacity':node._private.style['text-opacity'].value};
+						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
@@ -232,7 +211,7 @@
 					stateCenterY = centerY + beginPosY;
 
 					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
-						'opacity':node._private.style['text-opacity'].value};
+						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
