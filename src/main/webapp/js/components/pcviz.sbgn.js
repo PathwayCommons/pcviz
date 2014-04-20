@@ -337,18 +337,21 @@ var SBGNSettingsView = Backbone.View.extend({
             e.preventDefault();
             var cy = window.cy;
             filterSelectedNodes(cy);
+            cy.elements(":selected").unselect();
         });
 
         $("#filter-unselected").live('click',function(e) {
             e.preventDefault();
             var cy = window.cy;
             filterNonSelectedNodes(cy);
+            cy.elements(":selected").unselect();
         });
 
         $("#show-all").live('click', function(e) {
             e.preventDefault();
             var cy = window.cy;
             showAll(cy);
+            cy.elements(":selected").unselect();
         });
 
         return this;
@@ -414,7 +417,7 @@ var SBGNView = Backbone.View.extend({
                     ready: function()
                     {
                         window.cy = this;
-                        cy.boxSelectionEnabled(false);   
+                        //cy.boxSelectionEnabled(false);   
                         container.cytoscapePanzoom();
 
                         cy.on('tap', function(evt){
