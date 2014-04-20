@@ -582,7 +582,6 @@
               <tr>
                   <td colspan="2">
                       <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#"">
-                          <i class="icon-download-alt"></i>
                           Show detailed process (SBGN)
                       </a>
                   </td>
@@ -787,7 +786,7 @@
           </div>
       </div>
 
-      <div class="row-fluid" style="height:90%">
+      <div class="row-fluid" style="height:88%">
           <div class="row mainview" style="height:100%">
               <div class="span9" style="height:100%">
                   <div id="sbgn-network-loading">
