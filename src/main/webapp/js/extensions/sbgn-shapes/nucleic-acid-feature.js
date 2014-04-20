@@ -77,7 +77,7 @@
 				width, height, cornerRadius, cloneMarker, false);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value};
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
 			$$.sbgn.drawLabelText(context, nodeProp);
 
 			$$.sbgn.drawPathStateAndInfos(renderer, node, context, centerX, centerY);

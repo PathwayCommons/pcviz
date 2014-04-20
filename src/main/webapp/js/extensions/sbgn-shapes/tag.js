@@ -44,7 +44,7 @@
 			context.stroke();
 
 			var nodeProp = {'label':label, 'centerX':centerX - width/6, 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value};
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
 			$$.sbgn.drawLabelText(context, nodeProp);
 		},
 
