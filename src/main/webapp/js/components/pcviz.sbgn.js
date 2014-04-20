@@ -474,18 +474,6 @@ var SBGNView = Backbone.View.extend({
         }    
     },
 
-    updateEntityDetails : function(name, type)
-    {
-        var self = this;
-        var container = $(self.detailsContent);
-        var info = $(self.detailsInfo);
-
-        info.hide();
-        container.empty();
-        container.append(_.template($("#sbgn-entity-details").html(), {'name' : name, 'type' : type}));
-        container.show();
-    },
-
     updateNodeDetails: function(evt, node) 
     {
         var self = this;
@@ -537,6 +525,18 @@ var SBGNView = Backbone.View.extend({
         }); // end of JSON query result
     },
 
+    updateEntityDetails : function(name, type)
+    {
+        var self = this;
+        var container = $(self.detailsContent);
+        var info = $(self.detailsInfo);
+
+        info.hide();
+        container.empty();
+        container.append(_.template($("#sbgn-entity-details").html(), {'name' : name, 'type' : type}));
+        container.show();
+    },
+
     updateComplexDetails: function(evt, node) 
     {
         var self = this;
@@ -560,7 +560,6 @@ var SBGNView = Backbone.View.extend({
         container.append("<h4>Complex's Components</h4><hr>");
 
         for(var i = 0 ; i < childNodes.length ; i++){
-            var divId = '#' + childNodes[i].data("sbgnlabel");
             container.append("<button type='button' class='btn btn-primary label controls-state-change-of' data-toggle='collapse' data-target='#" + 
                 childNodes[i].data("sbgnlabel") + "'>" + 
                 childNodes[i].data("sbgnlabel") + 
@@ -568,6 +567,7 @@ var SBGNView = Backbone.View.extend({
 
             handleEachBiogeneInfo(childNodes[i]);
         }
+        container.show();
     },
 
     nodeBiogeneInfo : function(node, container, content){
