@@ -860,13 +860,13 @@
                                   <table class="table table-condensed">
                                       <tr id="filter-selected">
                                           <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Filter Selected Genes </span>
+                                              <span class="itx-type-on-off label controls-state-change-of">Hide Selected </span>
                                           </td>
                                       </tr>
 
                                       <tr id="filter-unselected">
                                           <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Filter Unselected Genes</span>
+                                              <span class="itx-type-on-off label controls-state-change-of">show Selected</span>
                                           </td>
                                       </tr>
 
