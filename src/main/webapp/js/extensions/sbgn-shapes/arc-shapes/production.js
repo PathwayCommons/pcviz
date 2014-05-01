@@ -91,7 +91,7 @@
 	    },
 	    
 	    gap: function(edge) {
-	      return 0;
+	      return edge._private.style['width'].pxValue * 2;
 	    }
 	}
 

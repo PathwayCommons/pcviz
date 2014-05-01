@@ -788,6 +788,7 @@
 
       <div class="row-fluid" style="height:88%">
           <div class="row mainview" style="height:100%">
+
               <div class="span9" style="height:100%">
                   <div id="sbgn-network-loading">
                       <h4>Loading network...</h4>
@@ -808,7 +809,9 @@
                       </div>
                   </div>
 
-                  <div id="sbgn-main-network"></div>
+                  <div id="sbgn-main-network">
+                      </-- reserved for sbgn network view -->
+                  </div>
               </div>
 
               <div class="span3" style="height:100%">
@@ -827,64 +830,82 @@
                       </div>
 
                       <div class="tab-pane fade" id="sbgn-settings">
-                          <div class="share mrl edge-types">
-                              <h4 class="demo-panel-title edge-types-title">Highlighting</h4>
-
-                                  <table class="table table-condensed">
-                                      <tr id="neighbors-of-selected">
-                                          <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Highlight Neighbors of Selected</span>
-                                          </td>
-                                      </tr>
-
-                                      <tr id="processes-of-selected">
-                                          <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Highlight Processes of Selected</span>
-                                          </td>
-                                      </tr>
-
-                                      <tr id="remove-highlights">
-                                          <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
-                                          </td>
-                                      </tr>
-
-                                  </table>
-                          </div>
-
-                          <hr>
-
-                          <div class="share mrl edge-types">
-                              <h4 class="demo-panel-title edge-types-title">Filtering</h4>
-
-                                  <table class="table table-condensed">
-                                      <tr id="filter-selected">
-                                          <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Hide Selected </span>
-                                          </td>
-                                      </tr>
-
-                                      <tr id="filter-unselected">
-                                          <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">show Selected</span>
-                                          </td>
-                                      </tr>
-
-                                      <tr id="show-all">
-                                          <td>
-                                              <span class="itx-type-on-off label controls-state-change-of">Show All</span>
-                                          </td>
-                                      </tr>
-
-                                  </table>
-                          </div>
+                          </-- reserved for sbgn settings -->
                       </div>
                   </div>
               </div>
+
           </div>
       </div>
   </div>
+  </script>
 
+  <script type="text/template" id="sbgn-settings-template">
+      <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Highlighting</h4>
+
+              <table class="table table-condensed">
+                  <tr id="neighbors-of-selected">
+                    <td>
+                        <span class="itx-type-on-off label controls-state-change-of">Highlight Neighbors of Selected</span>
+                    </td>
+                  </tr>
+
+                  <tr id="processes-of-selected">
+                      <td>
+                           <span class="itx-type-on-off label controls-state-change-of">Highlight Processes of Selected</span>
+                      </td>
+                  </tr>
+
+                  <tr id="remove-highlights">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
+                      </td>
+                  </tr>
+
+              </table>
+      </div>
+
+      <hr>
+
+      <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Filtering</h4>
+
+              <table class="table table-condensed">
+                  <tr id="filter-selected">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Hide Selected </span>
+                      </td>
+                  </tr>
+
+                  <tr id="filter-unselected">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Show Selected</span>
+                      </td>
+                  </tr>
+
+                  <tr id="show-all">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Show All</span>
+                      </td>
+                  </tr>
+
+              </table>
+      </div>
+
+      <hr>
+
+      <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Layout</h4>
+
+              <table class="table table-condensed">
+                  <tr id="apply-layout">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Apply Layout</span>
+                      </td>
+                  </tr>
+              </table>
+      </div>
   </script>
 
   <script type="text/template" id="sbgn-entity-details">
