@@ -199,7 +199,7 @@ public class PathwayCommonsGraphService {
         // the Pattern framework can generate SIF too
         SIFSearcher searcher = new SIFSearcher(
                 SIFEnum.CONTROLS_STATE_CHANGE_OF,
-                SIFEnum.CONTROLS_DEGRADATION_OF,
+                //SIFEnum.CONTROLS_DEGRADATION_OF,
                 SIFEnum.CATALYSIS_PRECEDES
         );
 
