@@ -21,7 +21,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
             //"content": "data(sbgnlabel)",
-            "border-width": 0.5,
+            "border-width": 1,
             "shape": "circle",
             "border-color": "#0f0f0f",
             "background-color": "#ffffff",
