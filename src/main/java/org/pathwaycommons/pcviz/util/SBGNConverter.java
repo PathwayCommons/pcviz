@@ -1,24 +1,54 @@
+/*
+ * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
+ *
+ * This file is part of PCViz.
+ *
+ * PCViz is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PCViz is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.pathwaycommons.pcviz.util;
 
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import org.biopax.paxtools.io.sbgn.L3ToSBGNPDConverter;
+import org.biopax.paxtools.io.sbgn.ListUbiqueDetector;
 import org.biopax.paxtools.model.Model;
-import org.omg.CORBA.PolicyError;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.pathwaycommons.pcviz.service.BlackListService;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
 
+/**
+ * @author Mecit Sari
+ */
 public class SBGNConverter
 {
+
+    private BlackListService blackListService;
+
+    public BlackListService getBlackListService() {
+        return blackListService;
+    }
+
+    public void setBlackListService(BlackListService bls) {
+        this.blackListService = bls;
+    }
+
     public void setGlyphPositionAsCenter(Glyph glyph, ArrayList<Glyph> states){
         //sbgnml positions are set as the beginning of the shape,
         //cytoscape.js accept as center, conversion in server side
@@ -159,11 +189,16 @@ public class SBGNConverter
     {
         CytoscapeJsGraph graph = new CytoscapeJsGraph();
 
+        Set<String> blacklist = getBlackListService().getBlackListSet();
 
-        L3ToSBGNPDConverter sbgnConverter = new L3ToSBGNPDConverter();
+        L3ToSBGNPDConverter sbgnConverter = new L3ToSBGNPDConverter(
+                new ListUbiqueDetector(blacklist), null, true);
+
         Sbgn sbgn = sbgnConverter.createSBGN(model);
+
         List nodes = sbgn.getMap().getGlyph();
         List edges = sbgn.getMap().getArc();
+
         java.util.Map portGlyphMap = new HashMap();
 
         traverseAndAddGlyphs(null, nodes, graph, portGlyphMap, genes);

@@ -292,9 +292,9 @@
 		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
 			width, height, cloneMarker);
 
-		if(!isMultimer && cloneMarker != null){
-		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
-		}
+//		if(!isMultimer && cloneMarker != null){
+//		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+//		}
 	}
 
 	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
@@ -318,7 +318,7 @@
 
 		 	context.fillStyle = oldColor;
 
-		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+//		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
 		}
 	}
 
@@ -335,9 +335,10 @@
 			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
 			context.fill();
 		 	context.fillStyle = oldColor;
-		 	if(!isMultimer){
-		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
-		 	}
+		 	
+//		 	if(!isMultimer){
+//		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+//		 	}
 		}
 	}
 
@@ -370,9 +371,9 @@
 
 		 	context.fillStyle = oldColor;
 
-		 	if(!isMultimer){
-		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
-		 	}
+//		 	if(!isMultimer){
+//		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
+//		 	}
 		}
 	}
 
