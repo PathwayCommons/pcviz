@@ -29,3 +29,8 @@ cbioportal.cache.folder.test=/tmp/cocitations/portal-test
 
 # PCViz self URL
 pcviz.url=http://awabi.cbio.mskcc.org/pc2-demo/
+
+# Blacklist
+#blacklist.location=http://www.pathwaycommons.org/pc2/downloads/blacklist.txt
+blacklist.location=file:/tmp/blacklist.txt
+#blacklist.test.location=classpath:blacklist_test.txt

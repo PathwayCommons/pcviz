@@ -31,7 +31,13 @@
         <constructor-arg index="0" value="${biogene.format}"/>
     </bean>
 
-    <bean id="sbgnConverter" class="org.pathwaycommons.pcviz.util.SBGNConverter"/>
+    <bean id="sbgnConverter" class="org.pathwaycommons.pcviz.util.SBGNConverter">
+        <property name="blackListService" ref="blackListService"/>
+    </bean>    
+
+    <bean class="org.pathwaycommons.pcviz.service.BlackListService" id="blackListService">
+        <property name="blackListResource" value="${blacklist.location}"/>
+    </bean>
 
     <bean class="org.pathwaycommons.pcviz.service.PathwayCommonsGraphService" id="graphService">
         <property name="cocitMan" ref="cocitationManager"/>
