@@ -22,7 +22,10 @@ import java.util.*;
 
 import org.biopax.paxtools.io.sbgn.L3ToSBGNPDConverter;
 import org.biopax.paxtools.io.sbgn.ListUbiqueDetector;
+import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
+import org.biopax.paxtools.model.level3.Entity;
+import org.biopax.paxtools.model.level3.Provenance;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
@@ -38,6 +41,7 @@ import org.sbgn.bindings.Sbgn;
  */
 public class SBGNConverter
 {
+    private static String UNKNOWN = "unknown";
 
     private BlackListService blackListService;
 
@@ -74,8 +78,8 @@ public class SBGNConverter
         }
     }
 
-    public void addGlyph(Glyph parent, Glyph glyph, ArrayList<Glyph> states,
-        CytoscapeJsGraph graph, Collection<String> genes)
+    public void addGlyph(Glyph parent, HashSet<BioPAXElement> bpElements, Glyph glyph, ArrayList<Glyph> states,
+                         CytoscapeJsGraph graph, Collection<String> genes)
     {
         CytoscapeJsNode cNode = new CytoscapeJsNode();
 
@@ -85,7 +89,9 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.SBGNORIENTATION, glyph.getOrientation());
         cNode.setProperty(PropertyKey.SBGNCOMPARTMENTREF, glyph.getCompartmentRef());
 
-        String lbl = (glyph.getLabel() == null) ? "unknown" : glyph.getLabel().getText();
+        extractDataSource(cNode, bpElements);
+
+        String lbl = (glyph.getLabel() == null) ? UNKNOWN : glyph.getLabel().getText();
         cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
 
         setGlyphPositionAsCenter(glyph, states);
@@ -105,9 +111,35 @@ public class SBGNConverter
         graph.getNodes().add(cNode);
     }
 
+    /**
+     * Simply iterates over the BioPAX elements and extracts data sources
+     * associated with the node.
+     *
+     * @param jsNode Cytoscape Node
+     * @param bpElements BioPAX Elements
+     */
+    private void extractDataSource(CytoscapeJsNode jsNode, HashSet<BioPAXElement> bpElements) {
+        HashSet<String> dataSources = new HashSet<String>();
+
+        for (BioPAXElement bpElement : bpElements) {
+            if(bpElement instanceof Entity) {
+                Entity entity = (Entity) bpElement;
+                for (Provenance provenance : entity.getDataSource()) {
+                    dataSources.add(provenance.getStandardName());
+                }
+            }
+        }
+
+        if(dataSources.isEmpty()) {
+            jsNode.setProperty(PropertyKey.DATASOURCE, Collections.singleton(UNKNOWN));
+        } else {
+            jsNode.setProperty(PropertyKey.DATASOURCE, dataSources);
+        }
+    }
+
     private void traverseAndAddGlyphs(Glyph parent, List<Glyph> nodes,
-        CytoscapeJsGraph graph, Map<String, Glyph> portGlyphMap,
-        Collection<String> genes)
+                                      CytoscapeJsGraph graph, Map<String, Glyph> portGlyphMap,
+                                      Collection<String> genes, Model model, Map<String, Set<String>> sbgn2BPMap)
     {
         for (Glyph node : nodes) {
             List<Glyph> glyphs = node.getGlyph();
@@ -135,11 +167,18 @@ public class SBGNConverter
                 portGlyphMap.put(p.getId(), node);
             }
 
-            addGlyph(parent, node, states, graph, genes);
+            // Extract the BP objects that correspond to this node
+            HashSet<BioPAXElement> bpes = new HashSet<BioPAXElement>();
+            Set<String> bpIds = sbgn2BPMap.get(node.getId());
+            for (String bpId : bpIds) {
+                bpes.add(model.getByID(bpId));
+            }
+
+            addGlyph(parent, bpes, node, states, graph, genes);
 
             if (childNodes.size() > 0)
             {
-                traverseAndAddGlyphs(node, childNodes, graph, portGlyphMap, genes);
+                traverseAndAddGlyphs(node, childNodes, graph, portGlyphMap, genes, model, sbgn2BPMap);
             }
         }
     }
@@ -187,17 +226,20 @@ public class SBGNConverter
 
         Set<String> blacklist = getBlackListService().getBlackListSet();
 
-        L3ToSBGNPDConverter sbgnConverter = new L3ToSBGNPDConverter(
-                new ListUbiqueDetector(blacklist), null, true);
+        L3ToSBGNPDConverter sbgnConverter
+                = new L3ToSBGNPDConverter(new ListUbiqueDetector(blacklist), null, true);
 
         Sbgn sbgn = sbgnConverter.createSBGN(model);
+        // For each SBGN object there might be multiple BioPAX Elements associated with it
+        // This map contains this information
+        Map<String, Set<String>> sbgn2BPMap = sbgnConverter.getSbgn2BPMap();
 
         List<Glyph> nodes = sbgn.getMap().getGlyph();
         List<Arc> edges = sbgn.getMap().getArc();
 
         Map<String, Glyph> portGlyphMap = new HashMap<String, Glyph>();
 
-        traverseAndAddGlyphs(null, nodes, graph, portGlyphMap, genes);
+        traverseAndAddGlyphs(null, nodes, graph, portGlyphMap, genes, model, sbgn2BPMap);
         traverseAndAddEdges(edges, graph, portGlyphMap);
 
         return graph;
