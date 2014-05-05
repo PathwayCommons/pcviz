@@ -37,6 +37,7 @@ public enum PropertyKey
     PARENT,
     PUBMED,
     RANK,
+    DATASOURCE,
     SBGNBBOX,
     SBGNCLASS,
     SBGNENTITY,
