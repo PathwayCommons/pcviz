@@ -818,15 +818,7 @@
                   <div id="sbgnTabs" class="tab-content">
 
                       <div class="tab-pane fade active in" id="sbgn-details">
-                          <div id="sbgn-graph-details-info" >
-                              <p class="help-text palette palette-silver">
-                                  Click on one of the genes in the network to see more details...
-                              </p>
-                              <img src="images/help-left-arrow.png" width="75">
-                          </div>
-                          <div id="sbgn-graph-details-content">
-                              <!-- reserved for backbone view -->
-                          </div>
+                          </-- reserved for sbgn details -->
                       </div>
 
                       <div class="tab-pane fade" id="sbgn-settings">
@@ -838,6 +830,18 @@
           </div>
       </div>
   </div>
+  </script>
+
+  <script type="text/template" id="sbgn-details-template">
+      <div id="sbgn-graph-details-info" >
+          <p class="help-text palette palette-silver">
+              Click on one of the genes in the network to see more details...
+          </p>
+          <img src="images/help-left-arrow.png" width="75">
+      </div>
+      <div id="sbgn-graph-details-content">
+          <!-- reserved for backbone view -->
+     </div>
   </script>
 
   <script type="text/template" id="sbgn-settings-template">

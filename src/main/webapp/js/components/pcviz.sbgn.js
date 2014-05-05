@@ -360,88 +360,17 @@ var SBGNSettingsView = Backbone.View.extend({
 
 });
 
-
-var SBGNView = Backbone.View.extend({
-    cyStyle: sbgnStyleSheet,
-    sbgnNetworkLoading: "#sbgn-network-loading",
-    sbgnTooSlowMessage: "#sbgn-too-slow-message",
+var SBGNDetailsView = Backbone.View.extend({
+    el: '#sbgn-details',
+    template:  _.template($('#sbgn-details-template'). html()),
     detailsContent: '#sbgn-graph-details-content',
     detailsInfo: '#sbgn-graph-details-info',
 
-    render: function() {
-
-        (new SBGNSettingsView()).render();
-
+    render: function(){
         var self = this;
-
-        var source = this.model.source;
-        var target = this.model.target;
-
-        var container = $(self.el);
-        var sbgnNetworkLoading = $(self.sbgnNetworkLoading);
-        var genesStr = source + "," + target;
-
-        sbgnNetworkLoading.slideDown();
-        container.hide();
-
-        window.setTimeout(function() 
-        {
-            $(self.sbgnTooSlowMessage).slideDown();
-        }, 5000);
-
-        $.getJSON("graph/detailed/pathsbetween/" + genesStr,
-            function(data) {
-                sbgnNetworkLoading.hide();
-                container.html("");
-                container.show();
-                $(self.sbgnTooSlowMessage).hide();
-
-                var positionMap = new Object();
-
-                //add position information to data
-                for (var i = 0 ; i < data.nodes.length ; i++){
-                    var xPos = data.nodes[i].data.sbgnbbox.x;
-                    var yPos = data.nodes[i].data.sbgnbbox.y;
-                    positionMap[data.nodes[i].data.id] = {'x':xPos, 'y':yPos};
-                }                  
-
-                var cyOptions = {
-                    elements: data,
-                    style: self.cyStyle,
-                    layout: { 
-                        name: 'preset',
-                        positions: positionMap
-                    },
-                    showOverlay: false,
-                    minZoom: 0.125,
-                    maxZoom: 16,
-
-                    ready: function()
-                    {
-                        window.cy = this;
-                        //cy.boxSelectionEnabled(false);   
-                        container.cytoscapePanzoom();
-
-                        cy.on('tap', function(evt){
-                            if(!evt.cyTarget.data() || evt.cyTarget.edges()){
-                                self.putDetailsHelp();
-                            }
-                        });
-
-                        cy.on('tap', 'node', function(evt){
-                            var node = this;
-                            self.updateSBGNDetails(evt, node);
-                        });
-
-                    }
-
-                };
-                container.cy(cyOptions);
-            } // end of function(data)
-        ); // end of $.getJSON
-
+        $(self.el).append(self.template);
         return this;
-    }, // end of render: function()
+    },
 
     putDetailsHelp: function(){
         var container = $(this.detailsContent);
@@ -451,19 +380,19 @@ var SBGNView = Backbone.View.extend({
         info.show();
     },
 
-    updateSBGNDetails: function(evt, node)
+    updateSBGNDetails: function()
     {
         var processTypes = ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"];
         var biogeneTypes = ["unspecified entity", "macromolecule", "nucleic acid feature", "simple chemical", "perturbing agent"];
-
+        var node = this.model;
         var type = node.data("sbgnclass");
         var name = node.data("sbgnlabel");
 
         if(type == "complex"){
-            this.updateComplexDetails(evt, node);
+            this.updateComplexDetails(node);
         }
         else if(biogeneTypes.indexOf(type) != -1){
-            this.updateNodeDetails(evt, node);
+            this.updateNodeDetails(node);
         }
         else if(processTypes.indexOf(type) != -1){
             this.updateEntityDetails("Process", type);
@@ -479,7 +408,7 @@ var SBGNView = Backbone.View.extend({
         }    
     },
 
-    updateNodeDetails: function(evt, node) 
+    updateNodeDetails: function(node) 
     {
         var self = this;
         var container = $(self.detailsContent);
@@ -542,7 +471,7 @@ var SBGNView = Backbone.View.extend({
         container.show();
     },
 
-    updateComplexDetails: function(evt, node) 
+    updateComplexDetails: function(node) 
     {
         var self = this;
         var container = $(self.detailsContent);
@@ -618,6 +547,93 @@ var SBGNView = Backbone.View.extend({
 
         });
     }
+
+});
+
+var SBGNView = Backbone.View.extend({
+    cyStyle: sbgnStyleSheet,
+    sbgnNetworkLoading: "#sbgn-network-loading",
+    sbgnTooSlowMessage: "#sbgn-too-slow-message",
+
+    render: function() {
+
+        (new SBGNSettingsView()).render();
+        (new SBGNDetailsView()).render();
+        var self = this;
+
+        var source = this.model.source;
+        var target = this.model.target;
+
+        var container = $(self.el);
+        var sbgnNetworkLoading = $(self.sbgnNetworkLoading);
+        var genesStr = source + "," + target;
+
+        sbgnNetworkLoading.slideDown();
+        container.hide();
+
+        window.setTimeout(function() 
+        {
+            $(self.sbgnTooSlowMessage).slideDown();
+        }, 5000);
+
+        $.getJSON("graph/detailed/pathsbetween/" + genesStr,
+            function(data) {
+                sbgnNetworkLoading.hide();
+                container.html("");
+                container.show();
+                $(self.sbgnTooSlowMessage).hide();
+
+                var positionMap = new Object();
+
+                //add position information to data
+                for (var i = 0 ; i < data.nodes.length ; i++){
+                    var xPos = data.nodes[i].data.sbgnbbox.x;
+                    var yPos = data.nodes[i].data.sbgnbbox.y;
+                    positionMap[data.nodes[i].data.id] = {'x':xPos, 'y':yPos};
+                }                  
+
+                var cyOptions = {
+                    elements: data,
+                    style: self.cyStyle,
+                    layout: { 
+                        name: 'preset',
+                        positions: positionMap
+                    },
+                    showOverlay: false,
+                    minZoom: 0.125,
+                    maxZoom: 16,
+
+                    ready: function()
+                    {
+                        window.cy = this;
+                        //cy.boxSelectionEnabled(false);   
+                        container.cytoscapePanzoom();
+
+                        cy.on('tap', function(evt){
+                            if(!evt.cyTarget.data() || evt.cyTarget.edges()){
+                                //self.putDetailsHelp();
+                                (new SBGNDetailsView({
+                                    })).putDetailsHelp();
+                            }
+                        });
+
+                        cy.on('tap', 'node', function(evt){
+                            var node = this;
+                            //self.updateSBGNDetails(evt, node);
+                            (new SBGNDetailsView({
+                                model: node,
+                            })).updateSBGNDetails();
+                        });
+
+                    }
+
+                };
+                container.cy(cyOptions);
+            } // end of function(data)
+        ); // end of $.getJSON
+
+        return this;
+    } // end of render: function()
 
 }); // end of SbgnView = Backbone.View.extend({
 
