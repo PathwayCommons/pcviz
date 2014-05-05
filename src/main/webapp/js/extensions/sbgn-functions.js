@@ -271,10 +271,11 @@
 			context.moveTo(markerBeginX,markerBeginY);
 			context.lineTo(markerEndX,markerEndY);
 			context.arc(0, 0, 1, Math.PI/6, 5*Math.PI/6);
-			context.closePath();
-					
+
 			context.scale(2/width, 2/height);
 			context.translate(-centerX, -centerY);
+			context.closePath();
+
 			context.fill();
 
 		 	context.fillStyle = oldColor;
@@ -283,18 +284,49 @@
 
 	$$.sbgn.drawSourceAndSinkCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
-		$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
-		width, height, cloneMarker);
+		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
+			width, height, cloneMarker)
 	}
 
 	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker, isMultimer){
-		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
-			width, height, cloneMarker);
+		if(cloneMarker != null){
+	
+			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
-//		if(!isMultimer && cloneMarker != null){
-//		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
-//		}
+			var firstCircleCenterX = centerX - width/2 + cornerRadius;
+			var firstCircleCenterY = centerY;
+			var secondCircleCenterX = centerX + width/2 - cornerRadius;
+			var secondCircleCenterY = centerY;
+
+			$$.sbgn.drawUnspecifiedEntityCloneMarker(context, firstCircleCenterX, firstCircleCenterY, 
+				2 * cornerRadius, 2 * cornerRadius, cloneMarker);
+
+			$$.sbgn.drawUnspecifiedEntityCloneMarker(context, secondCircleCenterX, secondCircleCenterY, 
+				2 * cornerRadius, 2 * cornerRadius, cloneMarker);
+
+			var oldColor  = context.fillStyle;
+			context.fillStyle = "#0f0f0f";
+
+			var recPoints = $$.math.generateUnitNgonPointsFitToSquare(4, 0);
+			var cloneX = centerX;
+			var cloneY = centerY + 3/4 * cornerRadius;
+			var cloneWidth = width - 2 * cornerRadius;
+			var cloneHeight = cornerRadius/2;
+
+			renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
+
+			// context.beginPath();
+			// context.moveTo(firstCircleCenterX, firstCircleCenterY + cornerRadius/2);
+			// context.lineTo(firstCircleCenterX, firstCircleCenterY + cornerRadius);
+			// context.lineTo(secondCircleCenterX, secondCircleCenterY + cornerRadius);
+			// context.lineTo(secondCircleCenterX, secondCircleCenterY + cornerRadius/2);
+			// context.lineTo(firstCircleCenterX, firstCircleCenterY + cornerRadius/2);
+			// context.closePath();
+			// context.fill();
+
+			context.fillStyle = oldColor;
+		}
 	}
 
 	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
@@ -317,8 +349,6 @@
 			context.fill();
 
 		 	context.fillStyle = oldColor;
-
-//		 	$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
 		}
 	}
 
@@ -335,10 +365,6 @@
 			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
 			context.fill();
 		 	context.fillStyle = oldColor;
-		 	
-//		 	if(!isMultimer){
-//		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
-//		 	}
 		}
 	}
 
@@ -370,10 +396,6 @@
 			context.fill();
 
 		 	context.fillStyle = oldColor;
-
-//		 	if(!isMultimer){
-//		 		$$.sbgn.drawCloneMarkerText(context, "label", cloneX, cloneY);
-//		 	}
 		}
 	}
 

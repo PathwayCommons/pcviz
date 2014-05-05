@@ -22,15 +22,15 @@
 			var height = node.height();
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 			var padding = node._private.style["border-width"].pxValue;
+			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				$$.sbgn.drawCirclePath(context, centerX + multimerPadding, 
-					centerY + multimerPadding, width, height);
+				renderer.drawRoundRectanglePath(context, centerX + multimerPadding, 
+					centerY + multimerPadding, width, height, cornerRadius);
 			}
 
-			$$.sbgn.drawCirclePath(context, centerX, centerY, width, height);
-
+			renderer.drawRoundRectanglePath(context, centerX, centerY, width, height, cornerRadius);
 		},
 
 		drawPath: function(context, node) {
@@ -42,11 +42,13 @@
 			var label = node._private.data.sbgnlabel;
 			var padding = node._private.style["border-width"].pxValue;
 			var cloneMarker = node._private.data.sbgnclonemarker;
+			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				$$.sbgn.drawCircle(context, centerX + multimerPadding,
-				 centerY + multimerPadding, width, height);
+				renderer.drawRoundRectangle(context, centerX + multimerPadding, 
+					centerY + multimerPadding, width, height, cornerRadius);
+
 				context.stroke();
 
 				$$.sbgn.drawSimpleChemicalCloneMarker(context, 
@@ -56,7 +58,7 @@
 				context.stroke();
 			}
 
-			$$.sbgn.drawCircle(context, centerX, centerY, width, height);
+			renderer.drawRoundRectangle(context, centerX, centerY, width, height, cornerRadius);
 
 			context.stroke();
 			
@@ -82,8 +84,8 @@
 			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
 				node, x, y);
 
-			var nodeIntersectLines = nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
-				height, x, y, padding);
+			var nodeIntersectLines = nodeShapes["roundrectangle"].intersectLine(
+    			centerX, centerY, width, height, x, y, padding) ;
 
 			//check whether sbgn class includes multimer substring or not
 			var multimerIntersectionLines = new Array();
@@ -106,7 +108,7 @@
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			var nodeIntersectBox = nodeShapes["ellipse"].intersectBox(
+			var nodeIntersectBox = nodeShapes["roundrectangle"].intersectBox(
 				x1, y1, x2, y2, width, 
 				height, centerX, centerY, padding);
 
@@ -134,7 +136,7 @@
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			var nodeCheckPointRough = nodeShapes["ellipse"].checkPointRough(x, y, 
+			var nodeCheckPointRough = nodeShapes["roundrectangle"].checkPointRough(x, y, 
 				padding, width, height, centerX, centerY);
 
 			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
@@ -159,7 +161,7 @@
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			var nodeCheckPoint =  nodeShapes["ellipse"].checkPoint(x, y, 
+			var nodeCheckPoint =  nodeShapes["roundrectangle"].checkPoint(x, y, 
 				padding, width, height, 
 				centerX, centerY);
 
