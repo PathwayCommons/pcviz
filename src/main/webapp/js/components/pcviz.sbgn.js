@@ -562,7 +562,7 @@ var SBGNView = Backbone.View.extend({
 
         var childNodes = node.descendants("node[sbgnclass!='complex']");
 
-        container.append("<h4>Complex's Components</h4><hr>");
+        container.append("<h4>" + node.data("sbgnlabel") +"</h4><hr>");
 
         for(var i = 0 ; i < childNodes.length ; i++){
             container.append("<button type='button' class='btn btn-primary label controls-state-change-of' data-toggle='collapse' data-target='#" + 
