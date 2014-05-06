@@ -851,7 +851,7 @@
               <table class="table table-condensed">
                   <tr id="neighbors-of-selected">
                     <td>
-                        <span class="itx-type-on-off label controls-state-change-of">Highlight Neighbors of Selected</span>
+                        <span class="itx-type-on-off label controls-state-change-of" >Highlight Neighbors of Selected</span>
                     </td>
                   </tr>
 
@@ -905,16 +905,38 @@
               <table class="table table-condensed">
                   <tr id="apply-layout">
                       <td>
-                          <span class="itx-type-on-off label controls-state-change-of">Apply Layout</span>
+                          <span class="itx-type-on-off label controls-state-change-of" >Apply Layout</span>
                       </td>
                   </tr>
               </table>
+      </div>
+
+      <hr>
+
+      <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Filter by Source</h4>
+              <div id="source-table" >
+                  <!-- reserved for process sources -->
+              </div>
       </div>
   </script>
 
   <script type="text/template" id="sbgn-entity-details">
     <h4>{{name}}</h4><hr>
     Type : {{type}}
+  </script>
+
+  <script type="text/template" id="sbgn-source-template">
+      <tr id={{source}}>
+          <td>
+              <span class="process-source itx-type-on-off label controls-state-change-of" data-itx-type={{type}}>{{source}} <span class="fui-cross-16"></span></span>
+          </td>
+      </tr>
+  </script>
+
+  <script type="text/template" id="loading-source-template">
+      loading source information...<br>
+      <img src="images/loading.gif" alt="loading..." height="17" width="50">
   </script>
 
 
