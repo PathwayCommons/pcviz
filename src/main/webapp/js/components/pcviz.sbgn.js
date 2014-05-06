@@ -228,23 +228,28 @@ var SBGNSettingsView = Backbone.View.extend({
 	notHighlightEdge: {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
     processSourceMap: null,
     processSourceContent: "#source-table",
-
+    processTypes: ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"],
+    filterTypes: null,
     render: function(){
     	var self = this;
     	$(self.el).append(self.template);
         $(self.processSourceContent).append(_.template($("#loading-source-template").html()));
 
         $(".process-source").die("click").live("click", function(evt){
-            alert($(this).data("itx-type"));
+            var sourceName = ($(this).data("itx-type"));
             if(!$(this).hasClass("itx-removed")) {
                 $(this).find("span")
                     .removeClass("fui-cross-16")
                     .addClass("fui-plus-16");
+
+                self.hideProcessSource(sourceName);
             }
             else{
                 $(this).find("span")
                     .removeClass("fui-plus-16")
                     .addClass("fui-cross-16");
+
+                self.showProcessSource(sourceName);
             }
             $(this).toggleClass("itx-removed");
         });
@@ -279,25 +284,58 @@ var SBGNSettingsView = Backbone.View.extend({
         return safeProperty;
     },
 
+    hideProcessSource: function(sourceName){
+        var self = this;
+        var allNodes = cy.elements();
+
+        var nodesToHide = cy.filter(function(i, ele){
+            if(ele.isNode() && self.processTypes.indexOf(ele.data("sbgnclass")) != -1){
+                var sources = ele.data("datasource");
+                for(var i = 0 ; i < sources.length ; i++){
+                    if(self.safeProperty(sources[i]) == sourceName)
+                        return true;
+                }
+            }
+            return false;
+        });
+
+        nodesToHide = self.expandRemainingNodes(nodesToHide, allNodes);
+        
+        self.applyFilter(allNodes.not(nodesToHide), sourceName);
+
+    },
+
+    showProcessSource: function(filterType){
+        this.removeFilter(filterType);        
+    },
+
     initProcessSources: function(nodes){
         var sourceMap = new Object();
 
         for (var i = 0 ; i < nodes.length ; i++){
             if(nodes[i].data.sbgnclass == "process"){
                 for(var j = 0 ; j < nodes[i].data.datasource.length ; j++)
-                    sourceMap[nodes[i].data.datasource[j]] = true;
+                    sourceMap[this.safeProperty(nodes[i].data.datasource[j])] = true;
             }
         }
 
         this.processSourceMap = sourceMap;
         this.updateSourceTable();
+        this.initFilterTypes();
+    },
+
+    initFilterTypes: function(){
+        this.filterTypes = new Array();
+        this.filterTypes.push("manually-filtered");
+
+        for(var source in this.processSourceMap)
+            this.filterTypes.push(source);
     },
 
     updateSourceTable: function(){
         var self = this;
         var container = $(self.processSourceContent);
         container.empty();
-        //container.append(_.template($("#loading-biogene-template").html(), {}));
         container.append("<table class='table table-condensed'>");
 
         for(var source in self.processSourceMap){
@@ -337,7 +375,7 @@ var SBGNSettingsView = Backbone.View.extend({
 		var allNodes = cy.nodes();
     	var selectedNodes = cy.nodes(":selected");
     	var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
-    	this.applyFilter(allNodes.not(nodesToShow));
+    	this.applyFilter(allNodes.not(nodesToShow), "manually-filtered");
 
         cy.elements(":selected").unselect();
 	},
@@ -346,14 +384,13 @@ var SBGNSettingsView = Backbone.View.extend({
     	var allNodes = cy.nodes();
     	var selectedNodes = cy.nodes(":selected");
     	var nodesToShow = this.expandNodes(selectedNodes);
-    	this.applyFilter(allNodes.not(nodesToShow));
+    	this.applyFilter(allNodes.not(nodesToShow), "manually-filtered");
 
     	cy.elements(":selected").unselect();
 	},
 
 	showAll: function(){
-    	cy.elements("node[manually-filtered='true']").show();
-    	cy.elements().removeData('manually-filtered');		
+        this.removeFilter("manually-filtered");		
 	},
 
 	highlightNeighborsofSelected: function(){
@@ -415,11 +452,29 @@ var SBGNSettingsView = Backbone.View.extend({
 	    return nodesToShow;
 	},
 
-	applyFilter: function(nodesToFilterOut){
-	    nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
+	applyFilter: function(nodesToFilterOut, filterType){
+	    //nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
 	    nodesToFilterOut.hide();
-	    nodesToFilterOut.data("manually-filtered", 'true');
+	    nodesToFilterOut.data(filterType, true);
 	},
+
+    removeFilter: function(filterType){
+        var self = this;
+        cy.elements().removeData(filterType);
+
+        var nodesToRemoveFilter = cy.filter(function(i, ele){
+            for(var i = 0 ; i < self.filterTypes.length ; i++){
+                if(self.filterTypes[i] != filterType){
+                    if(ele.data(self.filterTypes[i]) == true)
+                        return false;
+                }
+            }
+            return true;
+        });
+
+        nodesToRemoveFilter.show();
+        nodesToRemoveFilter.removeData(filterType);
+    },
 
 });
 

@@ -915,6 +915,7 @@
 
       <div class="share mrl edge-types">
           <h4 class="demo-panel-title edge-types-title">Filter by Source</h4>
+
               <div id="source-table" >
                   <!-- reserved for process sources -->
               </div>
