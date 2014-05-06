@@ -170,8 +170,11 @@ public class SBGNConverter
             // Extract the BP objects that correspond to this node
             HashSet<BioPAXElement> bpes = new HashSet<BioPAXElement>();
             Set<String> bpIds = sbgn2BPMap.get(node.getId());
-            for (String bpId : bpIds) {
-                bpes.add(model.getByID(bpId));
+
+            if(bpIds != null){
+                for (String bpId : bpIds) {
+                    bpes.add(model.getByID(bpId));
+                }
             }
 
             addGlyph(parent, bpes, node, states, graph, genes);
