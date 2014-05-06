@@ -226,10 +226,29 @@ var SBGNSettingsView = Backbone.View.extend({
 	template:  _.template($('#sbgn-settings-template'). html()),
 	notHighlightNode: {'border-opacity': 0.3, 'text-opacity' : 0.3},
 	notHighlightEdge: {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+    processSourceMap: null,
+    processSourceContent: "#source-table",
 
     render: function(){
     	var self = this;
     	$(self.el).append(self.template);
+        $(self.processSourceContent).append(_.template($("#loading-source-template").html()));
+
+        $(".process-source").die("click").live("click", function(evt){
+            alert($(this).data("itx-type"));
+            if(!$(this).hasClass("itx-removed")) {
+                $(this).find("span")
+                    .removeClass("fui-cross-16")
+                    .addClass("fui-plus-16");
+            }
+            else{
+                $(this).find("span")
+                    .removeClass("fui-plus-16")
+                    .addClass("fui-cross-16");
+            }
+            $(this).toggleClass("itx-removed");
+        });
+
         return this;
     },
 
@@ -243,6 +262,50 @@ var SBGNSettingsView = Backbone.View.extend({
     	'click #apply-layout': 'applyLayout',
     	'click #sbgnRightMenu a': 'showTab',
 	},
+
+    safeProperty: function(str){
+        var safeProperty = str.toUpperCase();
+
+        safeProperty = safeProperty.replace(/ /gi,'-');
+        safeProperty = safeProperty.replace(/\//gi,'-');
+        safeProperty = safeProperty.replace(/\\/gi,'-');
+        safeProperty = safeProperty.replace(/#/gi,'-');
+        safeProperty = safeProperty.replace(/\./gi,'-');
+        safeProperty = safeProperty.replace(/:/gi,'-');
+        safeProperty = safeProperty.replace(/;/gi,'-');
+        safeProperty = safeProperty.replace(/"/gi,'-');
+        safeProperty = safeProperty.replace(/'/gi,'-');
+
+        return safeProperty;
+    },
+
+    initProcessSources: function(nodes){
+        var sourceMap = new Object();
+
+        for (var i = 0 ; i < nodes.length ; i++){
+            if(nodes[i].data.sbgnclass == "process"){
+                for(var j = 0 ; j < nodes[i].data.datasource.length ; j++)
+                    sourceMap[nodes[i].data.datasource[j]] = true;
+            }
+        }
+
+        this.processSourceMap = sourceMap;
+        this.updateSourceTable();
+    },
+
+    updateSourceTable: function(){
+        var self = this;
+        var container = $(self.processSourceContent);
+        container.empty();
+        //container.append(_.template($("#loading-biogene-template").html(), {}));
+        container.append("<table class='table table-condensed'>");
+
+        for(var source in self.processSourceMap){
+            container.append(_.template($("#sbgn-source-template").html(), {'source':source, 'type':self.safeProperty(source)}));
+        }
+        container.append("</table>");
+
+    },
 
 	applyLayout: function(){
 		var options = {
@@ -556,8 +619,8 @@ var SBGNView = Backbone.View.extend({
     sbgnTooSlowMessage: "#sbgn-too-slow-message",
 
     render: function() {
-
-        (new SBGNSettingsView()).render();
+        var settingsView = new SBGNSettingsView();
+        settingsView.render();
         (new SBGNDetailsView()).render();
         var self = this;
 
@@ -590,7 +653,9 @@ var SBGNView = Backbone.View.extend({
                     var xPos = data.nodes[i].data.sbgnbbox.x;
                     var yPos = data.nodes[i].data.sbgnbbox.y;
                     positionMap[data.nodes[i].data.id] = {'x':xPos, 'y':yPos};
-                }                  
+                }
+
+                settingsView.initProcessSources(data.nodes);
 
                 var cyOptions = {
                     elements: data,
