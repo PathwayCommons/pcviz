@@ -846,35 +846,18 @@
 
   <script type="text/template" id="sbgn-settings-template">
       <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Highlighting</h4>
+          <h4 class="demo-panel-title edge-types-title">Process Sources</h4>
 
-              <table class="table table-condensed">
-                  <tr id="neighbors-of-selected">
-                    <td>
-                        <span class="itx-type-on-off label controls-state-change-of" >Highlight Neighbors of Selected</span>
-                    </td>
-                  </tr>
-
-                  <tr id="processes-of-selected">
-                      <td>
-                           <span class="itx-type-on-off label controls-state-change-of">Highlight Processes of Selected</span>
-                      </td>
-                  </tr>
-
-                  <tr id="remove-highlights">
-                      <td>
-                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
-                      </td>
-                  </tr>
-
-              </table>
+              <div id="source-table" >
+                  <!-- reserved for process sources -->
+              </div>
       </div>
 
       <hr>
 
       <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Filtering</h4>
-
+          <h4 class="demo-panel-title edge-types-title">Filter</h4>
+          	<div id="sdsd">
               <table class="table table-condensed">
                   <tr id="filter-selected">
                       <td>
@@ -895,6 +878,34 @@
                   </tr>
 
               </table>
+            </div>
+      </div>
+
+      <hr>
+
+      <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Highlight</h4>
+
+              <table class="table table-condensed">
+                  <tr id="neighbors-of-selected">
+                    <td>
+                        <span class="itx-type-on-off label controls-state-change-of" >Neighbors of Selected</span>
+                    </td>
+                  </tr>
+
+                  <tr id="processes-of-selected">
+                      <td>
+                           <span class="itx-type-on-off label controls-state-change-of">Processes of Selected</span>
+                      </td>
+                  </tr>
+
+                  <tr id="remove-highlights">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
+                      </td>
+                  </tr>
+
+              </table>
       </div>
 
       <hr>
@@ -905,21 +916,12 @@
               <table class="table table-condensed">
                   <tr id="apply-layout">
                       <td>
-                          <span class="itx-type-on-off label controls-state-change-of" >Apply Layout</span>
+                          <span class="itx-type-on-off label controls-state-change-of" >Recalculate</span>
                       </td>
                   </tr>
               </table>
       </div>
 
-      <hr>
-
-      <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Filter by Source</h4>
-
-              <div id="source-table" >
-                  <!-- reserved for process sources -->
-              </div>
-      </div>
   </script>
 
   <script type="text/template" id="sbgn-entity-details">
@@ -930,7 +932,7 @@
   <script type="text/template" id="sbgn-source-template">
       <tr id={{source}}>
           <td>
-              <span class="process-source itx-type-on-off label controls-state-change-of" data-itx-type={{type}}>{{source}} <span class="fui-cross-16"></span></span>
+              <span class="process-source itx-type-on-off label controls-state-change-of">{{source}} <span class="fui-cross-16"></span></span>
           </td>
       </tr>
   </script>
