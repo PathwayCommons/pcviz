@@ -221,6 +221,51 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "height": 15
          }); // end of sbgnStyleSheet
 
+var SBGNLayoutView = Backbone.View.extend({
+    defaultLayoutProperties: {name: 'cose', nodeRepulsion:10000, nodeOverlap:10, idealEdgeLength:10, edgeElasticity:100,
+        nestingFactor:5, gravity:250, numIter:100},
+    currentLayoutProperties: null,
+    el: '#sbgn-layout-table',
+
+    initialize: function() {
+        var self = this;
+        self.copyProperties();
+        self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+    },
+
+    copyProperties: function(){
+        this.currentLayoutProperties = _.clone(this.defaultLayoutProperties);
+    },
+
+    render: function(){
+        var self = this;
+        self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+        $(self.el).html(self.template);
+
+        $(self.el).dialog();        
+
+        $("#save-layout").die("click").live("click", function(evt){
+            self.currentLayoutProperties.nodeRepulsion = document.getElementById("node-repulsion").value;
+            self.currentLayoutProperties.nodeOverlap = document.getElementById("node-overlap").value;
+            self.currentLayoutProperties.idealEdgeLength = document.getElementById("ideal-edge-length").value;
+            self.currentLayoutProperties.edgeElasticity = document.getElementById("edge-elasticity").value;
+            self.currentLayoutProperties.nestingFactor = document.getElementById("nesting-factor").value;
+            self.currentLayoutProperties.gravity = document.getElementById("gravity").value;
+            self.currentLayoutProperties.numIter = document.getElementById("num-iter").value;
+
+            $(self.el).dialog('close');
+        });
+
+        $("#default-layout").die("click").live("click", function(evt){
+            self.copyProperties();
+            self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+            $(self.el).html(self.template);
+        });
+
+        return this;
+    },
+});
+
 var SBGNSettingsView = Backbone.View.extend({
 	el: '#sbgn-settings',
 	template:  _.template($('#sbgn-settings-template'). html()),
@@ -230,10 +275,13 @@ var SBGNSettingsView = Backbone.View.extend({
     processSourceContent: "#source-table",
     processTypes: ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"],
     filterTypes: null,
+    layoutSettingsView: null,
+
     render: function(){
     	var self = this;
     	$(self.el).append(self.template);
         $(self.processSourceContent).append(_.template($("#loading-source-template").html()));
+        self.layoutSettingsView = (new SBGNLayoutView());
 
         $(".process-source").die("click").live("click", function(evt){
             var sourceName = ($(this).data("itx-type"));
@@ -265,8 +313,13 @@ var SBGNSettingsView = Backbone.View.extend({
     	'click #filter-unselected': 'showSelected',
     	'click #show-all': 'showAll',
     	'click #apply-layout': 'applyLayout',
+        'click #layout-settings': 'changeLayoutSettings',
     	'click #sbgnRightMenu a': 'showTab',
 	},
+
+    changeLayoutSettings: function(){
+        this.layoutSettingsView.render();
+    },
 
     safeProperty: function(str){
         var safeProperty = str.toUpperCase();
@@ -346,24 +399,7 @@ var SBGNSettingsView = Backbone.View.extend({
     },
 
 	applyLayout: function(){
-		var options = {
-    		name: 'cose',
-			refresh: 0,
-		    fit : true, 
-		    padding : 10, 
-		    randomize : true,
-			nodeRepulsion : 100,
-		    nodeOverlap : 10,
-		    idealEdgeLength : 10,
-		    edgeElasticity : 10,
-		    nestingFactor : 5, 
-		    gravity : -50, 
-		    numIter : 100,
-		    initialTemp : 200,
-		    coolingFactor : 0.95, 
-		    minTemp : 1
-		};
-
+        var options = this.layoutSettingsView.currentLayoutProperties;
 		cy.layout( options );
 	},
 
