@@ -399,3 +399,6 @@ h4.pcviz-embed-logo small {
      margin:10px !important;
 }
 
+.ui-dialog {
+    z-index : 9020 !important;
+}

@@ -846,18 +846,35 @@
 
   <script type="text/template" id="sbgn-settings-template">
       <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Process Sources</h4>
+          <h4 class="demo-panel-title edge-types-title">Highlighting</h4>
 
-              <div id="source-table" >
-                  <!-- reserved for process sources -->
-              </div>
+              <table class="table table-condensed">
+                  <tr id="neighbors-of-selected">
+                    <td>
+                        <span class="itx-type-on-off label controls-state-change-of" >Highlight Neighbors of Selected</span>
+                    </td>
+                  </tr>
+
+                  <tr id="processes-of-selected">
+                      <td>
+                           <span class="itx-type-on-off label controls-state-change-of">Highlight Processes of Selected</span>
+                      </td>
+                  </tr>
+
+                  <tr id="remove-highlights">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
+                      </td>
+                  </tr>
+
+              </table>
       </div>
 
       <hr>
 
       <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Filter</h4>
-          	<div id="sdsd">
+          <h4 class="demo-panel-title edge-types-title">Filtering</h4>
+
               <table class="table table-condensed">
                   <tr id="filter-selected">
                       <td>
@@ -878,50 +895,35 @@
                   </tr>
 
               </table>
-            </div>
-      </div>
-
-      <hr>
-
-      <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Highlight</h4>
-
-              <table class="table table-condensed">
-                  <tr id="neighbors-of-selected">
-                    <td>
-                        <span class="itx-type-on-off label controls-state-change-of" >Neighbors of Selected</span>
-                    </td>
-                  </tr>
-
-                  <tr id="processes-of-selected">
-                      <td>
-                           <span class="itx-type-on-off label controls-state-change-of">Processes of Selected</span>
-                      </td>
-                  </tr>
-
-                  <tr id="remove-highlights">
-                      <td>
-                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
-                      </td>
-                  </tr>
-
-              </table>
       </div>
 
       <hr>
 
       <div class="share mrl edge-types">
           <h4 class="demo-panel-title edge-types-title">Layout</h4>
-
               <table class="table table-condensed">
                   <tr id="apply-layout">
                       <td>
-                          <span class="itx-type-on-off label controls-state-change-of" >Recalculate</span>
+                          <span class="itx-type-on-off label controls-state-change-of" >Apply Layout</span>
+                      </td>
+                  </tr>
+                  <tr id="layout-settings">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of" >Layout Settings</span>
                       </td>
                   </tr>
               </table>
       </div>
 
+      <hr>
+
+      <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Filter by Source</h4>
+
+              <div id="source-table" >
+                  <!-- reserved for process sources -->
+              </div>
+      </div>
   </script>
 
   <script type="text/template" id="sbgn-entity-details">
@@ -932,7 +934,7 @@
   <script type="text/template" id="sbgn-source-template">
       <tr id={{source}}>
           <td>
-              <span class="process-source itx-type-on-off label controls-state-change-of">{{source}} <span class="fui-cross-16"></span></span>
+              <span class="process-source itx-type-on-off label controls-state-change-of" data-itx-type={{type}}>{{source}} <span class="fui-cross-16"></span></span>
           </td>
       </tr>
   </script>
@@ -942,16 +944,95 @@
       <img src="images/loading.gif" alt="loading..." height="17" width="50">
   </script>
 
+  <script type="text/template" id="layout-settings-template">
+        <table class="table">
+            <tr>
+              <td>
+                  <span class="add-on"> Node Repulsion </span>
+              </td>
+              <td>
+                  <input id="node-repulsion" type="text" class="input-small" value={{nodeRepulsion}} >
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                  <span class="add-on"> Node Overlap </span>
+              </td>
+              <td>
+                  <input id="node-overlap" type="text" class="input-small" value={{nodeOverlap}} >
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                  <span class="add-on"> Ideal Edge Length </span>
+              </td>
+              <td>
+                  <input id="ideal-edge-length" type="text" class="input-small" value={{idealEdgeLength}} >
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                  <span class="add-on"> Edge Elasticity </span>
+              </td>
+              <td>
+                  <input id="edge-elasticity" type="text" class="input-small" value={{edgeElasticity}} >
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                  <span class="add-on"> Nesting Factor </span>
+              </td>
+              <td>
+                  <input id="nesting-factor" type="text" class="input-small" value={{nestingFactor}} >
+              </td>
+            </tr>
+
+              <tr>
+              <td>
+                  <span class="add-on"> Gravity </span>
+              </td>
+              <td>
+                  <input id="gravity" type="text" class="input-small" value={{gravity}} >
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                  <span class="add-on"> Number of Iterations </span>
+              </td>
+              <td>
+                  <input id="num-iter" type="text" class="input-small" value={{numIter}}>
+              </td>
+            </tr>
+
+            <tr id="layout-buttons">
+              <td>
+                  <button id="save-layout" >Save</button>
+              </td>
+              <td>
+                  <button id="default-layout">Default</button>
+              </td>
+            </tr>
+        </table>
+  </script>
+
+  <div id="sbgn-layout-table" title="Layout Properties">
+    <!-- sbgn layout table will be shown here -->
+  </div>
 
   <!-- JS libraries -->
   <script src="js/jquery-1.8.2.min.js"></script>
-  <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
   <script src="js/jquery.dropkick-1.0.0.js"></script>
   <script src="js/custom_checkbox_and_radio.js"></script>
   <script src="js/custom_radio.js"></script>
   <script src="js/jquery.tagsinput.js"></script>
   <script src="js/jquery.ui.touch-punch.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
   <script src="js/jquery.placeholder.js"></script>
   <script src="js/arbor.js"></script>
   <script src="js/cytoscape.min.js"></script>
