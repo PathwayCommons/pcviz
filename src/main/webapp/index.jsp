@@ -832,16 +832,13 @@
   </div>
   </script>
 
-  <script type="text/template" id="sbgn-details-template">
+  <script type="text/template" id="sbgn-help-template">
       <div id="sbgn-graph-details-info" >
           <p class="help-text palette palette-silver">
               Click on one of the genes in the network to see more details...
           </p>
           <img src="images/help-left-arrow.png" width="75">
       </div>
-      <div id="sbgn-graph-details-content">
-          <!-- reserved for backbone view -->
-     </div>
   </script>
 
   <script type="text/template" id="sbgn-settings-template">
@@ -926,9 +923,18 @@
       </div>
   </script>
 
-  <script type="text/template" id="sbgn-entity-details">
-    <h4>{{name}}</h4><hr>
-    Type : {{type}}
+  <script type="text/template" id="sbgn-simple-details">
+    <h3>{{sbgnlabel}}</h3><hr>
+    <table class="table table-condensed table-striped">
+        <tr>
+            <th>Type</th>
+            <td>{{sbgnclass}}</td>
+        </tr>
+        <tr>
+            <th>Process Source</th>
+            <td>{{datasource}}</td>
+        </tr>
+    </table>
   </script>
 
   <script type="text/template" id="sbgn-source-template">
@@ -1018,6 +1024,53 @@
               </td>
             </tr>
         </table>
+  </script>
+
+  <script type="text/template" id="sbgn-process-details-template">
+        <div class='node-details-info'>
+          <h3>{{sbgnclass}}</h3>
+
+          <table class="table table-condensed table-striped">
+              <tr>
+                  <th>Display Name</th>
+                  <td>{{sbgndisplayname}}</td>
+              </tr>
+
+              <tr>
+                  <th>Data Source</th>
+                  <td>{{datasource}}</td>
+              </tr>
+
+              <tr>
+                  <th>Comments</th>
+                  <td>
+                      <ul class="comment-list">
+                      </ul>
+                  </td>
+              </tr>
+
+              <tr>
+                  <th>Publications</th>
+                  <td>
+                      <ul class="publication-list">
+                      </ul>
+                  </td>
+              </tr>
+
+          </table>
+        </div>
+  </script>
+
+  <script type="text/template" id="sbgn-comment-template">
+    <li>
+        {{comment}}
+    </li>
+  </script>
+
+  <script type="text/template" id="sbgn-xref-template">
+    <li>
+        {{dbname}} : {{dbid}}
+    </li>
   </script>
 
   <div id="sbgn-layout-table" title="Layout Properties">

@@ -514,63 +514,16 @@ var SBGNSettingsView = Backbone.View.extend({
 
 });
 
-var SBGNDetailsView = Backbone.View.extend({
-    el: '#sbgn-details',
-    template:  _.template($('#sbgn-details-template'). html()),
-    detailsContent: '#sbgn-graph-details-content',
-    detailsInfo: '#sbgn-graph-details-info',
-
+var SBGNEpnDetailsView = Backbone.View.extend({
     render: function(){
-        var self = this;
-        $(self.el).append(self.template);
-        return this;
-    },
-
-    putDetailsHelp: function(){
-        var container = $(this.detailsContent);
-        var info = $(this.detailsInfo);
-
-        container.hide();
-        info.show();
-    },
-
-    updateSBGNDetails: function()
-    {
-        var processTypes = ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"];
-        var biogeneTypes = ["unspecified entity", "macromolecule", "nucleic acid feature", "simple chemical", "perturbing agent"];
-        var node = this.model;
-        var type = node.data("sbgnclass");
-        var name = node.data("sbgnlabel");
-
-        if(type == "complex"){
-            this.updateComplexDetails(node);
-        }
-        else if(biogeneTypes.indexOf(type) != -1){
-            this.updateNodeDetails(node);
-        }
-        else if(processTypes.indexOf(type) != -1){
-            this.updateEntityDetails("Process", type);
-        }
-        else if(type == "compartment"){
-            this.updateEntityDetails(name, type);
-        }
-        else if(type == "source and sink"){
-            this.updateEntityDetails("--", type);
-        }
-        else{
-            this.updateEntityDetails(name, type);
-        }    
+        this.$el.empty();
+        this.updateNodeDetails(this.model);
     },
 
     updateNodeDetails: function(node) 
     {
         var self = this;
-        var container = $(self.detailsContent);
-        var info = $(self.detailsInfo);
-
-        // remove previous content
-        info.hide();
-        container.empty();
+        var container = $(self.el);
         container.append(_.template($("#loading-biogene-template").html(), {}));
         container.show();
 
@@ -598,7 +551,7 @@ var SBGNDetailsView = Backbone.View.extend({
                     geneInfo["altered"] = parseInt(node.data("altered") * 100);
 
                     var biogeneView = new BioGeneView({
-                    el: self.detailsContent,
+                    el: container,
                     model: geneInfo
                     });
                     biogeneView.render();
@@ -612,28 +565,18 @@ var SBGNDetailsView = Backbone.View.extend({
             }
         }); // end of JSON query result
     },
+});
 
-    updateEntityDetails : function(name, type)
-    {
-        var self = this;
-        var container = $(self.detailsContent);
-        var info = $(self.detailsInfo);
-
-        info.hide();
-        container.empty();
-        container.append(_.template($("#sbgn-entity-details").html(), {'name' : name, 'type' : type}));
-        container.show();
+var SBGNComplexDetailsView = Backbone.View.extend({
+    render: function(){
+        this.$el.empty();
+        this.updateComplexDetails(this.model);
     },
 
     updateComplexDetails: function(node) 
     {
         var self = this;
-        var container = $(self.detailsContent);
-        var info = $(self.detailsInfo);
-
-        // remove previous content
-        info.hide();
-        container.empty();
+        var container = $(self.el);
 
         function handleEachBiogeneInfo(node){
             var divId = '#' + node.data("sbgnlabel");
@@ -701,18 +644,85 @@ var SBGNDetailsView = Backbone.View.extend({
 
         });
     }
+});
 
+var SBGNProcessDetailsView = Backbone.View.extend({
+    template:  _.template($('#sbgn-process-details-template'). html()),
+    render: function(){
+        var model = this.model;
+        this.$el.empty();
+        this.$el.append(this.template(model));
+
+        var commentCont = this.$el.find("ul.comment-list");
+
+        _.each(model.sbgncomment, function(comment) {
+            (new SBGNCommentView({
+                el: commentCont,
+                model: { comment : comment }
+            })).render();
+        });
+
+        var xrefCont = this.$el.find("ul.publication-list");
+
+        _.each(model.sbgnxref, function(xref) {
+            (new SBGNXrefView({
+                el: xrefCont,
+                model: { dbname : xref[0], dbid : xref[1] }
+            })).render();
+        });
+
+        return this;
+    }
+});
+
+var SBGNSimpleDetailsView = Backbone.View.extend({
+    template:  _.template($('#sbgn-simple-details'). html()),
+
+    render: function(){
+        this.$el.empty();
+        this.$el.append(this.template(this.model));
+    },
+});
+
+var SBGNCommentView = Backbone.View.extend({
+    template: _.template($("#sbgn-comment-template").html()),
+
+    render: function() {
+        this.$el.append(this.template(this.model));
+    }
+});
+
+var SBGNXrefView = Backbone.View.extend({
+    template: _.template($("#sbgn-xref-template").html()),
+
+    render: function() {
+        this.$el.append(this.template(this.model));
+    }
+});
+
+var SBGNHelpView = Backbone.View.extend({
+    template:  _.template($('#sbgn-help-template').html()),
+
+    render: function(){
+        this.$el.empty();
+        this.$el.append(this.template());
+    }
 });
 
 var SBGNView = Backbone.View.extend({
     cyStyle: sbgnStyleSheet,
     sbgnNetworkLoading: "#sbgn-network-loading",
     sbgnTooSlowMessage: "#sbgn-too-slow-message",
+    processTypes : ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"],
+    epnTypes : ["unspecified entity", "macromolecule", "nucleic acid feature", "simple chemical", "perturbing agent"],
 
     render: function() {
         var settingsView = new SBGNSettingsView();
         settingsView.render();
-        (new SBGNDetailsView()).render();
+        (new SBGNHelpView({
+            el : "#sbgn-details",
+        })).render();        
+
         var self = this;
 
         var source = this.model.source;
@@ -767,18 +777,39 @@ var SBGNView = Backbone.View.extend({
 
                         cy.on('tap', function(evt){
                             if(!evt.cyTarget.data() || evt.cyTarget.edges()){
-                                //self.putDetailsHelp();
-                                (new SBGNDetailsView({
-                                    })).putDetailsHelp();
+                                (new SBGNHelpView({
+                                    el : "#sbgn-details",
+                                })).render();
                             }
                         });
 
                         cy.on('tap', 'node', function(evt){
                             var node = this;
-                            //self.updateSBGNDetails(evt, node);
-                            (new SBGNDetailsView({
-                                model: node,
-                            })).updateSBGNDetails();
+
+                            if(self.processTypes.indexOf(node.data("sbgnclass")) > -1){
+                                (new SBGNProcessDetailsView({
+                                    model : node.data(),
+                                    el : "#sbgn-details"
+                                })).render();
+                            }
+                            else if(self.epnTypes.indexOf(node.data("sbgnclass")) > -1){
+                                (new SBGNEpnDetailsView({
+                                    model : node,
+                                    el : "#sbgn-details"
+                                })).render();
+                            }
+                            else if(node.data("sbgnclass") == "complex"){
+                                (new SBGNComplexDetailsView({
+                                    model : node,
+                                    el : "#sbgn-details"
+                                })).render();
+                            }
+                            else{
+                                (new SBGNSimpleDetailsView({
+                                    model : node.data(),
+                                    el : "#sbgn-details"
+                                })).render();
+                            }
                         });
 
                     }
