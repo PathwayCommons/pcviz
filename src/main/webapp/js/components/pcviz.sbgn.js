@@ -656,7 +656,7 @@ var SBGNProcessDetailsView = Backbone.View.extend({
         var commentCont = this.$el.find("ul.comment-list");
 
         _.each(model.sbgncomment, function(comment) {
-            (new SBGNCommentView({
+            (new SBGNListView({
                 el: commentCont,
                 model: { comment : comment }
             })).render();
@@ -671,7 +671,48 @@ var SBGNProcessDetailsView = Backbone.View.extend({
             })).render();
         });
 
+        var evidenceTermCont = this.$el.find("ul.evidence-term-list");
+
+        _.each(model.sbgnevidencecode, function(evidence) {
+            (new SBGNListView({
+                el: evidenceTermCont,
+                model: { comment : evidence }
+            })).render();
+        });
+
+        var evidenceXrefCont = this.$el.find("ul.evidence-xref-list");
+
+        _.each(model.sbgnevidencexref, function(xref) {
+            (new SBGNXrefView({
+                el: evidenceXrefCont,
+                model: { dbname : xref[0], dbid : xref[1] }
+            })).render();
+        });
+
+        this.format();
+
         return this;
+    },
+
+    format: function() {
+        if(this.model.sbgndisplayname == undefined)
+            this.$el.find(".sbgn-display-name").hide();
+        
+        if(this.model.datasource == undefined)
+            this.$el.find(".sbgn-data-source").hide();
+
+        if(this.model.sbgncomment.length <= 0)
+            this.$el.find(".sbgn-comment-list").hide();
+
+        if(this.model.sbgnxref.length <= 0)
+            this.$el.find(".sbgn-xref-list").hide();
+
+        if(this.model.sbgnevidencecode.length <= 0)
+            this.$el.find(".sbgn-evidence-term-list").hide();
+
+        if(this.model.sbgnevidencexref.length <= 0)
+            this.$el.find(".sbgn-evidence-xref-list").hide();
+
     }
 });
 
@@ -684,8 +725,8 @@ var SBGNSimpleDetailsView = Backbone.View.extend({
     },
 });
 
-var SBGNCommentView = Backbone.View.extend({
-    template: _.template($("#sbgn-comment-template").html()),
+var SBGNListView = Backbone.View.extend({
+    template: _.template($("#sbgn-list-template").html()),
 
     render: function() {
         this.$el.append(this.template(this.model));
@@ -699,6 +740,7 @@ var SBGNXrefView = Backbone.View.extend({
         this.$el.append(this.template(this.model));
     }
 });
+
 
 var SBGNHelpView = Backbone.View.extend({
     template:  _.template($('#sbgn-help-template').html()),

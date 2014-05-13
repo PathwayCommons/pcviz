@@ -1031,17 +1031,17 @@
           <h3>{{sbgnclass}}</h3>
 
           <table class="table table-condensed table-striped">
-              <tr>
+              <tr class="sbgn-display-name">
                   <th>Display Name</th>
                   <td>{{sbgndisplayname}}</td>
               </tr>
 
-              <tr>
+              <tr class="sbgn-data-source">
                   <th>Data Source</th>
                   <td>{{datasource}}</td>
               </tr>
 
-              <tr>
+              <tr class="sbgn-comment-list">
                   <th>Comments</th>
                   <td>
                       <ul class="comment-list">
@@ -1049,7 +1049,23 @@
                   </td>
               </tr>
 
-              <tr>
+              <tr class="sbgn-evidence-term-list">
+                  <th>Evidence Term</th>
+                  <td>
+                      <ul class="evidence-term-list">
+                      </ul>
+                  </td>
+              </tr>
+
+              <tr class="sbgn-evidence-xref-list">
+                  <th>Evidence Xref</th>
+                  <td>
+                      <ul class="evidence-xref-list">
+                      </ul>
+                  </td>
+              </tr>
+
+              <tr class="sbgn-xref-list">
                   <th>Publications</th>
                   <td>
                       <ul class="publication-list">
@@ -1061,7 +1077,7 @@
         </div>
   </script>
 
-  <script type="text/template" id="sbgn-comment-template">
+  <script type="text/template" id="sbgn-list-template">
     <li>
         {{comment}}
     </li>
