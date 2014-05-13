@@ -24,8 +24,8 @@ import org.biopax.paxtools.io.sbgn.L3ToSBGNPDConverter;
 import org.biopax.paxtools.io.sbgn.ListUbiqueDetector;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
-import org.biopax.paxtools.model.level3.Entity;
-import org.biopax.paxtools.model.level3.Provenance;
+import org.biopax.paxtools.model.level2.xref;
+import org.biopax.paxtools.model.level3.*;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
@@ -120,13 +120,53 @@ public class SBGNConverter
      */
     private void extractDataSource(CytoscapeJsNode jsNode, HashSet<BioPAXElement> bpElements) {
         HashSet<String> dataSources = new HashSet<String>();
+        String displayName = null;
+        HashSet<String> commentSet = new HashSet<String>();
+        HashSet<String[]> xrefs = new HashSet<String[]>();
+        HashSet<String[]> evidenceXrefs = new HashSet<String[]>();
+        HashSet<String> evidenceTerms = new HashSet<String>();
 
         for (BioPAXElement bpElement : bpElements) {
             if(bpElement instanceof Entity) {
                 Entity entity = (Entity) bpElement;
+
                 for (Provenance provenance : entity.getDataSource()) {
                     dataSources.add(provenance.getStandardName());
                 }
+
+                displayName = entity.getDisplayName();
+
+                for (String s : entity.getComment()) {
+                    commentSet.add(s);
+                }
+
+                for (Xref xr : entity.getXref()) {
+                    if(xr.getId() != null || xr.getDb() != null){
+                        String[] xrefArray = {xr.getId(), xr.getDb()};
+                        xrefs.add(xrefArray);
+                    }
+                }
+
+                for(Evidence ev : entity.getEvidence()) {
+
+                    //get evidence Xref
+                    for(Xref xr : ev.getXref()) {
+                        if(xr.getId() != null || xr.getDb() != null){
+                            String[] xrefArray = {xr.getId(), xr.getDb()};
+                            evidenceXrefs.add(xrefArray);
+                        }
+                    }
+
+                    //get evidence terms
+                    for(EvidenceCodeVocabulary ecv : ev.getEvidenceCode()) {
+                        for(String term : ecv.getTerm()) {
+                            evidenceTerms.add(term);
+                        }
+                    }
+
+
+                }
+
             }
         }
 
@@ -135,12 +175,17 @@ public class SBGNConverter
         } else {
             jsNode.setProperty(PropertyKey.DATASOURCE, dataSources);
         }
+
+        jsNode.setProperty(PropertyKey.SBGNDISPLAYNAME, displayName);
+        jsNode.setProperty(PropertyKey.SBGNCOMMENT, commentSet);
+        jsNode.setProperty(PropertyKey.SBGNXREF, xrefs);
+        jsNode.setProperty(PropertyKey.SBGNEVIDENCECODE, evidenceTerms);
+        jsNode.setProperty(PropertyKey.SBGNEVIDENCEXREF, evidenceXrefs);
     }
 
     private void traverseAndAddGlyphs(Glyph parent, List<Glyph> nodes,
                                       CytoscapeJsGraph graph, Map<String, Glyph> portGlyphMap,
-                                      Collection<String> genes, Model model, Map<String, Set<String>> sbgn2BPMap)
-    {
+                                      Collection<String> genes, Model model, Map<String, Set<String>> sbgn2BPMap) {
         for (Glyph node : nodes) {
             List<Glyph> glyphs = node.getGlyph();
 
@@ -186,7 +231,8 @@ public class SBGNConverter
         }
     }
 
-    private void traverseAndAddEdges(List<Arc> edges, CytoscapeJsGraph graph, Map<String, Glyph> portGlyphMap)
+    private void traverseAndAddEdges(List<Arc> edges, CytoscapeJsGraph graph,
+                                     Map<String, Glyph> portGlyphMap,Model model)
     {
         for (Arc arc : edges)
         {
@@ -233,6 +279,7 @@ public class SBGNConverter
                 = new L3ToSBGNPDConverter(new ListUbiqueDetector(blacklist), null, true);
 
         Sbgn sbgn = sbgnConverter.createSBGN(model);
+
         // For each SBGN object there might be multiple BioPAX Elements associated with it
         // This map contains this information
         Map<String, Set<String>> sbgn2BPMap = sbgnConverter.getSbgn2BPMap();
@@ -243,7 +290,7 @@ public class SBGNConverter
         Map<String, Glyph> portGlyphMap = new HashMap<String, Glyph>();
 
         traverseAndAddGlyphs(null, nodes, graph, portGlyphMap, genes, model, sbgn2BPMap);
-        traverseAndAddEdges(edges, graph, portGlyphMap);
+        traverseAndAddEdges(edges, graph, portGlyphMap, model);
 
         return graph;
     }
