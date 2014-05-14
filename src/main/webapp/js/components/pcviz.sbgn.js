@@ -267,10 +267,10 @@ var SBGNLayoutView = Backbone.View.extend({
 });
 
 var SBGNSettingsView = Backbone.View.extend({
-	el: '#sbgn-settings',
-	template:  _.template($('#sbgn-settings-template'). html()),
-	notHighlightNode: {'border-opacity': 0.3, 'text-opacity' : 0.3},
-	notHighlightEdge: {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+    el: '#sbgn-settings',
+    template:  _.template($('#sbgn-settings-template'). html()),
+    notHighlightNode: {'border-opacity': 0.3, 'text-opacity' : 0.3},
+    notHighlightEdge: {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
     processSourceMap: null,
     processSourceContent: "#source-table",
     processTypes: ["process", "omitted process", "uncertain process", "association", "dissociation", "phenotype"],
@@ -278,8 +278,8 @@ var SBGNSettingsView = Backbone.View.extend({
     layoutSettingsView: null,
 
     render: function(){
-    	var self = this;
-    	$(self.el).append(self.template);
+        var self = this;
+        $(self.el).append(self.template);
         $(self.processSourceContent).append(_.template($("#loading-source-template").html()));
         self.layoutSettingsView = (new SBGNLayoutView());
 
@@ -306,16 +306,16 @@ var SBGNSettingsView = Backbone.View.extend({
     },
 
     events: {
-    	'click #neighbors-of-selected': 'highlightNeighborsofSelected',
-    	'click #processes-of-selected': 'highlightProcessesOfSelected',
-    	'click #remove-highlights': 'removeHighlights',
-    	'click #filter-selected': 'hideSelected',
-    	'click #filter-unselected': 'showSelected',
-    	'click #show-all': 'showAll',
-    	'click #apply-layout': 'applyLayout',
+        'click #neighbors-of-selected': 'highlightNeighborsofSelected',
+        'click #processes-of-selected': 'highlightProcessesOfSelected',
+        'click #remove-highlights': 'removeHighlights',
+        'click #filter-selected': 'hideSelected',
+        'click #filter-unselected': 'showSelected',
+        'click #show-all': 'showAll',
+        'click #apply-layout': 'applyLayout',
         'click #layout-settings': 'changeLayoutSettings',
-    	'click #sbgnRightMenu a': 'showTab',
-	},
+        'click #sbgnRightMenu a': 'showTab',
+    },
 
     changeLayoutSettings: function(){
         this.layoutSettingsView.render();
@@ -398,101 +398,101 @@ var SBGNSettingsView = Backbone.View.extend({
 
     },
 
-	applyLayout: function(){
+    applyLayout: function(){
         var options = this.layoutSettingsView.currentLayoutProperties;
-		cy.layout( options );
-	},
+        cy.layout( options );
+    },
 
-	showTab: function(){
-		$(this).tab('show');
-	},
+    showTab: function(){
+        $(this).tab('show');
+    },
 
-	hideSelected: function(){
-		var allNodes = cy.nodes();
-    	var selectedNodes = cy.nodes(":selected");
-    	var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
-    	this.applyFilter(allNodes.not(nodesToShow), "manually-filtered");
+    hideSelected: function(){
+        var allNodes = cy.nodes();
+        var selectedNodes = cy.nodes(":selected");
+        var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
+        this.applyFilter(allNodes.not(nodesToShow), "manually-filtered");
 
         cy.elements(":selected").unselect();
-	},
+    },
 
-	showSelected: function(){    	
-    	var allNodes = cy.nodes();
-    	var selectedNodes = cy.nodes(":selected");
-    	var nodesToShow = this.expandNodes(selectedNodes);
-    	this.applyFilter(allNodes.not(nodesToShow), "manually-filtered");
+    showSelected: function(){       
+        var allNodes = cy.nodes();
+        var selectedNodes = cy.nodes(":selected");
+        var nodesToShow = this.expandNodes(selectedNodes);
+        this.applyFilter(allNodes.not(nodesToShow), "manually-filtered");
 
-    	cy.elements(":selected").unselect();
-	},
+        cy.elements(":selected").unselect();
+    },
 
-	showAll: function(){
-        this.removeFilter("manually-filtered");		
-	},
+    showAll: function(){
+        this.removeFilter("manually-filtered");     
+    },
 
-	highlightNeighborsofSelected: function(){
-	    var selectedEles = cy.elements(":selected");
-	    selectedEles = selectedEles.add(selectedEles.parents("node[sbgnclass='complex']"));
-	    selectedEles = selectedEles.add(selectedEles.descendants());
-	    var neighborhoodEles = selectedEles.neighborhood();
-	    var nodesToHighlight = selectedEles.add(neighborhoodEles);
-	    nodesToHighlight = nodesToHighlight.add(nodesToHighlight.descendants());
-	    this.highlightGraph(nodesToHighlight.nodes(), nodesToHighlight.edges());
-	},
+    highlightNeighborsofSelected: function(){
+        var selectedEles = cy.elements(":selected");
+        selectedEles = selectedEles.add(selectedEles.parents("node[sbgnclass='complex']"));
+        selectedEles = selectedEles.add(selectedEles.descendants());
+        var neighborhoodEles = selectedEles.neighborhood();
+        var nodesToHighlight = selectedEles.add(neighborhoodEles);
+        nodesToHighlight = nodesToHighlight.add(nodesToHighlight.descendants());
+        this.highlightGraph(nodesToHighlight.nodes(), nodesToHighlight.edges());
+    },
 
-	highlightProcessesOfSelected: function(){
-    	var selectedEles = cy.elements(":selected");
-    	selectedEles = this.expandNodes(selectedEles);
-   		this.highlightGraph(selectedEles.nodes(), selectedEles.edges());
-	},
+    highlightProcessesOfSelected: function(){
+        var selectedEles = cy.elements(":selected");
+        selectedEles = this.expandNodes(selectedEles);
+        this.highlightGraph(selectedEles.nodes(), selectedEles.edges());
+    },
 
-	removeHighlights: function(){
-       	cy.nodes().removeCss(this.notHighlightNode);
-   		cy.edges().removeCss(this.notHighlightEdge);
-	},
+    removeHighlights: function(){
+        cy.nodes().removeCss(this.notHighlightNode);
+        cy.edges().removeCss(this.notHighlightEdge);
+    },
 
-	highlightGraph: function(nodes, edges){
-	    cy.nodes().css(this.notHighlightNode);
-	    cy.edges().css(this.notHighlightEdge);
-	    nodes.removeCss(this.notHighlightNode);
-	    edges.removeCss(this.notHighlightEdge);
-	},
+    highlightGraph: function(nodes, edges){
+        cy.nodes().css(this.notHighlightNode);
+        cy.edges().css(this.notHighlightEdge);
+        nodes.removeCss(this.notHighlightNode);
+        edges.removeCss(this.notHighlightEdge);
+    },
 
-	expandNodes: function(nodesToShow){
-	    //add children
-	    nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
-	    //add parents
-	    nodesToShow = nodesToShow.add(nodesToShow.parents());
-	    //add complex children
-	    nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
+    expandNodes: function(nodesToShow){
+        //add children
+        nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
+        //add parents
+        nodesToShow = nodesToShow.add(nodesToShow.parents());
+        //add complex children
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
 
-	    var processes = nodesToShow.nodes("node[sbgnclass='process']");
-	    var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
-	    var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
+        var processes = nodesToShow.nodes("node[sbgnclass='process']");
+        var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
+        var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
 
-	    nodesToShow = nodesToShow.add(processes.neighborhood());
-	    nodesToShow = nodesToShow.add(neighborProcesses);
-	    nodesToShow = nodesToShow.add(neighborProcesses.neighborhood());
+        nodesToShow = nodesToShow.add(processes.neighborhood());
+        nodesToShow = nodesToShow.add(neighborProcesses);
+        nodesToShow = nodesToShow.add(neighborProcesses.neighborhood());
 
-	    //add parents
-	    nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
-	    //add children
-	    nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
+        //add parents
+        nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
+        //add children
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
 
-	    return nodesToShow;
-	},
+        return nodesToShow;
+    },
 
-	expandRemainingNodes: function(nodesToFilter, allNodes){
-	    nodesToFilter = this.expandNodes(nodesToFilter);
-	    var nodesToShow = allNodes.not(nodesToFilter);
-	    nodesToShow = this.expandNodes(nodesToShow);
-	    return nodesToShow;
-	},
+    expandRemainingNodes: function(nodesToFilter, allNodes){
+        nodesToFilter = this.expandNodes(nodesToFilter);
+        var nodesToShow = allNodes.not(nodesToFilter);
+        nodesToShow = this.expandNodes(nodesToShow);
+        return nodesToShow;
+    },
 
-	applyFilter: function(nodesToFilterOut, filterType){
-	    //nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
-	    nodesToFilterOut.hide();
-	    nodesToFilterOut.data(filterType, true);
-	},
+    applyFilter: function(nodesToFilterOut, filterType){
+        //nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
+        nodesToFilterOut.hide();
+        nodesToFilterOut.data(filterType, true);
+    },
 
     removeFilter: function(filterType){
         var self = this;
@@ -762,7 +762,7 @@ var SBGNView = Backbone.View.extend({
         var settingsView = new SBGNSettingsView();
         settingsView.render();
         (new SBGNHelpView({
-            el : "#sbgn-details",
+            el : "#sbgn-details-container",
         })).render();        
 
         var self = this;
@@ -820,7 +820,7 @@ var SBGNView = Backbone.View.extend({
                         cy.on('tap', function(evt){
                             if(!evt.cyTarget.data() || evt.cyTarget.edges()){
                                 (new SBGNHelpView({
-                                    el : "#sbgn-details",
+                                    el : "#sbgn-details-container",
                                 })).render();
                             }
                         });
@@ -831,25 +831,25 @@ var SBGNView = Backbone.View.extend({
                             if(self.processTypes.indexOf(node.data("sbgnclass")) > -1){
                                 (new SBGNProcessDetailsView({
                                     model : node.data(),
-                                    el : "#sbgn-details"
+                                    el : "#sbgn-details-container"
                                 })).render();
                             }
                             else if(self.epnTypes.indexOf(node.data("sbgnclass")) > -1){
                                 (new SBGNEpnDetailsView({
                                     model : node,
-                                    el : "#sbgn-details"
+                                    el : "#sbgn-details-container"
                                 })).render();
                             }
                             else if(node.data("sbgnclass") == "complex"){
                                 (new SBGNComplexDetailsView({
                                     model : node,
-                                    el : "#sbgn-details"
+                                    el : "#sbgn-details-container"
                                 })).render();
                             }
                             else{
                                 (new SBGNSimpleDetailsView({
                                     model : node.data(),
-                                    el : "#sbgn-details"
+                                    el : "#sbgn-details-container"
                                 })).render();
                             }
                         });

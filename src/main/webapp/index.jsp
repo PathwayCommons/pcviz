@@ -818,7 +818,9 @@
                   <div id="sbgnTabs" class="tab-content">
 
                       <div class="tab-pane fade active in" id="sbgn-details">
+                        <div id="sbgn-details-container">
                           </-- reserved for sbgn details -->
+                        </div>
                       </div>
 
                       <div class="tab-pane fade" id="sbgn-settings">
@@ -842,35 +844,19 @@
   </script>
 
   <script type="text/template" id="sbgn-settings-template">
+
       <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Highlighting</h4>
+          <h4 class="demo-panel-title edge-types-title">Source</h4>
 
-              <table class="table table-condensed">
-                  <tr id="neighbors-of-selected">
-                    <td>
-                        <span class="itx-type-on-off label controls-state-change-of" >Highlight Neighbors of Selected</span>
-                    </td>
-                  </tr>
-
-                  <tr id="processes-of-selected">
-                      <td>
-                           <span class="itx-type-on-off label controls-state-change-of">Highlight Processes of Selected</span>
-                      </td>
-                  </tr>
-
-                  <tr id="remove-highlights">
-                      <td>
-                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
-                      </td>
-                  </tr>
-
-              </table>
+              <div id="source-table" >
+                  <!-- reserved for process sources -->
+              </div>
       </div>
 
       <hr>
 
       <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Filtering</h4>
+          <h4 class="demo-panel-title edge-types-title">Filter</h4>
 
               <table class="table table-condensed">
                   <tr id="filter-selected">
@@ -897,11 +883,38 @@
       <hr>
 
       <div class="share mrl edge-types">
+          <h4 class="demo-panel-title edge-types-title">Highlight</h4>
+
+              <table class="table table-condensed">
+                  <tr id="neighbors-of-selected">
+                    <td>
+                        <span class="itx-type-on-off label controls-state-change-of" >Neighbors of Selected</span>
+                    </td>
+                  </tr>
+
+                  <tr id="processes-of-selected">
+                      <td>
+                           <span class="itx-type-on-off label controls-state-change-of">Processes of Selected</span>
+                      </td>
+                  </tr>
+
+                  <tr id="remove-highlights">
+                      <td>
+                          <span class="itx-type-on-off label controls-state-change-of">Remove Highlights</span>
+                      </td>
+                  </tr>
+
+              </table>
+      </div>
+
+      <hr>
+
+      <div class="share mrl edge-types">
           <h4 class="demo-panel-title edge-types-title">Layout</h4>
               <table class="table table-condensed">
                   <tr id="apply-layout">
                       <td>
-                          <span class="itx-type-on-off label controls-state-change-of" >Apply Layout</span>
+                          <span class="itx-type-on-off label controls-state-change-of" >Recalculate</span>
                       </td>
                   </tr>
                   <tr id="layout-settings">
@@ -912,15 +925,6 @@
               </table>
       </div>
 
-      <hr>
-
-      <div class="share mrl edge-types">
-          <h4 class="demo-panel-title edge-types-title">Filter by Source</h4>
-
-              <div id="source-table" >
-                  <!-- reserved for process sources -->
-              </div>
-      </div>
   </script>
 
   <script type="text/template" id="sbgn-simple-details">
@@ -929,10 +933,6 @@
         <tr>
             <th>Type</th>
             <td>{{sbgnclass}}</td>
-        </tr>
-        <tr>
-            <th>Process Source</th>
-            <td>{{datasource}}</td>
         </tr>
     </table>
   </script>
