@@ -434,53 +434,106 @@ var EmbedNetworkView = Backbone.View.extend({
         // log this event on google analytics
         ga('send', 'event', 'widget', networkType, names);
 
-        $.getJSON("graph/" + networkType + "/" + names,
-            function(data) 
-            {
-                networkLoading.hide();
-                container.html("");
-                container.show();
-
-                var windowSize = self.options.windowSize;
-                if(windowSize == undefined)
-                    windowSize = {};
-
-                var cyOptions = {
-                    elements: data,
-                    style: self.cyStyle,
-                    showOverlay: false,
-                    layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
-                    minZoom: 0.25,
-                    maxZoom: 16,
-
-                    ready: function() 
+        var geneValidations = new GeneValidations({ genes: names });
+        geneValidations.fetch({
+            success: function() {
+                $.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
+                    function(data)
                     {
-                        window.cy = this; // for debugging
+                        networkLoading.hide();
+                        container.html("");
+                        container.show();
 
-                        // We don't need this, so better disable
-                        cy.boxSelectionEnabled(false);
+                        var windowSize = self.options.windowSize;
+                        if(windowSize == undefined)
+                            windowSize = {};
 
-                        // add pan zoom control panel
-                        container.cytoscapePanzoom();
+                        var cyOptions = {
+                            elements: data,
+                            style: self.cyStyle,
+                            showOverlay: false,
+                    layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
+                            minZoom: 0.25,
+                            maxZoom: 16,
 
-                        // When a node is moved, saved its new location
-                        cy.on('free', 'node', function(evt) {
-                            var node = this;
-                            var position = node.position();
-                            localStorage.setItem(node.id(), JSON.stringify(position));
-                        });
+                            ready: function()
+                            {
+                                window.cy = this; // for debugging
 
-                        // This is to get rid of overlapping nodes and panControl
-                        cy.zoom(0.90).center();
+                                // We don't need this, so better disable
+                                cy.boxSelectionEnabled(false);
 
-                        // Run the ranker on this graph
-                        cy.rankNodes();
-                    } // end of ready function
-                }; // end of cyOptions
+                                // add pan zoom control panel
+                                container.cytoscapePanzoom();
 
-                container.cy(cyOptions);
-            } // end of success method: function(data) 
-        ); // end of JSON query
+                                var createAndPostClickMessage = function(where, info) {
+                                    var message = {
+                                        type: "pcvizclick",
+                                        content: {
+                                            info: info,
+                                            where: where
+                                        }
+                                    };
+
+                                    top.postMessage(JSON.stringify(message), "*");
+                                };
+
+                                // we are gonna use 'tap' to handle events for multiple devices
+                                // add click listener on nodes
+                                cy.on('tap', 'node', function(evt){
+                                    // request json data from BioGene service
+                                    var node = this;
+                                    $.getJSON("biogene/human/" + node.id(), function(queryResult) {
+                                        var geneInfo = queryResult.geneInfo[0];
+                                        var nodeData = node.data();
+                                        nodeData["annotation"] = geneInfo;
+                                        createAndPostClickMessage("node", nodeData);
+                                    }); // end of JSON query result
+                                });
+
+                                cy.on('tap', 'edge', function(evt){
+                                    createAndPostClickMessage("edge", this.data());
+                                });
+
+                                // add click listener to core (for background clicks)
+                                cy.on('tap', function(evt) {
+                                    // if click on background, hide details
+                                    if(evt.cyTarget === cy)
+                                    {
+                                        createAndPostClickMessage("background", null, "none");
+                                    }
+                                });
+
+                                // This is to get rid of overlapping nodes and panControl
+                                cy.zoom(0.90).center();
+
+                                // Run the ranker on this graph
+                                cy.rankNodes();
+                            } // end of ready function
+                        }; // end of cyOptions
+
+                        container.cy(cyOptions);
+
+                        // Post this message to the main web-page
+                        var numberOfNodes = data.nodes.length;
+                        var numberOfEdges = data.edges.length;
+
+                        var message = {
+                            type: "pcvizloaded",
+                            content: {
+                                numberOfEdges: numberOfEdges,
+                                numberOfNodes: numberOfNodes
+                            }
+                        };
+
+                        top.postMessage(JSON.stringify(message), "*");
+                        // end of message passing
+
+                    } // end of success method: function(data)
+                ); // end of JSON query
+            }
+        });
+
 
         return this;
     } // end of render function
