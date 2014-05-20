@@ -33,7 +33,8 @@ var BioGeneView = Backbone.View.extend({
             geneUniprotId: this.extractFirstUniprotId(this.model.geneUniprotMapping),
             geneUniprotLinks: this.generateUniprotLinks(this.model.geneUniprotMapping),
             geneSummary: this.model.geneSummary,
-            altered: this.model.altered
+            altered: this.model.altered,
+            modifications: this.model.modifications
         };
 
         // compile the template using underscore
@@ -94,9 +95,16 @@ var BioGeneView = Backbone.View.extend({
         if (this.model.geneSummary == undefined)
             this.$el.find(".node-details-summary").hide();
 
+        if (this.model.modifications == undefined || this.model.modifications.length == 0)
+            this.$el.find(".biogene-mods").hide();
+
         if($("#cancer-context-list li.todo-done").length == 0) {
             this.$el.find(".alteration-frequency-info").hide();
         } else {
+            this.$el.find(".alteration-frequency-help").hide();
+        }
+
+        if(this.model.hideContext) {
             this.$el.find(".alteration-frequency-help").hide();
         }
 

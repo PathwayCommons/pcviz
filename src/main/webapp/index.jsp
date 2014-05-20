@@ -480,6 +480,12 @@
                       <a href='http://www.ncbi.nlm.nih.gov/gene?term={{geneId}}' target='blank'>{{geneId}}</a>
                   </td>
               </tr>
+              <tr class="biogene-info biogene-mods">
+                  <th>Modifications:</th>
+                  <td>
+                      {{modifications.join(", ")}}
+                  </td>
+              </tr>
           </table>
 
           <div class="alteration-frequency-help">
@@ -581,7 +587,8 @@
 
               <tr>
                   <td colspan="2">
-                      <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#"">
+                      <a id="show-sbgn-button" class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="#">
+                          <i class=" icon-zoom-in"></i>
                           Show detailed process (SBGN)
                       </a>
                   </td>
@@ -1041,26 +1048,10 @@
                   <td>{{datasource}}</td>
               </tr>
 
-              <tr class="sbgn-comment-list">
-                  <th>Comments</th>
-                  <td>
-                      <ul class="comment-list">
-                      </ul>
-                  </td>
-              </tr>
-
               <tr class="sbgn-evidence-term-list">
-                  <th>Evidence Term</th>
+                  <th>Evidence Terms</th>
                   <td>
                       <ul class="evidence-term-list">
-                      </ul>
-                  </td>
-              </tr>
-
-              <tr class="sbgn-evidence-xref-list">
-                  <th>Evidence Xref</th>
-                  <td>
-                      <ul class="evidence-xref-list">
                       </ul>
                   </td>
               </tr>
@@ -1070,6 +1061,12 @@
                   <td>
                       <ul class="publication-list">
                       </ul>
+                  </td>
+              </tr>
+
+              <tr class="sbgn-comment-list">
+                  <td class="comment-list" colspan="2">
+                      <b>Comments:</b><br>
                   </td>
               </tr>
 
@@ -1085,7 +1082,7 @@
 
   <script type="text/template" id="sbgn-xref-template">
     <li>
-        {{dbname}} : {{dbid}}
+        <a href="http://www.ncbi.nlm.nih.gov/pubmed/{{dbid}}" target="_blank">{{dbname}}:{{dbid}}</a>
     </li>
   </script>
 
