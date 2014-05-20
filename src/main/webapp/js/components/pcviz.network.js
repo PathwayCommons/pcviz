@@ -36,7 +36,7 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge")
         .css({
-            "width": "mapData(cited, 5, 50, 0.4, 0.5)",
+            "width": "mapData(cited, 0, 100, 1, 1.22)",
             "line-color": "#444"
         })
         .selector("[?isdirected]")
@@ -71,12 +71,19 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .css({
             "line-color": "#2980B9"
         })
-        .selector(":selected")
+        .selector("edge:selected")
         .css({
-            "background-color": "#000",
-            "line-color": "#000",
-            "source-arrow-color": "#000",
-            "target-arrow-color": "#000"
+            "line-color": "pink",
+            "source-arrow-color": "pink",
+            "target-arrow-color": "pink",
+            "width": "5px"
+        })
+        .selector("node:selected")
+        .css({
+            'background-color': '#000',
+            'line-color': '#000',
+            'target-arrow-color': '#000',
+            'text-outline-color': '#000'
         })
         .selector(".ui-cytoscape-edgehandles-source")
         .css({
