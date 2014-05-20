@@ -20,158 +20,45 @@
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
-            //"content": "data(sbgnlabel)",
             "border-width": 1,
-            "shape": "circle",
             "border-color": "#0f0f0f",
             "background-color": "#ffffff",
             "font-size": 11,
+            "shape": "data(sbgnclass)"
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment']")
         .css({
             "width": "data(sbgnbbox.w)",
             "height": "data(sbgnbbox.h)"
         })
-        .selector("node[sbgnclass='macromolecule'],[sbgnclass='macromolecule multimer']")
-        .css({
-            "shape": "macromolecule",
-            //"width": "50",
-            //"height": "50"
-        })
-        .selector("node[sbgnclass='complex'],[sbgnclass='complex multimer']")
-        .css({
-            "shape": "complex",
-            "background-opacity" : "1",
-        })
-        .selector("node[sbgnclass='nucleic acid feature'],[sbgnclass='nucleic acid feature multimer']")
-        .css({
-            "shape": "nucleic acid feature",
-            //"content": "data(sbgnlabel)"
-        })
-        .selector("node[sbgnclass='simple chemical'],[sbgnclass='simple chemical multimer']")
-        .css({
-            "shape": "simple chemical",
-            //"content": "data(sbgnlabel)",
-            "text-valign" : "center",
-            "text-halign" : "center"
-        })
-        .selector("node[sbgnclass='source and sink']")
-        .css({
-            "shape": "source and sink"
-        })
         .selector("node[sbgnclass='compartment']")
         .css({
             "content": "data(sbgnlabel)",
-            "shape": "roundrectangle",
             "text-valign" : "bottom",
             "text-halign" : "center"
-        })
-        .selector("node[sbgnclass='unspecified entity']")
-        .css({
-            "shape": "ellipse",
-            "content": "data(sbgnlabel)",
-            "text-valign" : "center",
-            "text-halign" : "center"
-        })
-        .selector("node[sbgnclass='process']")
-        .css({
-            "shape": "square",
-            "content": "",
-            "text-valign" : "center",
-            "text-halign" : "center",
-        })
-        .selector("node[sbgnclass='omitted process']")
-        .css({
-            "shape": "square",
-            "content": "\\\\",
-            "text-valign" : "center",
-            "text-halign" : "center",
-        })
-        .selector("node[sbgnclass='uncertain process']")
-        .css({
-            "shape": "square",
-            "content": "?",
-            "text-valign" : "center",
-            "text-halign" : "center",
-        })
-        .selector("node[sbgnclass='association']")
-        .css({
-            "shape": "circle",
-            "background-color": "#000000"
-        })
-        .selector("node[sbgnclass='dissociation']")
-        .css({
-            "shape": "dissociation",
-        })
-        .selector("node[sbgnclass='phenotype']")
-        .css({
-            "shape": "phenotype",
-        })
-        .selector("node[sbgnclass='and operator']")
-        .css({
-            "shape": "circle",
-            "content": "AND",
-            "text-valign" : "center",
-            "text-halign" : "center",
-        })
-        .selector("node[sbgnclass='or operator']")
-        .css({
-            "shape": "circle",
-            "content": "OR",
-            "text-valign" : "center",
-            "text-halign" : "center",
-        })
-        .selector("node[sbgnclass='not operator']")
-        .css({
-            "shape": "circle",
-            "content": "NOT",
-            "text-valign" : "center",
-            "text-halign" : "center",
         })
         .selector("edge")
         .css({
             "line-color": "#0f0f0f",
             "target-arrow-fill": "hollow",
             "source-arrow-fill": "hollow",
-            "target-arrow-color": "##919191",
+            "target-arrow-color": "#919191",
             'background-opacity': 1,
-            'width': 1.5
-        })
-        .selector("edge[sbgnclass='modulation']")
-        .css({
-            "target-arrow-shape": "diamond"
-        })
-        .selector("edge[sbgnclass='stimulation']")
-        .css({
-            "target-arrow-shape": "triangle",
-        })
-        .selector("edge[sbgnclass='catalysis']")
-        .css({
-            "target-arrow-shape": "circle"
+            'width': 1.5,
+            "target-arrow-shape": "data(sbgnclass)"
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
-            "target-arrow-color": "#919191",
             "target-arrow-fill": "filled",
-            "target-arrow-shape": "tee"
-        })
-        .selector("edge[sbgnclass='logic arc'],[sbgnclass='equivalence arc']")
-        .css({
-            "target-arrow-shape": "none"
         })
         .selector("edge[sbgnclass='consumption']")
         .css({
-            "source-arrow-shape": "consumption"
+            "target-arrow-shape": "none",
+            "source-arrow-shape": "data(sbgnclass)"
         })
         .selector("edge[sbgnclass='production']")
         .css({
-            "target-arrow-color": "#919191",
             "target-arrow-fill": "filled",
-            "target-arrow-shape": "production"
-        })
-        .selector("edge[sbgnclass='necessary stimulation']")
-        .css({
-            "target-arrow-shape": "necessary stimulation"
         })
         .selector(":selected")
         .css({
