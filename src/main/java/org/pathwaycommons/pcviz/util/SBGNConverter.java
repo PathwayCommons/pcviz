@@ -90,6 +90,7 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.SBGNCOMPARTMENTREF, glyph.getCompartmentRef());
 
         extractDataSource(cNode, bpElements);
+        extractModifications(cNode, bpElements);
 
         String lbl = (glyph.getLabel() == null) ? UNKNOWN : glyph.getLabel().getText();
         cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
@@ -109,6 +110,30 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.SBGNCLONEMARKER, glyph.getClone());
 
         graph.getNodes().add(cNode);
+    }
+
+    /**
+     * Simply iterates over the BioPAX elements and extracts modifications for proteins.
+     *
+     * @param jsNode Cytoscape Node
+     * @param bpElements BioPAX Elements
+     */
+    private void extractModifications(CytoscapeJsNode jsNode, HashSet<BioPAXElement> bpElements) {
+        HashSet<String> modifications = new HashSet<String>();
+
+        for (BioPAXElement bpElement : bpElements) {
+            if(bpElement instanceof Protein) {
+                Protein protein = (Protein) bpElement;
+
+                for (EntityFeature entityFeature : protein.getFeature()) {
+                    if(entityFeature instanceof ModificationFeature || entityFeature instanceof FragmentFeature) {
+                        // TODO: Proper toString!
+                        modifications.add(entityFeature.toString());
+                    }
+                }
+            }
+        }
+        jsNode.setProperty(PropertyKey.SBGNMODIFICATIONS, modifications);
     }
 
     /**

@@ -109,8 +109,16 @@ var sbgnStyleSheet = cytoscape.stylesheet()
          }); // end of sbgnStyleSheet
 
 var SBGNLayoutView = Backbone.View.extend({
-    defaultLayoutProperties: {name: 'cose', nodeRepulsion:10000, nodeOverlap:10, idealEdgeLength:10, edgeElasticity:100,
-        nestingFactor:5, gravity:250, numIter:100},
+    defaultLayoutProperties: {
+        name: 'cose',
+        nodeRepulsion: 10000,
+        nodeOverlap: 10,
+        idealEdgeLength: 10,
+        edgeElasticity: 100,
+        nestingFactor: 5,
+        gravity: 250,
+        numIter: 100
+    },
     currentLayoutProperties: null,
     el: '#sbgn-layout-table',
 
@@ -201,7 +209,7 @@ var SBGNSettingsView = Backbone.View.extend({
         'click #show-all': 'showAll',
         'click #apply-layout': 'applyLayout',
         'click #layout-settings': 'changeLayoutSettings',
-        'click #sbgnRightMenu a': 'showTab',
+        'click #sbgnRightMenu a': 'showTab'
     },
 
     changeLayoutSettings: function(){
@@ -250,7 +258,7 @@ var SBGNSettingsView = Backbone.View.extend({
     },
 
     initProcessSources: function(nodes){
-        var sourceMap = new Object();
+        var sourceMap = {};
 
         for (var i = 0 ; i < nodes.length ; i++){
             if(nodes[i].data.sbgnclass == "process"){
@@ -265,7 +273,7 @@ var SBGNSettingsView = Backbone.View.extend({
     },
 
     initFilterTypes: function(){
-        this.filterTypes = new Array();
+        this.filterTypes = [];
         this.filterTypes.push("manually-filtered");
 
         for(var source in this.processSourceMap)
@@ -279,10 +287,15 @@ var SBGNSettingsView = Backbone.View.extend({
         container.append("<table class='table table-condensed'>");
 
         for(var source in self.processSourceMap){
-            container.append(_.template($("#sbgn-source-template").html(), {'source':source, 'type':self.safeProperty(source)}));
+            container.append(
+                _.template($("#sbgn-source-template").html(),
+                    {
+                        'source': source,
+                        'type': self.safeProperty(source)
+                    })
+            );
         }
         container.append("</table>");
-
     },
 
     applyLayout: function(){
@@ -436,10 +449,12 @@ var SBGNEpnDetailsView = Backbone.View.extend({
                     var geneInfo = queryResult.geneInfo[0];
                     geneInfo["isseed"] = node.data("isseed");
                     geneInfo["altered"] = parseInt(node.data("altered") * 100);
+                    geneInfo["hideContext"] = true;
+                    geneInfo["modifications"] = node.data("sbgnmodifications");
 
                     var biogeneView = new BioGeneView({
-                    el: container,
-                    model: geneInfo
+                        el: container,
+                        model: geneInfo
                     });
                     biogeneView.render();
                 }
@@ -535,26 +550,35 @@ var SBGNComplexDetailsView = Backbone.View.extend({
 
 var SBGNProcessDetailsView = Backbone.View.extend({
     template:  _.template($('#sbgn-process-details-template'). html()),
+    expanderOpts: {
+        slicePoint: 50,
+        expandPrefix: ' ',
+        expandText: ' (...)',
+        userCollapseText: ' (show less)',
+        moreClass: 'expander-read-more',
+        lessClass: 'expander-read-less',
+        detailClass: 'expander-details',
+        expandEffect: 'fadeIn',
+        collapseEffect: 'fadeOut'
+    },
+
     render: function(){
         var model = this.model;
         this.$el.empty();
         this.$el.append(this.template(model));
 
-        var commentCont = this.$el.find("ul.comment-list");
-
+        var commentCont = this.$el.find(".comment-list");
         _.each(model.sbgncomment, function(comment) {
-            (new SBGNListView({
-                el: commentCont,
-                model: { comment : comment }
-            })).render();
+            commentCont.append(comment);
         });
+        commentCont.expander(this.expanderOpts);
 
         var xrefCont = this.$el.find("ul.publication-list");
 
         _.each(model.sbgnxref, function(xref) {
             (new SBGNXrefView({
                 el: xrefCont,
-                model: { dbname : xref[0], dbid : xref[1] }
+                model: { dbname : xref[1], dbid : xref[0] }
             })).render();
         });
 
