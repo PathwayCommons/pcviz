@@ -49,7 +49,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
-            "target-arrow-fill": "filled",
+            "target-arrow-fill": "filled"
         })
         .selector("edge[sbgnclass='consumption']")
         .css({
@@ -58,7 +58,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge[sbgnclass='production']")
         .css({
-            "target-arrow-fill": "filled",
+            "target-arrow-fill": "filled"
         })
         .selector(":selected")
         .css({
@@ -81,12 +81,12 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector(":selected[sbgnclass='compartment']")
         .css({
             "background-opacity" : "0.7",
-            "background-color": "#444444",
+            "background-color": "#444444"
         })
         .selector(":active[sbgnclass='compartment']")
         .css({
             "background-opacity" : "0.5",
-            "background-color": "#777777",
+            "background-color": "#777777"
         })
         .selector(".ui-cytoscape-edgehandles-source")
         .css({
@@ -158,7 +158,7 @@ var SBGNLayoutView = Backbone.View.extend({
         });
 
         return this;
-    },
+    }
 });
 
 var SBGNSettingsView = Backbone.View.extend({
@@ -410,7 +410,7 @@ var SBGNSettingsView = Backbone.View.extend({
 
         nodesToRemoveFilter.show();
         nodesToRemoveFilter.removeData(filterType);
-    },
+    }
 
 });
 
@@ -447,8 +447,8 @@ var SBGNEpnDetailsView = Backbone.View.extend({
                 {
                     // generate the view by using backbone
                     var geneInfo = queryResult.geneInfo[0];
-                    geneInfo["isseed"] = node.data("isseed");
                     geneInfo["altered"] = parseInt(node.data("altered") * 100);
+                    geneInfo["isseed"] = node.data("isseed")
                     geneInfo["hideContext"] = true;
                     geneInfo["modifications"] = node.data("sbgnmodifications");
 
@@ -466,7 +466,7 @@ var SBGNEpnDetailsView = Backbone.View.extend({
                 }
             }
         }); // end of JSON query result
-    },
+    }
 });
 
 var SBGNComplexDetailsView = Backbone.View.extend({
@@ -526,8 +526,8 @@ var SBGNComplexDetailsView = Backbone.View.extend({
                     {
                         // generate the view by using backbone
                         var geneInfo = queryResult.geneInfo[0];
-                        geneInfo["isseed"] = node.data("isseed");
                         geneInfo["altered"] = parseInt(node.data("altered") * 100);
+                        geneInfo["isseed"] = node.data("isseed");
 
                         var biogeneView = new BioGeneView({
                         el: content,
@@ -633,7 +633,7 @@ var SBGNSimpleDetailsView = Backbone.View.extend({
     render: function(){
         this.$el.empty();
         this.$el.append(this.template(this.model));
-    },
+    }
 });
 
 var SBGNListView = Backbone.View.extend({
@@ -673,7 +673,7 @@ var SBGNView = Backbone.View.extend({
         var settingsView = new SBGNSettingsView();
         settingsView.render();
         (new SBGNHelpView({
-            el : "#sbgn-details-container",
+            el : "#sbgn-details-container"
         })).render();        
 
         var self = this;
@@ -700,7 +700,7 @@ var SBGNView = Backbone.View.extend({
                 container.show();
                 $(self.sbgnTooSlowMessage).hide();
 
-                var positionMap = new Object();
+                var positionMap = {};
 
                 //add position information to data
                 for (var i = 0 ; i < data.nodes.length ; i++){
@@ -731,7 +731,7 @@ var SBGNView = Backbone.View.extend({
                         cy.on('tap', function(evt){
                             if(!evt.cyTarget.data() || evt.cyTarget.edges()){
                                 (new SBGNHelpView({
-                                    el : "#sbgn-details-container",
+                                    el : "#sbgn-details-container"
                                 })).render();
                             }
                         });
