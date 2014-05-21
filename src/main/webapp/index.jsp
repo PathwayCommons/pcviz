@@ -483,7 +483,7 @@
               <tr class="biogene-info biogene-mods">
                   <th>Modifications:</th>
                   <td>
-                      {{modifications.join(", ")}}
+                      {{modifications != undefined ? modifications.join(", ") : ""}}
                   </td>
               </tr>
           </table>
