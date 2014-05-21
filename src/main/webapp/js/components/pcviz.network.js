@@ -373,6 +373,7 @@ var NetworkView = Backbone.View.extend({
 			    var geneInfo = queryResult.geneInfo[0];
 			    geneInfo["isseed"] = node.data("isseed");
 			    geneInfo["altered"] = parseInt(node.data("altered") * 100);
+                geneInfo["uniprot"] = node.data("uniprot");
 
 			    var biogeneView = new BioGeneView({
 				el: self.detailsContent,

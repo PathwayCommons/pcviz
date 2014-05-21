@@ -30,7 +30,7 @@ var BioGeneView = Backbone.View.extend({
             geneLocation: this.model.geneLocation,
             geneMim: this.model.geneMim,
             geneId: this.model.geneId,
-            geneUniprotId: this.extractFirstUniprotId(this.model.geneUniprotMapping),
+            geneUniprotId: this.model.uniprot =! undefined ? this.model.uniprot : this.extractFirstUniprotId(this.model.geneUniprotMapping),
             geneUniprotLinks: this.generateUniprotLinks(this.model.geneUniprotMapping),
             geneSummary: this.model.geneSummary,
             altered: this.model.altered
@@ -88,7 +88,7 @@ var BioGeneView = Backbone.View.extend({
         if (this.model.geneId == undefined)
             this.$el.find(".biogene-id").hide();
 
-        if (this.model.geneUniprotMapping == undefined)
+        if (this.model.uniprot == undefined)
             this.$el.find(".biogene-uniprot-links").hide();
 
         if (this.model.geneSummary == undefined)

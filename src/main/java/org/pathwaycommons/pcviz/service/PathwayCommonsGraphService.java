@@ -190,6 +190,7 @@ public class PathwayCommonsGraphService {
                 node.setProperty(PropertyKey.ISSEED, isSeed);
                 node.setProperty(PropertyKey.RANK, 0);
                 node.setProperty(PropertyKey.ALTERED, 0);
+                node.setProperty(PropertyKey.UNIPROT, geneNameService.getUniprotId(nodeName));
                 graph.getNodes().add(node);
 
             }

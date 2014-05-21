@@ -35,6 +35,7 @@ public class GeneNameService {
     private HashMap<String, HashSet<String>> geneMaps = null;
     private ArrayList<String> geneMapKeysSorted = null;
     private Integer autoCompleteLimit = Integer.MAX_VALUE;
+    private HashMap<String, String> symbolToUniprot = new HashMap<String, String>();
 
     public Resource getGeneResource() {
         return geneResource;
@@ -94,6 +95,7 @@ public class GeneNameService {
 		            uniprotId = uniprotId.trim().toUpperCase();
 		            if(!uniprotId.isEmpty()) {
 			            addToMap(uniprotId, primaryName);
+                        symbolToUniprot.put(primaryName, uniprotId);
 		            }
 	            }
             }
@@ -146,5 +148,9 @@ public class GeneNameService {
         }
 
         return autoCompleteResults;
+    }
+
+    public String getUniprotId(String symbol) {
+        return this.symbolToUniprot.get(symbol);
     }
 }

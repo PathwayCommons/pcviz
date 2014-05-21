@@ -480,6 +480,8 @@
               </tr>
           </table>
 
+
+
           <div class="alteration-frequency-help">
               <p class="help-text palette palette-silver">
                   Load context to see the frequency of alteration for this gene in different cancer studies.

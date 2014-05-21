@@ -35,6 +35,7 @@ public enum PropertyKey
     TYPE,
     IMPORTANCE,
 	PUBMED,
+    UNIPROT,
     RANK;
 
 	@Override
