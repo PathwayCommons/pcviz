@@ -73,15 +73,13 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge:selected")
         .css({
-            "line-color": "pink",
-            "source-arrow-color": "pink",
-            "target-arrow-color": "pink",
-            "width": "5px"
+            "line-color": "magenta",
+            "source-arrow-color": "magenta",
+            "target-arrow-color": "magenta"
         })
         .selector("node:selected")
         .css({
-            'background-color': '#000',
-            'line-color': '#000',
+            'border-color': 'magenta',
             'target-arrow-color': '#000',
             'text-outline-color': '#000'
         })

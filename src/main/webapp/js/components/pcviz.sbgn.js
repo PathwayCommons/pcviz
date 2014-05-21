@@ -37,6 +37,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "text-valign" : "bottom",
             "text-halign" : "center"
         })
+
         .selector("edge")
         .css({
             "line-color": "#0f0f0f",
@@ -68,6 +69,18 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "line-color": "#000",
             "source-arrow-color": "#000",
             "target-arrow-color": "#000"
+        })
+        .selector("edge:selected")
+        .css({
+            "line-color": "magenta",
+            "source-arrow-color": "magenta",
+            "target-arrow-color": "magenta"
+        })
+        .selector("node:selected")
+        .css({
+            'border-color': 'magenta',
+            'target-arrow-color': '#000',
+            'text-outline-color': '#000'
         })
         .selector(":active")
         .css({
@@ -106,7 +119,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "shape": "rectangle",
             "width": 15,
             "height": 15
-         }); // end of sbgnStyleSheet
+         })
+         ; // end of sbgnStyleSheet
 
 var SBGNLayoutView = Backbone.View.extend({
     defaultLayoutProperties: {
