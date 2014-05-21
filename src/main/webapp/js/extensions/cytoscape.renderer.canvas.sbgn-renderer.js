@@ -22,18 +22,1115 @@
  */
 
 /*
- * Those are the sbgn shapes, we need this map to override cytoscape.js core functions.
- * Compartment is also another sbgn shape but we did not include it since we just use
- * roundrectangle shape for it.
+ * Some of the core functions of cytoscape.js must be overrided so that we can access the data
+ * associated with the node's itself.
  */
-var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macromolecule' : true, 
-	'nucleic acid feature' : true, 'perturbing agent' : true, 'source and sink' : true, 
-	'complex' : true, 'process' : true, 'omitted process' : true, 'uncertain process' : true, 
-	'association' : true, 'dissociation' : true, 'phenotype' : true,
-	'tag' : true, 'consumption' : true, 'production' : true, 'modulation' : true, 
-	'stimulation' : true, 'catalysis' : true, 'inhibition' : true, 'necessary stimulation' : true,
-	'logic arc' : true, 'equivalence arc' : true, 'and operator' : true,
-	'or operator' : true, 'not operator' : true};
+;(function($$){"use strict";
+
+	/*
+	 * Those are the sbgn shapes, we need this map to override cytoscape.js core functions.
+	 * Compartment is also another sbgn shape but we did not include it since we just use
+	 * roundrectangle shape for it.
+	 */
+	var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macromolecule' : true, 
+		'nucleic acid feature' : true, 'perturbing agent' : true, 'source and sink' : true, 
+		'complex' : true, 'process' : true, 'omitted process' : true, 'uncertain process' : true, 
+		'association' : true, 'dissociation' : true, 'phenotype' : true,
+		'tag' : true, 'consumption' : true, 'production' : true, 'modulation' : true, 
+		'stimulation' : true, 'catalysis' : true, 'inhibition' : true, 'necessary stimulation' : true,
+		'logic arc' : true, 'equivalence arc' : true, 'and operator' : true,
+		'or operator' : true, 'not operator' : true};
+
+	var CanvasRenderer = $$('renderer', 'canvas');
+	var renderer = CanvasRenderer.prototype;
+
+	function drawSelection(render,context, node){
+		//TODO: do it for all classes in sbgn, create a sbgn class array to check
+		if(sbgnShapes[render.getNodeShape(node)]){
+			CanvasRenderer.nodeShapes[render.getNodeShape(node)].draw(
+					context,
+					node); //node._private.data.weight / 5.0
+		}
+		else{
+			CanvasRenderer.nodeShapes[render.getNodeShape(node)].draw(
+					context,
+					node._private.position.x,
+					node._private.position.y,
+					render.getNodeWidth(node),
+					render.getNodeHeight(node)); //node._private.data.weight / 5.0
+		}
+	}
+
+	function drawPathSelection(render,context, node){
+		//TODO: do it for all classes in sbgn, create a sbgn class array to check
+		if(sbgnShapes[render.getNodeShape(node)]){
+			CanvasRenderer.nodeShapes[render.getNodeShape(node)].drawPath(
+					context,
+					node); //node._private.data.weight / 5.0
+		}
+		else{
+			CanvasRenderer.nodeShapes[render.getNodeShape(node)].drawPath(
+					context,
+					node._private.position.x,
+					node._private.position.y,
+					render.getNodeWidth(node),
+					render.getNodeHeight(node)); //node._private.data.weight / 5.0
+		}
+	}
+
+	function intersectLineSelection(render, node, x, y){
+		//TODO: do it for all classes in sbgn, create a sbgn class array to check
+		if(sbgnShapes[render.getNodeShape(node)]){
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectLine(
+				node,
+				x, //halfPointX,
+				y //halfPointY
+			);
+		}
+		else{
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectLine(
+				node._private.position.x,
+				node._private.position.y,
+				render.getNodeWidth(node),
+				render.getNodeHeight(node),
+				x, //halfPointX,
+				y, //halfPointY
+				node._private.style["border-width"].pxValue / 2
+			);
+		}
+	}
+
+	function checkPointRoughSelection(render, node, x, y, nodeThreshold){
+		//TODO: do it for all classes in sbgn, create a sbgn class array to check
+		if(sbgnShapes[render.getNodeShape(node)]){
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPointRough(x, y,
+				node,
+				nodeThreshold);
+		}
+		else{
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPointRough(x, y,
+				node._private.style["border-width"].pxValue / 2,
+				render.getNodeWidth(node) + nodeThreshold, 
+				render.getNodeHeight(node) + nodeThreshold,
+				node._private.position.x,
+				node._private.position.y);
+		}
+	}
+
+	function checkPointSelection(render, node, x, y, nodeThreshold){
+		//TODO: do it for all classes in sbgn, create a sbgn class array to check
+		if(sbgnShapes[render.getNodeShape(node)]){
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPoint(x, y,
+				node,
+				nodeThreshold);
+		}
+		else{
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPoint(x, y,
+				node._private.style["border-width"].pxValue / 2,
+				render.getNodeWidth(node) + nodeThreshold, 
+				render.getNodeHeight(node) + nodeThreshold,
+				node._private.position.x, 
+				node._private.position.y);
+		}
+	}
+
+	function intersectBoxSelection(render, x1, y1, x2, y2, node){
+		//TODO: do it for all classes in sbgn, create a sbgn class array to check
+		if(sbgnShapes[render.getNodeShape(node)]){
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectBox(x1, y1, x2, y2, node);
+		}
+		else{
+			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectBox(x1, y1, x2, y2,
+				render.getNodeWidth(node), 
+				render.getNodeHeight(node),
+				node._private.position.x, 
+				node._private.position.y, 
+				node._private.style["border-width"].pxValue / 2);
+		}
+	}
+
+	CanvasRenderer.prototype.drawPie = function(context, node){
+		node = node[0]; // ensure ele ref
+
+		if( !this.hasPie(node) ){ return; } // exit early if not needed
+
+		var nodeW = this.getNodeWidth( node );
+		var nodeH = this.getNodeHeight( node );
+		var x = node._private.position.x;
+		var y = node._private.position.y;
+		var radius = Math.min( nodeW, nodeH ) / 2; // must fit in node
+		var lastPercent = 0; // what % to continue drawing pie slices from on [0, 1]
+
+		context.save();
+
+		// clip to the node shape
+		drawPathSelection(this, context, node);
+
+		context.clip();
+
+		for( var i = 1; i <= $$.style.pieBackgroundN; i++ ){ // 1..N
+			var size = node._private.style['pie-' + i + '-background-size'].value;
+			var color = node._private.style['pie-' + i + '-background-color'];
+			var percent = size / 100; // map integer range [0, 100] to [0, 1]
+			var angleStart = 1.5 * Math.PI + 2 * Math.PI * lastPercent; // start at 12 o'clock and go clockwise
+			var angleDelta = 2 * Math.PI * percent;
+			var angleEnd = angleStart + angleDelta;
+
+			// slice start and end points
+			var sx1 = x + radius * Math.cos( angleStart );
+			var sy1 = y + radius * Math.sin( angleStart );
+
+			// ignore if
+			// - zero size
+			// - we're already beyond the full circle
+			// - adding the current slice would go beyond the full circle
+			if( size === 0 || lastPercent >= 1 || lastPercent + percent > 1 ){
+				continue;
+			}
+
+			context.beginPath();
+			context.moveTo(x, y);
+			context.arc( x, y, radius, angleStart, angleEnd );
+			context.closePath();
+
+			context.fillStyle = 'rgb(' 
+				+ color.value[0] + ','
+				+ color.value[1] + ','
+				+ color.value[2] + ')'
+			;
+
+			context.fill();
+
+			lastPercent += percent;
+		}
+
+		context.restore();
+	};
+
+
+	CanvasRenderer.prototype.drawInscribedImage = function(context, img, node) {
+		var r = this;
+//		console.log(this.data);
+		var zoom = this.data.cy._private.zoom;
+		
+		var nodeX = node._private.position.x;
+		var nodeY = node._private.position.y;
+
+		//var nodeWidth = node._private.style["width"].value;
+		//var nodeHeight = node._private.style["height"].value;
+		var nodeWidth = this.getNodeWidth(node);
+		var nodeHeight = this.getNodeHeight(node);
+		
+		context.save();
+		
+		drawPathSelection(this, context, node);
+		
+		context.clip();
+		
+//		context.setTransform(1, 0, 0, 1, 0, 0);
+		
+		var imgDim = [img.width, img.height];
+		context.drawImage(img, 
+				nodeX - imgDim[0] / 2,
+				nodeY - imgDim[1] / 2,
+				imgDim[0],
+				imgDim[1]);
+		
+		context.restore();
+		
+		if (node._private.style["border-width"].value > 0) {
+			context.stroke();
+		}
+		
+	};
+
+	CanvasRenderer.prototype.getAllInBox = function(x1, y1, x2, y2) {
+		var data = this.data; 
+		var nodes = this.getCachedNodes(); 
+		var edges = this.getCachedEdges(); 
+		var box = [];
+		
+		var x1c = Math.min(x1, x2); 
+		var x2c = Math.max(x1, x2); 
+		var y1c = Math.min(y1, y2); 
+		var y2c = Math.max(y1, y2); 
+		x1 = x1c; 
+		x2 = x2c; 
+		y1 = y1c; 
+		y2 = y2c; 
+		var heur;
+		
+		for (var i=0;i<nodes.length;i++) {
+			if (intersectBoxSelection(this, x1, y1, x2, y2, nodes[i])){ 
+				box.push(nodes[i]); 
+			}
+		}
+		
+		for (var i=0;i<edges.length;i++) {
+			if (edges[i]._private.rscratch.edgeType == "self") {
+				if ((heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
+						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+						edges[i]._private.rscratch.cp2ax, edges[i]._private.rscratch.cp2ay,
+						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value))
+							&&
+						(heur == 2 || (heur == 1 && $$.math.checkBezierInBox(x1, y1, x2, y2,
+							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+							edges[i]._private.rscratch.cp2ax, edges[i]._private.rscratch.cp2ay,
+							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value)))
+								||
+					(heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
+						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+						edges[i]._private.rscratch.cp2cx, edges[i]._private.rscratch.cp2cy,
+						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value))
+							&&
+						(heur == 2 || (heur == 1 && $$.math.checkBezierInBox(x1, y1, x2, y2,
+							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+							edges[i]._private.rscratch.cp2cx, edges[i]._private.rscratch.cp2cy,
+							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value)))
+					)
+				{ box.push(edges[i]); }
+			}
+			
+			if (edges[i]._private.rscratch.edgeType == "bezier" &&
+				(heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
+						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+						edges[i]._private.rscratch.cp2x, edges[i]._private.rscratch.cp2y,
+						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value))
+							&&
+						(heur == 2 || (heur == 1 && $$.math.checkBezierInBox(x1, y1, x2, y2,
+							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+							edges[i]._private.rscratch.cp2x, edges[i]._private.rscratch.cp2y,
+							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value))))
+				{ box.push(edges[i]); }
+		
+			if (edges[i]._private.rscratch.edgeType == "straight" &&
+				(heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
+						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+						edges[i]._private.rscratch.startX * 0.5 + edges[i]._private.rscratch.endX * 0.5, 
+						edges[i]._private.rscratch.startY * 0.5 + edges[i]._private.rscratch.endY * 0.5, 
+						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value))
+							&& 
+						(heur == 2 || (heur == 1 && $$.math.checkStraightEdgeInBox(x1, y1, x2, y2,
+							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
+							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style["width"].value))))
+				{ box.push(edges[i]); }
+			
+		}
+		
+		return box;
+	}
+
+	// Find nearest element
+	CanvasRenderer.prototype.findNearestElement = function(x, y, visibleElementsOnly) {
+		var data = this.data; 
+		var nodes = this.getCachedNodes(); 
+		var edges = this.getCachedEdges(); 
+		var near = [];
+		var isTouch = CanvasRenderer.isTouch;
+		
+		var zoom = this.data.cy.zoom();
+		var edgeThreshold = (isTouch ? 256 : 32) / zoom;
+		var nodeThreshold = (isTouch ? 16 : 0) /  zoom;
+		
+		// Check nodes
+		for (var i = 0; i < nodes.length; i++) {
+			
+			if (checkPointRoughSelection(this, nodes[i], x, y, nodeThreshold) &&
+				checkPointSelection(this, nodes[i], x, y, nodeThreshold)) {
+				
+				if (visibleElementsOnly) {
+					if (nodes[i]._private.style["opacity"].value != 0
+						&& nodes[i]._private.style["visibility"].value == "visible"
+						&& nodes[i]._private.style["display"].value == "element") {
+						
+						near.push(nodes[i]);	
+					}
+				} else {
+					near.push(nodes[i]);
+				}
+			}
+		}
+		
+		// Check edges
+		var addCurrentEdge;
+		for (var i = 0; i < edges.length; i++) {
+			var edge = edges[i];
+			var rs = edge._private.rscratch;
+
+			addCurrentEdge = false;
+
+			if (rs.edgeType == "self") {
+				if (($$.math.inBezierVicinity(x, y,
+						rs.startX,
+						rs.startY,
+						rs.cp2ax,
+						rs.cp2ay,
+						rs.selfEdgeMidX,
+						rs.selfEdgeMidY,
+						Math.pow(edge._private.style["width"].value/2, 2))
+							&&
+					(Math.pow(edges[i]._private.style["width"].value/2, 2) + edgeThreshold > 
+						$$.math.sqDistanceToQuadraticBezier(x, y,
+							rs.startX,
+							rs.startY,
+							rs.cp2ax,
+							rs.cp2ay,
+							rs.selfEdgeMidX,
+							rs.selfEdgeMidY)))
+					||
+					($$.math.inBezierVicinity(x, y,
+						rs.selfEdgeMidX,
+						rs.selfEdgeMidY,
+						rs.cp2cx,
+						rs.cp2cy,
+						rs.endX,
+						rs.endY,
+						Math.pow(edges[i]._private.style["width"].value/2, 2))
+							&&
+					(Math.pow(edges[i]._private.style["width"].value/2, 2) + edgeThreshold > 
+						$$.math.sqDistanceToQuadraticBezier(x, y,
+							rs.selfEdgeMidX,
+							rs.selfEdgeMidY,
+							rs.cp2cx,
+							rs.cp2cy,
+							rs.endX,
+							rs.endY))))
+					 { addCurrentEdge = true; }
+			
+			} else if (rs.edgeType == "straight") {
+				if ($$.math.inLineVicinity(x, y, rs.startX, rs.startY, rs.endX, rs.endY, edges[i]._private.style["width"].value * 2)
+						&&
+					Math.pow(edges[i]._private.style["width"].value / 2, 2) + edgeThreshold >
+					$$.math.sqDistanceToFiniteLine(x, y,
+						rs.startX,
+						rs.startY,
+						rs.endX,
+						rs.endY))
+					{ addCurrentEdge = true; }
+			
+			} else if (rs.edgeType == "bezier") {
+				if ($$.math.inBezierVicinity(x, y,
+					rs.startX,
+					rs.startY,
+					rs.cp2x,
+					rs.cp2y,
+					rs.endX,
+					rs.endY,
+					Math.pow(edges[i]._private.style["width"].value / 2, 2))
+						&&
+					(Math.pow(edges[i]._private.style["width"].value / 2 , 2) + edgeThreshold >
+						$$.math.sqDistanceToQuadraticBezier(x, y,
+							rs.startX,
+							rs.startY,
+							rs.cp2x,
+							rs.cp2y,
+							rs.endX,
+							rs.endY)))
+					{ addCurrentEdge = true; }
+			}
+			
+			if (!near.length || near[near.length - 1] != edges[i]) {
+				if ((CanvasRenderer.arrowShapes[edges[i]._private.style["source-arrow-shape"].value].roughCollide(x, y,
+						edges[i]._private.rscratch.arrowStartX, edges[i]._private.rscratch.arrowStartY,
+						this.getArrowWidth(edges[i]._private.style["width"].value),
+						this.getArrowHeight(edges[i]._private.style["width"].value),
+						[edges[i]._private.rscratch.arrowStartX - edges[i].source()[0]._private.position.x,
+							edges[i]._private.rscratch.arrowStartY - edges[i].source()[0]._private.position.y], 0)
+						&&
+					CanvasRenderer.arrowShapes[edges[i]._private.style["source-arrow-shape"].value].collide(x, y,
+						edges[i]._private.rscratch.arrowStartX, edges[i]._private.rscratch.arrowStartY,
+						this.getArrowWidth(edges[i]._private.style["width"].value),
+						this.getArrowHeight(edges[i]._private.style["width"].value),
+						[edges[i]._private.rscratch.arrowStartX - edges[i].source()[0]._private.position.x,
+							edges[i]._private.rscratch.arrowStartY - edges[i].source()[0]._private.position.y], 0))
+					||
+					(CanvasRenderer.arrowShapes[edges[i]._private.style["target-arrow-shape"].value].roughCollide(x, y,
+						edges[i]._private.rscratch.arrowEndX, edges[i]._private.rscratch.arrowEndY,
+						this.getArrowWidth(edges[i]._private.style["width"].value),
+						this.getArrowHeight(edges[i]._private.style["width"].value),
+						[edges[i]._private.rscratch.arrowEndX - edges[i].target()[0]._private.position.x,
+							edges[i]._private.rscratch.arrowEndY - edges[i].target()[0]._private.position.y], 0)
+						&&
+					CanvasRenderer.arrowShapes[edges[i]._private.style["target-arrow-shape"].value].collide(x, y,
+						edges[i]._private.rscratch.arrowEndX, edges[i]._private.rscratch.arrowEndY,
+						this.getArrowWidth(edges[i]._private.style["width"].value),
+						this.getArrowHeight(edges[i]._private.style["width"].value),
+						[edges[i]._private.rscratch.arrowEndX - edges[i].target()[0]._private.position.x,
+							edges[i]._private.rscratch.arrowEndY - edges[i].target()[0]._private.position.y], 0)))
+					{ addCurrentEdge = true; }
+			}
+			
+			if (addCurrentEdge) {
+				if (visibleElementsOnly) {
+					// For edges, make sure the edge is visible/has nonzero opacity,
+					// then also make sure both source and target nodes are visible/have
+					// nonzero opacity
+					var source = data.cy.getElementById(edges[i]._private.data.source)
+					var target = data.cy.getElementById(edges[i]._private.data.target)
+					
+					if (edges[i]._private.style["opacity"].value != 0
+						&& edges[i]._private.style["visibility"].value == "visible"
+						&& edges[i]._private.style["display"].value == "element"
+						&& source._private.style["opacity"].value != 0
+						&& source._private.style["visibility"].value == "visible"
+						&& source._private.style["display"].value == "element"
+						&& target._private.style["opacity"].value != 0
+						&& target._private.style["visibility"].value == "visible"
+						&& target._private.style["display"].value == "element") {
+						
+						near.push(edges[i]);	
+					}
+				} else {
+					near.push(edges[i]);
+				}
+			}
+		} 
+		
+		near.sort( this.zOrderSort );
+		
+		if (near.length > 0) { return near[ near.length - 1 ]; } else { return null; }
+	};
+
+
+	CanvasRenderer.prototype.findEndpoints = function(edge) {
+		var intersect;
+
+		var source = edge.source()[0];
+		var target = edge.target()[0];
+		
+		var srcPos = source._private.position;
+		var tgtPos = target._private.position;
+
+		var tgtArShape = edge._private.style["target-arrow-shape"].value;
+		var srcArShape = edge._private.style["source-arrow-shape"].value;
+
+		var tgtBorderW = target._private.style["border-width"].pxValue;
+		var srcBorderW = source._private.style["border-width"].pxValue;
+
+		var rs = edge._private.rscratch;
+		
+		if (edge._private.rscratch.edgeType == "self") {
+			
+			var cp = [rs.cp2cx, rs.cp2cy];
+
+			intersect = intersectLineSelection(this, target, cp[0], cp[1]);
+			
+			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
+				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
+			var edgeEnd = $$.math.shortenIntersection(intersect, cp,
+				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
+			
+			rs.endX = edgeEnd[0];
+			rs.endY = edgeEnd[1];
+			
+			rs.arrowEndX = arrowEnd[0];
+			rs.arrowEndY = arrowEnd[1];
+			
+			var cp = [rs.cp2ax, rs.cp2ay];
+
+			intersect = intersectLineSelection(this, source, cp[0], cp[1]);
+			
+			var arrowStart = $$.math.shortenIntersection(intersect, cp,
+				CanvasRenderer.arrowShapes[srcArShape].spacing(edge));
+			var edgeStart = $$.math.shortenIntersection(intersect, cp,
+				CanvasRenderer.arrowShapes[srcArShape].gap(edge));
+			
+			rs.startX = edgeStart[0];
+			rs.startY = edgeStart[1];
+
+
+			rs.arrowStartX = arrowStart[0];
+			rs.arrowStartY = arrowStart[1];
+			
+		} else if (rs.edgeType == "straight") {
+
+			intersect = intersectLineSelection(this, target, source.position().x, source.position().y);
+
+				
+			if (intersect.length == 0) {
+				rs.noArrowPlacement = true;
+	//			return;
+			} else {
+				rs.noArrowPlacement = false;
+			}
+			
+			var arrowEnd = $$.math.shortenIntersection(intersect,
+				[source.position().x, source.position().y],
+				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
+			var edgeEnd = $$.math.shortenIntersection(intersect,
+				[source.position().x, source.position().y],
+				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
+
+			rs.endX = edgeEnd[0];
+			rs.endY = edgeEnd[1];
+			
+			rs.arrowEndX = arrowEnd[0];
+			rs.arrowEndY = arrowEnd[1];
+
+			intersect = intersectLineSelection(this,source, target.position().x, target.position().y);
+
+
+			if (intersect.length == 0) {
+				rs.noArrowPlacement = true;
+	//			return;
+			} else {
+				rs.noArrowPlacement = false;
+			}
+			
+			var arrowStart = $$.math.shortenIntersection(intersect,
+				[target.position().x, target.position().y],
+				CanvasRenderer.arrowShapes[srcArShape].spacing(edge));
+			var edgeStart = $$.math.shortenIntersection(intersect,
+				[target.position().x, target.position().y],
+				CanvasRenderer.arrowShapes[srcArShape].gap(edge));
+
+			rs.startX = edgeStart[0];
+			rs.startY = edgeStart[1];
+			
+			rs.arrowStartX = arrowStart[0];
+			rs.arrowStartY = arrowStart[1];
+						
+		} else if (rs.edgeType == "bezier") {
+			// if( window.badArrow) debugger;
+			var cp = [rs.cp2x, rs.cp2y];
+
+			intersect = intersectLineSelection(this, target, cp[0], cp[1]);
+			
+			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
+				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
+			var edgeEnd = $$.math.shortenIntersection(intersect, cp,
+				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
+			
+			rs.endX = edgeEnd[0];
+			rs.endY = edgeEnd[1];
+			
+			rs.arrowEndX = arrowEnd[0];
+			rs.arrowEndY = arrowEnd[1];
+			
+			intersect = intersectLineSelection(this, source, cp[0], cp[1]);
+			
+			var arrowStart = $$.math.shortenIntersection(
+				intersect, 
+				cp,
+				CanvasRenderer.arrowShapes[srcArShape].spacing(edge)
+			);
+			var edgeStart = $$.math.shortenIntersection(
+				intersect, 
+				cp,
+				CanvasRenderer.arrowShapes[srcArShape].gap(edge)
+			);
+		
+			rs.startX = edgeStart[0];
+			rs.startY = edgeStart[1];
+			
+			rs.arrowStartX = arrowStart[0];
+			rs.arrowStartY = arrowStart[1];
+			
+			// if( isNaN(rs.startX) || isNaN(rs.startY) ){
+			// 	debugger;
+			// }
+
+		} else if (rs.isArcEdge) {
+			return;
+		}
+	}
+
+	// Draw node
+	CanvasRenderer.prototype.drawNode = function(context, node, drawOverlayInstead) {
+		
+		var nodeWidth, nodeHeight;
+		
+		if ( !node.visible() ) {
+			return;
+		}
+
+		var parentOpacity = node.effectiveOpacity();
+		if( parentOpacity === 0 ){ return; }
+
+		// context.fillStyle = "orange";
+		// context.fillRect(node.position().x, node.position().y, 2, 2);
+		
+		nodeWidth = this.getNodeWidth(node);
+		nodeHeight = this.getNodeHeight(node);
+		
+		context.lineWidth = node._private.style["border-width"].pxValue;
+
+		if( drawOverlayInstead === undefined || !drawOverlayInstead ){
+
+			// Node color & opacity
+			context.fillStyle = "rgba(" 
+				+ node._private.style["background-color"].value[0] + ","
+				+ node._private.style["background-color"].value[1] + ","
+				+ node._private.style["background-color"].value[2] + ","
+				+ (node._private.style["background-opacity"].value 
+				* node._private.style["opacity"].value * parentOpacity) + ")";
+			
+			// Node border color & opacity
+			context.strokeStyle = "rgba(" 
+				+ node._private.style["border-color"].value[0] + ","
+				+ node._private.style["border-color"].value[1] + ","
+				+ node._private.style["border-color"].value[2] + ","
+				+ (node._private.style["border-opacity"].value * node._private.style["opacity"].value * parentOpacity) + ")";
+			
+			context.lineJoin = 'miter'; // so borders are square with the node shape
+			
+			//var image = this.getCachedImage("url");
+			
+			var url = node._private.style["background-image"].value[2] ||
+				node._private.style["background-image"].value[1];
+			
+			if (url != undefined) {
+				
+				var r = this;
+				var image = this.getCachedImage(url,
+						
+						function() {
+							
+//							console.log(e);
+							r.data.canvasNeedsRedraw[CanvasRenderer.NODE] = true;
+							r.data.canvasNeedsRedraw[CanvasRenderer.DRAG] = true;
+							
+							// Replace Image object with Canvas to solve zooming too far
+							// into image graphical errors (Jan 10 2013)
+							r.swapCachedImage(url);
+							
+							r.redraw();
+						}
+				);
+				
+				if (image.complete == false) {
+
+					drawPathSelection(r,context, node);
+					
+					context.stroke();
+					context.fillStyle = "#555555";
+					context.fill();
+					
+				} else {
+					//context.clip
+					this.drawInscribedImage(context, image, node);
+				}
+				
+			} else {
+
+				// Draw node
+				drawSelection(this,context, node);
+			}
+			
+			this.drawPie(context, node);
+
+			// Border width, draw border
+			if (node._private.style["border-width"].pxValue > 0) {
+				drawPathSelection(this,context, node);
+
+				context.stroke();
+			}
+
+		// draw the overlay
+		} else {
+
+			var overlayPadding = node._private.style["overlay-padding"].pxValue;
+			var overlayOpacity = node._private.style["overlay-opacity"].value;
+			var overlayColor = node._private.style["overlay-color"].value;
+			if( overlayOpacity > 0 ){
+				context.fillStyle = "rgba( " + overlayColor[0] + ", " + overlayColor[1] + ", " + overlayColor[2] + ", " + overlayOpacity + " )";
+
+				CanvasRenderer.nodeShapes['roundrectangle'].draw(
+					context,
+					node._private.position.x,
+					node._private.position.y,
+					nodeWidth + overlayPadding * 2,
+					nodeHeight + overlayPadding * 2
+				);
+			}
+		}
+
+	};
+
+	// Round rectangle drawing
+	CanvasRenderer.prototype.drawRoundRectanglePath = function(
+		context, x, y, width, height, radius) {
+		
+		var halfWidth = width / 2;
+		var halfHeight = height / 2;
+		//var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+		var cornerRadius = radius;
+		context.translate(x, y);
+		
+		context.beginPath();
+		
+		// Start at top middle
+		context.moveTo(0, -halfHeight);
+		// Arc from middle top to right side
+		context.arcTo(halfWidth, -halfHeight, halfWidth, 0, cornerRadius);
+		// Arc from right side to bottom
+		context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
+		// Arc from bottom to left side
+		context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
+		// Arc from left side to topBorder
+		context.arcTo(-halfWidth, -halfHeight, 0, -halfHeight, cornerRadius);
+		// Join line
+		context.lineTo(0, -halfHeight);
+		
+		context.closePath();
+		
+		context.translate(-x, -y);
+	}
+
+
+	CanvasRenderer.prototype.getNodeShape = function(node)
+	{
+		// TODO only allow rectangle for a compound node?
+//		if (node._private.style["width"].value == "auto" ||
+//		    node._private.style["height"].value == "auto")
+//		{
+//			return "rectangle";
+//		}
+
+		var shape = node._private.style["shape"].value;
+
+		return shape;
+	};
+
+		// Find edge control points
+	CanvasRenderer.prototype.findEdgeControlPoints = function(edges) {
+		var hashTable = {}; var cy = this.data.cy;
+		var pairIds = [];
+		
+		// create a table of edge (src, tgt) => list of edges between them
+		var pairId;
+		for (var i = 0; i < edges.length; i++){
+			var edge = edges[i];
+
+			// ignore edges who are not to be displayed
+			// they shouldn't take up space
+			if( edge._private.style.display.value === 'none' ){
+				continue;
+			}
+
+			var srcId = edge._private.data.source;
+			var tgtId = edge._private.data.target;
+
+			pairId = srcId > tgtId ?
+				tgtId + '-' + srcId :
+				srcId + '-' + tgtId ;
+
+			if (hashTable[pairId] == undefined) {
+				hashTable[pairId] = [];
+			}
+			
+			hashTable[pairId].push( edge );
+			pairIds.push( pairId );
+		}
+
+		var src, tgt, srcPos, tgtPos, srcW, srcH, tgtW, tgtH, srcShape, tgtShape, srcBorder, tgtBorder;
+		var midpt;
+		var vectorNormInverse;
+		var badBezier;
+		
+		// for each pair (src, tgt), create the ctrl pts
+		// Nested for loop is OK; total number of iterations for both loops = edgeCount	
+		for (var p = 0; p < pairIds.length; p++) {
+			pairId = pairIds[p];
+		
+			src = cy.getElementById( hashTable[pairId][0]._private.data.source );
+			tgt = cy.getElementById( hashTable[pairId][0]._private.data.target );
+
+			srcPos = src._private.position;
+			tgtPos = tgt._private.position;
+
+			srcW = this.getNodeWidth(src);
+			srcH = this.getNodeHeight(src);
+
+			tgtW = this.getNodeWidth(tgt);
+			tgtH = this.getNodeHeight(tgt);
+
+			srcShape = CanvasRenderer.nodeShapes[ this.getNodeShape(src) ];
+			tgtShape = CanvasRenderer.nodeShapes[ this.getNodeShape(tgt) ];
+
+			srcBorder = src._private.style["border-width"].pxValue;
+			tgtBorder = tgt._private.style["border-width"].pxValue;
+
+			badBezier = false;
+			
+
+			if (hashTable[pairId].length > 1) {
+
+				// pt outside src shape to calc distance/displacement from src to tgt
+				/*
+				var srcOutside = srcShape.intersectLine(
+					srcPos.x,
+					srcPos.y,
+					srcW,
+					srcH,
+					tgtPos.x,
+					tgtPos.y,
+					srcBorder / 2
+				);
+				*/
+				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y);
+
+				// pt outside tgt shape to calc distance/displacement from src to tgt
+				/*
+				var tgtOutside = tgtShape.intersectLine(
+					tgtPos.x,
+					tgtPos.y,
+					tgtW,
+					tgtH,
+					srcPos.x,
+					srcPos.y,
+					tgtBorder / 2
+				);
+				*/
+				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y);
+
+				var midpt = {
+					x: ( srcOutside[0] + tgtOutside[0] )/2,
+					y: ( srcOutside[1] + tgtOutside[1] )/2
+				};
+
+				var dy = ( tgtOutside[1] - srcOutside[1] );
+				var dx = ( tgtOutside[0] - srcOutside[0] );
+				var l = Math.sqrt( dx*dx + dy*dy );
+
+				var vector = {
+					x: dx,
+					y: dy
+				};
+				
+				var vectorNorm = {
+					x: vector.x/l,
+					y: vector.y/l
+				};
+				vectorNormInverse = {
+					x: -vectorNorm.y,
+					y: vectorNorm.x
+				};
+
+				// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
+				if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
+					checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
+					/* tgtShape.checkPoint( srcOutside[0], srcOutside[1], tgtBorder/2, tgtW, tgtH, tgtPos.x, tgtPos.y )  ||
+					srcShape.checkPoint( tgtOutside[0], tgtOutside[1], srcBorder/2, srcW, srcH, srcPos.x, srcPos.y ) */ 
+				){
+					vectorNormInverse = {};
+					badBezier = true;
+				}
+				
+			}
+			
+			var edge;
+			var rs;
+			
+			for (var i = 0; i < hashTable[pairId].length; i++) {
+				edge = hashTable[pairId][i];
+				rs = edge._private.rscratch;
+				
+				var edgeIndex1 = rs.lastEdgeIndex;
+				var edgeIndex2 = i;
+
+				var numEdges1 = rs.lastNumEdges;
+				var numEdges2 = hashTable[pairId].length;
+
+				var srcX1 = rs.lastSrcCtlPtX;
+				var srcX2 = srcPos.x;
+				var srcY1 = rs.lastSrcCtlPtY;
+				var srcY2 = srcPos.y;
+				var srcW1 = rs.lastSrcCtlPtW;
+				var srcW2 = src.outerWidth();
+				var srcH1 = rs.lastSrcCtlPtH;
+				var srcH2 = src.outerHeight();
+
+				var tgtX1 = rs.lastTgtCtlPtX;
+				var tgtX2 = tgtPos.x;
+				var tgtY1 = rs.lastTgtCtlPtY;
+				var tgtY2 = tgtPos.y;
+				var tgtW1 = rs.lastTgtCtlPtW;
+				var tgtW2 = tgt.outerWidth();
+				var tgtH1 = rs.lastTgtCtlPtH;
+				var tgtH2 = tgt.outerHeight();
+
+				if( badBezier ){
+					rs.badBezier = true;
+				} else {
+					rs.badBezier = false;
+				}
+
+				if( srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2
+				&&  tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2
+				&&  edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2 ){
+					// console.log('edge ctrl pt cache HIT')
+					continue; // then the control points haven't changed and we can skip calculating them
+				} else {
+					rs.lastSrcCtlPtX = srcX2;
+					rs.lastSrcCtlPtY = srcY2;
+					rs.lastSrcCtlPtW = srcW2;
+					rs.lastSrcCtlPtH = srcH2;
+					rs.lastTgtCtlPtX = tgtX2;
+					rs.lastTgtCtlPtY = tgtY2;
+					rs.lastTgtCtlPtW = tgtW2;
+					rs.lastTgtCtlPtH = tgtH2;
+					rs.lastEdgeIndex = edgeIndex2;
+					rs.lastNumEdges = numEdges2;
+					// console.log('edge ctrl pt cache MISS')
+				}
+
+				var stepSize = edge._private.style["control-point-step-size"].value;
+
+				// Self-edge
+				if ( src.id() == tgt.id() ) {
+						
+					rs.edgeType = "self";
+					
+					// New -- fix for large nodes
+					rs.cp2ax = srcPos.x;
+					rs.cp2ay = srcPos.y - (1 + Math.pow(srcH, 1.12) / 100) * stepSize * (i / 3 + 1);
+					
+					rs.cp2cx = src._private.position.x - (1 + Math.pow(srcW, 1.12) / 100) * stepSize * (i / 3 + 1);
+					rs.cp2cy = srcPos.y;
+					
+					rs.selfEdgeMidX = (rs.cp2ax + rs.cp2cx) / 2.0;
+					rs.selfEdgeMidY = (rs.cp2ay + rs.cp2cy) / 2.0;
+					
+				// Straight edge
+				} else if (hashTable[pairId].length % 2 == 1
+					&& i == Math.floor(hashTable[pairId].length / 2)) {
+					
+					rs.edgeType = "straight";
+					
+				// Bezier edge
+				} else {
+					var distanceFromMidpoint = (0.5 - hashTable[pairId].length / 2 + i) * stepSize;
+					
+					rs.edgeType = "bezier";
+					
+					rs.cp2x = midpt.x + vectorNormInverse.x * distanceFromMidpoint;
+					rs.cp2y = midpt.y + vectorNormInverse.y * distanceFromMidpoint;
+					
+					// console.log(edge, midPointX, displacementX, distanceFromMidpoint);
+				}
+
+				// find endpts for edge
+				this.findEndpoints( edge );
+
+				var badStart = !$$.is.number( rs.startX ) || !$$.is.number( rs.startY );
+				var badAStart = !$$.is.number( rs.arrowStartX ) || !$$.is.number( rs.arrowStartY );
+				var badEnd = !$$.is.number( rs.endX ) || !$$.is.number( rs.endY );
+				var badAEnd = !$$.is.number( rs.arrowEndX ) || !$$.is.number( rs.arrowEndY );
+
+				var minCpADistFactor = 3;
+				var arrowW = this.getArrowWidth( edge._private.style['width'].pxValue ) * CanvasRenderer.arrowShapeHeight;
+				var minCpADist = minCpADistFactor * arrowW;
+				var startACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.startX, y: rs.startY } );
+				var closeStartACp = startACpDist < minCpADist;
+				var endACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.endX, y: rs.endY } );
+				var closeEndACp = endACpDist < minCpADist;
+
+				if( rs.edgeType === "bezier" ){
+					var overlapping = false;
+
+					if( badStart || badAStart || closeStartACp ){
+						overlapping = true;
+
+						// project control point along line from src centre to outside the src shape
+						// (otherwise intersection will yield nothing)
+						var cpD = { // delta
+							x: rs.cp2x - srcPos.x,
+							y: rs.cp2y - srcPos.y
+						};
+						var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
+						var cpM = { // normalised delta
+							x: cpD.x / cpL,
+							y: cpD.y / cpL
+						};
+						var radius = Math.max(srcW, srcH);
+						var cpProj = { // *2 radius guarantees outside shape
+							x: rs.cp2x + cpM.x * 2 * radius,
+							y: rs.cp2y + cpM.y * 2 * radius
+						};
+						/*
+						var srcCtrlPtIntn = srcShape.intersectLine(
+							srcPos.x,
+							srcPos.y,
+							srcW,
+							srcH,
+							cpProj.x,
+							cpProj.y,
+							srcBorder / 2
+						);
+						*/
+
+						var srcCtrlPtIntn = intersectLineSelection(this, src, cpProj.x, cpProj.y);
+
+						if( closeStartACp ){
+							rs.cp2x = rs.cp2x + cpM.x * (minCpADist - startACpDist); 
+							rs.cp2y = rs.cp2y + cpM.y * (minCpADist - startACpDist)
+						} else {
+							rs.cp2x = srcCtrlPtIntn[0] + cpM.x * minCpADist; 
+							rs.cp2y = srcCtrlPtIntn[1] + cpM.y * minCpADist;
+						}
+					}
+
+					if( badEnd || badAEnd || closeEndACp ){
+						overlapping = true;
+
+						// project control point along line from tgt centre to outside the tgt shape
+						// (otherwise intersection will yield nothing)
+						var cpD = { // delta
+							x: rs.cp2x - tgtPos.x,
+							y: rs.cp2y - tgtPos.y
+						};
+						var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
+						var cpM = { // normalised delta
+							x: cpD.x / cpL,
+							y: cpD.y / cpL
+						};
+						var radius = Math.max(srcW, srcH);
+						var cpProj = { // *2 radius guarantees outside shape
+							x: rs.cp2x + cpM.x * 2 * radius,
+							y: rs.cp2y + cpM.y * 2 * radius
+						};
+						/*
+						var tgtCtrlPtIntn = tgtShape.intersectLine(
+							tgtPos.x,
+							tgtPos.y,
+							tgtW,
+							tgtH,
+							cpProj.x,
+							cpProj.y,
+							tgtBorder / 2
+						);
+						*/
+						var tgtCtrlPtIntn = intersectLineSelection(this, tgt, cpProj.x, cpProj.y);
+
+						if( closeEndACp ){
+							rs.cp2x = rs.cp2x + cpM.x * (minCpADist - endACpDist); 
+							rs.cp2y = rs.cp2y + cpM.y * (minCpADist - endACpDist);
+						} else {
+							rs.cp2x = tgtCtrlPtIntn[0] + cpM.x * minCpADist; 
+							rs.cp2y = tgtCtrlPtIntn[1] + cpM.y * minCpADist;
+						}
+						
+					}
+
+					if( overlapping ){
+						// recalc endpts
+						this.findEndpoints( edge );
+					}
+				}
+
+				// project the edge into rstyle
+				this.projectBezier( edge );
+
+			}
+		}
+		
+		return hashTable;
+	}
+
+
+})( cytoscape );
+
 
 /* 
  * Those are the utilization functions to use for drawing sbgn shapes.
@@ -45,11 +1142,12 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 	var renderer = CanvasRenderer.prototype;
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
+
 	function truncateText(textProp, context) {
 	    var width;
 	    var text = textProp.label;
 	    var len = text.length;
-	    var ellipsis = '...';
+	    var ellipsis = "...";
 	    while ((width = context.measureText(text).width) > textProp.width) {
 	        --len;
 	        text = text.substring(0, len) + ellipsis;
@@ -59,21 +1157,21 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 	$$.sbgn.drawText = function(context, textProp){
 		context.font = textProp.font;
-		context.textAlign = 'center';
-		context.textBaseline = 'middle';
+		context.textAlign = "center";
+		context.textBaseline = "middle";
 		var oldColor  = context.fillStyle;
 		context.fillStyle = textProp.color;
 		var oldOpacity = context.globalAlpha;
 		context.globalAlpha = textProp.opacity;
-		context.fillText('' + truncateText(textProp, context), textProp.centerX, textProp.centerY);
+		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
 		context.fillStyle = oldColor;
 		context.globalAlpha = oldOpacity;
 		context.stroke();
 	}
 
 	$$.sbgn.drawLabelText = function(context, textProp){
-		textProp.color = '#0f0f0f';
-		textProp.font = '9px Arial';
+		textProp.color = "#0f0f0f";
+		textProp.font = "9px Arial";
 		$$.sbgn.drawText(context, textProp);
 	}
 
@@ -82,23 +1180,23 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		var stateVariable = textProp.state.variable;
 
 		var stateLabel = (stateVariable == null) ? stateValue : 
-			stateValue + '@' + stateVariable;
+			stateValue + "@" + stateVariable;
 
 		textProp.label = stateLabel;
-		textProp.color = '#0f0f0f';
-		textProp.font = '8px Arial';
+		textProp.color = "#0f0f0f";
+		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
 	}
 
 	$$.sbgn.drawInfoText = function(context, textProp){
-		textProp.color = '#0f0f0f';
-		textProp.font = '8px Arial';
+		textProp.color = "#0f0f0f";
+		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
 	}
 
 	$$.sbgn.drawCloneMarkerText = function(context, textProp){
-		textProp.color = '#fff';
-		textProp.font = '4px Arial';
+		textProp.color = "#fff";
+		textProp.font = "4px Arial";
 		$$.sbgn.drawText(context, textProp);	
 	}
 
@@ -136,7 +1234,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 	    context.translate(-centerX, -centerY);
 	}
 
-	$$.sbgn.drawStateAndInfos = function(renderer, node, context, centerX, centerY){
+	$$.sbgn.drawPathStateAndInfos = function(node, context, centerX, centerY){
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
 		var stateCount = 0, infoCount = 0;
 				
@@ -150,7 +1248,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
 				'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
-			if(state.clazz == 'state variable' && stateCount < 2){//draw ellipse
+			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				//var stateLabel = state.state.value;
 				$$.sbgn.drawEllipse(context,stateCenterX, stateCenterY, 
 					stateWidth, stateHeight);
@@ -160,7 +1258,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 				stateCount++;
 			}
-			else if(state.clazz == 'unit of information' && infoCount < 2){//draw rectangle
+			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
 				renderer.drawRoundRectangle(context,
 					stateCenterX, stateCenterY,
 					stateWidth, stateHeight,
@@ -183,7 +1281,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		return 0;
 	}
 
-	$$.sbgn.drawComplexStateAndInfo = function(renderer, context, node, stateAndInfos, 
+	$$.sbgn.drawComplexStateAndInfo = function(context, node, stateAndInfos, 
 		centerX, centerY, width, height){
 		var upWidth = 0, downWidth = 0;
 		var boxPadding = 10, betweenBoxPadding = 5;
@@ -207,7 +1305,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
 						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
-					if(state.clazz == 'state variable'){//draw ellipse
+					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
@@ -215,7 +1313,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 						textProp.state = state.state;
 						$$.sbgn.drawStateText(context, textProp);
 					}
-					else if(state.clazz == 'unit of information'){//draw rectangle
+					else if(state.clazz == "unit of information"){//draw rectangle
 						renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
@@ -235,7 +1333,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
 						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
-					if(state.clazz == 'state variable'){//draw ellipse
+					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
@@ -243,7 +1341,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 						textProp.state = state.state;
 						$$.sbgn.drawStateText(context, textProp);
 					}
-					else if(state.clazz == 'unit of information'){//draw rectangle
+					else if(state.clazz == "unit of information"){//draw rectangle
 						renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
@@ -279,7 +1377,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		width, height, cloneMarker){
 		if(cloneMarker != null){
 			var oldColor  = context.fillStyle;
-			context.fillStyle = '#0f0f0f';
+			context.fillStyle = "#0f0f0f";
 
 			context.beginPath();
 			context.translate(centerX, centerY);
@@ -328,7 +1426,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 				2 * cornerRadius, 2 * cornerRadius, cloneMarker);
 
 			var oldColor  = context.fillStyle;
-			context.fillStyle = '#0f0f0f';
+			context.fillStyle = "#0f0f0f";
 
 			var recPoints = $$.math.generateUnitNgonPointsFitToSquare(4, 0);
 			var cloneX = centerX;
@@ -342,7 +1440,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		}
 	}
 
-	$$.sbgn.drawPerturbingAgentCloneMarker = function(renderer, context, centerX, centerY, 
+	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
 		if(cloneMarker != null){
 			var cloneWidth = width;
@@ -353,7 +1451,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
 
 			var oldColor  = context.fillStyle;
-			context.fillStyle = '#0f0f0f';
+			context.fillStyle = "#0f0f0f";
 
 			renderer.drawPolygon(context,
 				cloneX, cloneY,
@@ -373,7 +1471,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var cloneX = centerX;
 			var cloneY = centerY + 3 * height / 8;
 			var oldColor  = context.fillStyle;
-			context.fillStyle = '#0f0f0f';
+			context.fillStyle = "#0f0f0f";
 
 			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
 			context.fill();
@@ -400,7 +1498,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var markerPoints = new Array(-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1);
 
 			var oldColor  = context.fillStyle;
-			context.fillStyle = '#0f0f0f';
+			context.fillStyle = "#0f0f0f";
 
 			renderer.drawPolygon(context,
 				cloneX, cloneY,
@@ -414,18 +1512,17 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 	$$.sbgn.isMultimer = function(node){
 		var sbgnClass = node._private.data.sbgnclass;
-		if(sbgnClass.indexOf('multimer') != -1)
+		if(sbgnClass.indexOf("multimer") != -1)
 			return true;
 		return false;
 	}
 
-	$$.sbgn.nucleicAcidIntersectionLine = function(node, x, y, nodeX, nodeY){
+	$$.sbgn.nucleicAcidIntersectionLine = function(node, x, y, nodeX, nodeY, cornerRadius){
 		var nodeX = node._private.position.x;
 		var nodeY = node._private.position.y;
 		var width = node.width();
 		var height = node.height();
-		var padding = node._private.style['border-width'].pxValue / 2;
-		var cornerRadius = nodeShapes['nucleic acid feature'].cornerRadius;
+		var padding = node._private.style["border-width"].pxValue / 2;
 
 		var halfWidth = width / 2;
 		var halfHeight = height / 2;
@@ -530,12 +1627,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		return []; // if nothing
 	}
 
-	$$.sbgn.nucleicAcidIntersectionBox = function(x1, y1, x2, y2, centerX, centerY, node){
+	$$.sbgn.nucleicAcidIntersectionBox = function(x1, y1, x2, y2, centerX, centerY, node, points, cornerRadius){
 		var width = node.width();
 		var height = node.height();
-		var padding = node._private.style['border-width'].pxValue / 2;
-		var points = nodeShapes['square'].points;
-		var cornerRadius = nodeShapes['nucleic acid feature'].cornerRadius;
+		var padding = node._private.style["border-width"].pxValue / 2;
 
 		//we have a rectangle at top and a roundrectangle at bottom
 		var rectIntersectBoxResult = $$.math.boxIntersectPolygon(
@@ -551,21 +1646,20 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		return rectIntersectBoxResult || roundRectIntersectBoxResult;
 	}
 
-	$$.sbgn.nucleicAcidCheckPoint = function(x, y, centerX, centerY, node, threshold){
+	$$.sbgn.nucleicAcidCheckPoint = function(x, y, centerX, centerY, node, threshold, points, cornerRadius){
 		var width = node.width();
 		var height = node.height();
-		var padding = node._private.style['border-width'].pxValue / 2;
-		var cornerRadius = nodeShapes['nucleic acid feature'].cornerRadius;
+		var padding = node._private.style["border-width"].pxValue / 2;
 
 		//check rectangle at top
-		if ($$.math.pointInsidePolygon(x, y, nodeShapes['roundrectangle'].points,
+		if ($$.math.pointInsidePolygon(x, y, points,
 			centerX, centerY -  cornerRadius/2, width, height - cornerRadius, [0, -1], 
 			padding)) {
 			return true;
 		}
 
 		//check rectangle at bottom
-		if ($$.math.pointInsidePolygon(x, y, nodeShapes['roundrectangle'].points,
+		if ($$.math.pointInsidePolygon(x, y, points,
 			centerX, centerY + height/2 -  cornerRadius/2, width - 2*cornerRadius, cornerRadius, [0, -1], 
 			padding)) {
 			return true;
@@ -606,7 +1700,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 	$$.sbgn.checkPointStateAndInfoBoxes = function(x, y, node, threshold){
 		var centerX = node._private.position.x;
 		var centerY = node._private.position.y;
-		var padding = node._private.style['border-width'].pxValue / 2;
+		var padding = node._private.style["border-width"].pxValue / 2;
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
 
 		var stateCount = 0, infoCount = 0;
@@ -619,8 +1713,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var stateCenterX = state.bbox.x + centerX;
 			var stateCenterY = state.bbox.y + centerY;
 
-			if(state.clazz == 'state variable' && stateCount < 2){//draw ellipse
-				var stateCheckPoint = nodeShapes['ellipse'].checkPoint(
+			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
+				var stateCheckPoint = nodeShapes["ellipse"].checkPoint(
 					x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 
 				if(stateCheckPoint == true)
@@ -628,8 +1722,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 				stateCount++;
 			}
-			else if(state.clazz == 'unit of information' && infoCount < 2){//draw rectangle
-				var infoCheckPoint = nodeShapes['roundrectangle'].checkPoint(
+			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
+				var infoCheckPoint = nodeShapes["roundrectangle"].checkPoint(
 					x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 				
 				if(infoCheckPoint == true)
@@ -646,7 +1740,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		centerX, centerY){
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
 		var stateCount = 0, infoCount = 0;
-		var padding = node._private.style['border-width'].pxValue / 2;
+		var padding = node._private.style["border-width"].pxValue / 2;
 
 		for(var i = 0 ; i < stateAndInfos.length ; i++){
 			var state = stateAndInfos[i];
@@ -655,9 +1749,9 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var stateCenterX = state.bbox.x + centerX;
 			var stateCenterY = state.bbox.y + centerY;
 
-			if(state.clazz == 'state variable' && stateCount < 2){//draw ellipse
+			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				return true;
-				var stateCheckPointRough = nodeShapes['ellipse'].checkPointRough(
+				var stateCheckPointRough = nodeShapes["ellipse"].checkPointRough(
 					x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 				
 				if(stateCheckPointRough == true)
@@ -665,8 +1759,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 				stateCount++;
 			}
-			else if(state.clazz == 'unit of information' && infoCount < 2){//draw rectangle
-				var infoCheckPointRough = nodeShapes['roundrectangle'].checkPointRough(
+			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
+				var infoCheckPointRough = nodeShapes["roundrectangle"].checkPointRough(
 					x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 				
 				if(infoCheckPointRough == true)
@@ -682,7 +1776,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 	$$.sbgn.intersectLineStateAndInfoBoxes = function(node, x, y){
 		var centerX = node._private.position.x;
 		var centerY = node._private.position.y;
-		var padding = node._private.style['border-width'].pxValue / 2;
+		var padding = node._private.style["border-width"].pxValue / 2;
 		
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
 		
@@ -697,7 +1791,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var stateCenterX = state.bbox.x + centerX;
 			var stateCenterY = state.bbox.y + centerY;
 
-			if(state.clazz == 'state variable' && stateCount < 2){//draw ellipse
+			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				var stateIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY, 
 					stateCenterX, stateCenterY, stateWidth, stateHeight, padding);
 
@@ -706,7 +1800,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 				stateCount++;
 			}
-			else if(state.clazz == 'unit of information' && infoCount < 2){//draw rectangle
+			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
 				var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY, 
 					stateCenterX, stateCenterY, stateWidth, stateHeight, 5, padding);
 
@@ -727,12 +1821,12 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		var centerY = node._private.position.y;
 		var width = node.width();
 		var height = node.height();
-		var padding = node._private.style['border-width'].pxValue / 2;
+		var padding = node._private.style["border-width"].pxValue / 2;
 		
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
 		
 		var stateCount = 0, infoCount = 0;
-		var padding = node._private.style['border-width'].pxValue / 2;
+		var padding = node._private.style["border-width"].pxValue / 2;
 
 		for(var i = 0 ; i < stateAndInfos.length ; i++){
 			var state = stateAndInfos[i];
@@ -741,8 +1835,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var stateCenterX = state.bbox.x + centerX;
 			var stateCenterY = state.bbox.y + centerY;
 
-			if(state.clazz == 'state variable' && stateCount < 2){//draw ellipse
-				var stateIntersectBox = nodeShapes['ellipse'].intersectBox(x1, y1, x2, y2,
+			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
+				var stateIntersectBox = nodeShapes["ellipse"].intersectBox(x1, y1, x2, y2,
 					stateWidth, stateHeight, stateCenterX, stateCenterY, padding);
 
 				if(stateIntersectBox == true)
@@ -750,8 +1844,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 				stateCount++;
 			}
-			else if(state.clazz == 'unit of information' && infoCount < 2){//draw rectangle
-				var infoIntersectBox = nodeShapes['roundrectangle'].intersectBox(x1, y1, x2, y2,
+			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
+				var infoIntersectBox = nodeShapes["roundrectangle"].intersectBox(x1, y1, x2, y2,
 					stateWidth, stateHeight, stateCenterX, stateCenterY, padding);
 				
 				if(infoIntersectBox == true)
@@ -983,1104 +2077,6 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 })( cytoscape );
 
-/*
- * Some of the core functions of cytoscape.js must be overrided so that we can access the data
- * associated with the node's itself.
- */
-;(function($$){'use strict';
-
-	var CanvasRenderer = $$('renderer', 'canvas');
-	var renderer = CanvasRenderer.prototype;
-
-	function drawSelection(render,context, node){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			CanvasRenderer.nodeShapes[render.getNodeShape(node)].draw(
-					context,
-					node); //node._private.data.weight / 5.0
-		}
-		else{
-			CanvasRenderer.nodeShapes[render.getNodeShape(node)].draw(
-					context,
-					node._private.position.x,
-					node._private.position.y,
-					render.getNodeWidth(node),
-					render.getNodeHeight(node)); //node._private.data.weight / 5.0
-		}
-	}
-
-	function drawPathSelection(render,context, node){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			CanvasRenderer.nodeShapes[render.getNodeShape(node)].drawPath(
-					context,
-					node); //node._private.data.weight / 5.0
-		}
-		else{
-			CanvasRenderer.nodeShapes[render.getNodeShape(node)].drawPath(
-					context,
-					node._private.position.x,
-					node._private.position.y,
-					render.getNodeWidth(node),
-					render.getNodeHeight(node)); //node._private.data.weight / 5.0
-		}
-	}
-
-	function intersectLineSelection(render, node, x, y){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectLine(
-				node,
-				x, //halfPointX,
-				y //halfPointY
-			);
-		}
-		else{
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectLine(
-				node._private.position.x,
-				node._private.position.y,
-				render.getNodeWidth(node),
-				render.getNodeHeight(node),
-				x, //halfPointX,
-				y, //halfPointY
-				node._private.style['border-width'].pxValue / 2
-			);
-		}
-	}
-
-	function checkPointRoughSelection(render, node, x, y, nodeThreshold){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPointRough(x, y,
-				node,
-				nodeThreshold);
-		}
-		else{
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPointRough(x, y,
-				node._private.style['border-width'].pxValue / 2,
-				render.getNodeWidth(node) + nodeThreshold, 
-				render.getNodeHeight(node) + nodeThreshold,
-				node._private.position.x,
-				node._private.position.y);
-		}
-	}
-
-	function checkPointSelection(render, node, x, y, nodeThreshold){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPoint(x, y,
-				node,
-				nodeThreshold);
-		}
-		else{
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPoint(x, y,
-				node._private.style['border-width'].pxValue / 2,
-				render.getNodeWidth(node) + nodeThreshold, 
-				render.getNodeHeight(node) + nodeThreshold,
-				node._private.position.x, 
-				node._private.position.y);
-		}
-	}
-
-	function intersectBoxSelection(render, x1, y1, x2, y2, node){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectBox(x1, y1, x2, y2, node);
-		}
-		else{
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].intersectBox(x1, y1, x2, y2,
-				render.getNodeWidth(node), 
-				render.getNodeHeight(node),
-				node._private.position.x, 
-				node._private.position.y, 
-				node._private.style['border-width'].pxValue / 2);
-		}
-	}
-
-	CanvasRenderer.prototype.drawPie = function(context, node){
-		node = node[0]; // ensure ele ref
-
-		if( !this.hasPie(node) ){ return; } // exit early if not needed
-
-		var nodeW = this.getNodeWidth( node );
-		var nodeH = this.getNodeHeight( node );
-		var x = node._private.position.x;
-		var y = node._private.position.y;
-		var radius = Math.min( nodeW, nodeH ) / 2; // must fit in node
-		var lastPercent = 0; // what % to continue drawing pie slices from on [0, 1]
-
-		context.save();
-
-		// clip to the node shape
-		drawPathSelection(this, context, node);
-
-		context.clip();
-
-		for( var i = 1; i <= $$.style.pieBackgroundN; i++ ){ // 1..N
-			var size = node._private.style['pie-' + i + '-background-size'].value;
-			var color = node._private.style['pie-' + i + '-background-color'];
-			var percent = size / 100; // map integer range [0, 100] to [0, 1]
-			var angleStart = 1.5 * Math.PI + 2 * Math.PI * lastPercent; // start at 12 o'clock and go clockwise
-			var angleDelta = 2 * Math.PI * percent;
-			var angleEnd = angleStart + angleDelta;
-
-			// slice start and end points
-			var sx1 = x + radius * Math.cos( angleStart );
-			var sy1 = y + radius * Math.sin( angleStart );
-
-			// ignore if
-			// - zero size
-			// - we're already beyond the full circle
-			// - adding the current slice would go beyond the full circle
-			if( size === 0 || lastPercent >= 1 || lastPercent + percent > 1 ){
-				continue;
-			}
-
-			context.beginPath();
-			context.moveTo(x, y);
-			context.arc( x, y, radius, angleStart, angleEnd );
-			context.closePath();
-
-			context.fillStyle = 'rgb(' 
-				+ color.value[0] + ','
-				+ color.value[1] + ','
-				+ color.value[2] + ')'
-			;
-
-			context.fill();
-
-			lastPercent += percent;
-		}
-
-		context.restore();
-	};
-
-
-	CanvasRenderer.prototype.drawInscribedImage = function(context, img, node) {
-		var r = this;
-//		console.log(this.data);
-		var zoom = this.data.cy._private.zoom;
-		
-		var nodeX = node._private.position.x;
-		var nodeY = node._private.position.y;
-
-		//var nodeWidth = node._private.style['width'].value;
-		//var nodeHeight = node._private.style['height'].value;
-		var nodeWidth = this.getNodeWidth(node);
-		var nodeHeight = this.getNodeHeight(node);
-		
-		context.save();
-		
-		drawPathSelection(this, context, node);
-		
-		context.clip();
-		
-//		context.setTransform(1, 0, 0, 1, 0, 0);
-		
-		var imgDim = [img.width, img.height];
-		context.drawImage(img, 
-				nodeX - imgDim[0] / 2,
-				nodeY - imgDim[1] / 2,
-				imgDim[0],
-				imgDim[1]);
-		
-		context.restore();
-		
-		if (node._private.style['border-width'].value > 0) {
-			context.stroke();
-		}
-		
-	};
-
-	CanvasRenderer.prototype.getAllInBox = function(x1, y1, x2, y2) {
-		var data = this.data; 
-		var nodes = this.getCachedNodes(); 
-		var edges = this.getCachedEdges(); 
-		var box = [];
-		
-		var x1c = Math.min(x1, x2); 
-		var x2c = Math.max(x1, x2); 
-		var y1c = Math.min(y1, y2); 
-		var y2c = Math.max(y1, y2); 
-		x1 = x1c; 
-		x2 = x2c; 
-		y1 = y1c; 
-		y2 = y2c; 
-		var heur;
-		
-		for (var i=0;i<nodes.length;i++) {
-			if (intersectBoxSelection(this, x1, y1, x2, y2, nodes[i])){ 
-				box.push(nodes[i]); 
-			}
-		}
-		
-		for (var i=0;i<edges.length;i++) {
-			if (edges[i]._private.rscratch.edgeType == 'self') {
-				if ((heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
-						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-						edges[i]._private.rscratch.cp2ax, edges[i]._private.rscratch.cp2ay,
-						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value))
-							&&
-						(heur == 2 || (heur == 1 && $$.math.checkBezierInBox(x1, y1, x2, y2,
-							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-							edges[i]._private.rscratch.cp2ax, edges[i]._private.rscratch.cp2ay,
-							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value)))
-								||
-					(heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
-						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-						edges[i]._private.rscratch.cp2cx, edges[i]._private.rscratch.cp2cy,
-						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value))
-							&&
-						(heur == 2 || (heur == 1 && $$.math.checkBezierInBox(x1, y1, x2, y2,
-							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-							edges[i]._private.rscratch.cp2cx, edges[i]._private.rscratch.cp2cy,
-							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value)))
-					)
-				{ box.push(edges[i]); }
-			}
-			
-			if (edges[i]._private.rscratch.edgeType == 'bezier' &&
-				(heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
-						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-						edges[i]._private.rscratch.cp2x, edges[i]._private.rscratch.cp2y,
-						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value))
-							&&
-						(heur == 2 || (heur == 1 && $$.math.checkBezierInBox(x1, y1, x2, y2,
-							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-							edges[i]._private.rscratch.cp2x, edges[i]._private.rscratch.cp2y,
-							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value))))
-				{ box.push(edges[i]); }
-		
-			if (edges[i]._private.rscratch.edgeType == 'straight' &&
-				(heur = $$.math.boxInBezierVicinity(x1, y1, x2, y2,
-						edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-						edges[i]._private.rscratch.startX * 0.5 + edges[i]._private.rscratch.endX * 0.5, 
-						edges[i]._private.rscratch.startY * 0.5 + edges[i]._private.rscratch.endY * 0.5, 
-						edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value))
-							&& 
-						(heur == 2 || (heur == 1 && $$.math.checkStraightEdgeInBox(x1, y1, x2, y2,
-							edges[i]._private.rscratch.startX, edges[i]._private.rscratch.startY,
-							edges[i]._private.rscratch.endX, edges[i]._private.rscratch.endY, edges[i]._private.style['width'].value))))
-				{ box.push(edges[i]); }
-			
-		}
-		
-		return box;
-	}
-
-	// Find nearest element
-	CanvasRenderer.prototype.findNearestElement = function(x, y, visibleElementsOnly) {
-		var data = this.data; 
-		var nodes = this.getCachedNodes(); 
-		var edges = this.getCachedEdges(); 
-		var near = [];
-		var isTouch = CanvasRenderer.isTouch;
-		
-		var zoom = this.data.cy.zoom();
-		var edgeThreshold = (isTouch ? 256 : 32) / zoom;
-		var nodeThreshold = (isTouch ? 16 : 0) /  zoom;
-		
-		// Check nodes
-		for (var i = 0; i < nodes.length; i++) {
-			
-			if (checkPointRoughSelection(this, nodes[i], x, y, nodeThreshold) &&
-				checkPointSelection(this, nodes[i], x, y, nodeThreshold)) {
-				
-				if (visibleElementsOnly) {
-					if (nodes[i]._private.style['opacity'].value != 0
-						&& nodes[i]._private.style['visibility'].value == 'visible'
-						&& nodes[i]._private.style['display'].value == 'element') {
-						
-						near.push(nodes[i]);	
-					}
-				} else {
-					near.push(nodes[i]);
-				}
-			}
-		}
-		
-		// Check edges
-		var addCurrentEdge;
-		for (var i = 0; i < edges.length; i++) {
-			var edge = edges[i];
-			var rs = edge._private.rscratch;
-
-			addCurrentEdge = false;
-
-			if (rs.edgeType == 'self') {
-				if (($$.math.inBezierVicinity(x, y,
-						rs.startX,
-						rs.startY,
-						rs.cp2ax,
-						rs.cp2ay,
-						rs.selfEdgeMidX,
-						rs.selfEdgeMidY,
-						Math.pow(edge._private.style['width'].value/2, 2))
-							&&
-					(Math.pow(edges[i]._private.style['width'].value/2, 2) + edgeThreshold > 
-						$$.math.sqDistanceToQuadraticBezier(x, y,
-							rs.startX,
-							rs.startY,
-							rs.cp2ax,
-							rs.cp2ay,
-							rs.selfEdgeMidX,
-							rs.selfEdgeMidY)))
-					||
-					($$.math.inBezierVicinity(x, y,
-						rs.selfEdgeMidX,
-						rs.selfEdgeMidY,
-						rs.cp2cx,
-						rs.cp2cy,
-						rs.endX,
-						rs.endY,
-						Math.pow(edges[i]._private.style['width'].value/2, 2))
-							&&
-					(Math.pow(edges[i]._private.style['width'].value/2, 2) + edgeThreshold > 
-						$$.math.sqDistanceToQuadraticBezier(x, y,
-							rs.selfEdgeMidX,
-							rs.selfEdgeMidY,
-							rs.cp2cx,
-							rs.cp2cy,
-							rs.endX,
-							rs.endY))))
-					 { addCurrentEdge = true; }
-			
-			} else if (rs.edgeType == 'straight') {
-				if ($$.math.inLineVicinity(x, y, rs.startX, rs.startY, rs.endX, rs.endY, edges[i]._private.style['width'].value * 2)
-						&&
-					Math.pow(edges[i]._private.style['width'].value / 2, 2) + edgeThreshold >
-					$$.math.sqDistanceToFiniteLine(x, y,
-						rs.startX,
-						rs.startY,
-						rs.endX,
-						rs.endY))
-					{ addCurrentEdge = true; }
-			
-			} else if (rs.edgeType == 'bezier') {
-				if ($$.math.inBezierVicinity(x, y,
-					rs.startX,
-					rs.startY,
-					rs.cp2x,
-					rs.cp2y,
-					rs.endX,
-					rs.endY,
-					Math.pow(edges[i]._private.style['width'].value / 2, 2))
-						&&
-					(Math.pow(edges[i]._private.style['width'].value / 2 , 2) + edgeThreshold >
-						$$.math.sqDistanceToQuadraticBezier(x, y,
-							rs.startX,
-							rs.startY,
-							rs.cp2x,
-							rs.cp2y,
-							rs.endX,
-							rs.endY)))
-					{ addCurrentEdge = true; }
-			}
-			
-			if (!near.length || near[near.length - 1] != edges[i]) {
-				if ((CanvasRenderer.arrowShapes[edges[i]._private.style['source-arrow-shape'].value].roughCollide(x, y,
-						edges[i]._private.rscratch.arrowStartX, edges[i]._private.rscratch.arrowStartY,
-						this.getArrowWidth(edges[i]._private.style['width'].value),
-						this.getArrowHeight(edges[i]._private.style['width'].value),
-						[edges[i]._private.rscratch.arrowStartX - edges[i].source()[0]._private.position.x,
-							edges[i]._private.rscratch.arrowStartY - edges[i].source()[0]._private.position.y], 0)
-						&&
-					CanvasRenderer.arrowShapes[edges[i]._private.style['source-arrow-shape'].value].collide(x, y,
-						edges[i]._private.rscratch.arrowStartX, edges[i]._private.rscratch.arrowStartY,
-						this.getArrowWidth(edges[i]._private.style['width'].value),
-						this.getArrowHeight(edges[i]._private.style['width'].value),
-						[edges[i]._private.rscratch.arrowStartX - edges[i].source()[0]._private.position.x,
-							edges[i]._private.rscratch.arrowStartY - edges[i].source()[0]._private.position.y], 0))
-					||
-					(CanvasRenderer.arrowShapes[edges[i]._private.style['target-arrow-shape'].value].roughCollide(x, y,
-						edges[i]._private.rscratch.arrowEndX, edges[i]._private.rscratch.arrowEndY,
-						this.getArrowWidth(edges[i]._private.style['width'].value),
-						this.getArrowHeight(edges[i]._private.style['width'].value),
-						[edges[i]._private.rscratch.arrowEndX - edges[i].target()[0]._private.position.x,
-							edges[i]._private.rscratch.arrowEndY - edges[i].target()[0]._private.position.y], 0)
-						&&
-					CanvasRenderer.arrowShapes[edges[i]._private.style['target-arrow-shape'].value].collide(x, y,
-						edges[i]._private.rscratch.arrowEndX, edges[i]._private.rscratch.arrowEndY,
-						this.getArrowWidth(edges[i]._private.style['width'].value),
-						this.getArrowHeight(edges[i]._private.style['width'].value),
-						[edges[i]._private.rscratch.arrowEndX - edges[i].target()[0]._private.position.x,
-							edges[i]._private.rscratch.arrowEndY - edges[i].target()[0]._private.position.y], 0)))
-					{ addCurrentEdge = true; }
-			}
-			
-			if (addCurrentEdge) {
-				if (visibleElementsOnly) {
-					// For edges, make sure the edge is visible/has nonzero opacity,
-					// then also make sure both source and target nodes are visible/have
-					// nonzero opacity
-					var source = data.cy.getElementById(edges[i]._private.data.source)
-					var target = data.cy.getElementById(edges[i]._private.data.target)
-					
-					if (edges[i]._private.style['opacity'].value != 0
-						&& edges[i]._private.style['visibility'].value == 'visible'
-						&& edges[i]._private.style['display'].value == 'element'
-						&& source._private.style['opacity'].value != 0
-						&& source._private.style['visibility'].value == 'visible'
-						&& source._private.style['display'].value == 'element'
-						&& target._private.style['opacity'].value != 0
-						&& target._private.style['visibility'].value == 'visible'
-						&& target._private.style['display'].value == 'element') {
-						
-						near.push(edges[i]);	
-					}
-				} else {
-					near.push(edges[i]);
-				}
-			}
-		} 
-		
-		near.sort( this.zOrderSort );
-		
-		if (near.length > 0) { return near[ near.length - 1 ]; } else { return null; }
-	};
-
-
-	CanvasRenderer.prototype.findEndpoints = function(edge) {
-		var intersect;
-
-		var source = edge.source()[0];
-		var target = edge.target()[0];
-		
-		var srcPos = source._private.position;
-		var tgtPos = target._private.position;
-
-		var tgtArShape = edge._private.style['target-arrow-shape'].value;
-		var srcArShape = edge._private.style['source-arrow-shape'].value;
-
-		var tgtBorderW = target._private.style['border-width'].pxValue;
-		var srcBorderW = source._private.style['border-width'].pxValue;
-
-		var rs = edge._private.rscratch;
-		
-		if (edge._private.rscratch.edgeType == 'self') {
-			
-			var cp = [rs.cp2cx, rs.cp2cy];
-
-			intersect = intersectLineSelection(this, target, cp[0], cp[1]);
-			
-			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
-				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
-			var edgeEnd = $$.math.shortenIntersection(intersect, cp,
-				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
-			
-			rs.endX = edgeEnd[0];
-			rs.endY = edgeEnd[1];
-			
-			rs.arrowEndX = arrowEnd[0];
-			rs.arrowEndY = arrowEnd[1];
-			
-			var cp = [rs.cp2ax, rs.cp2ay];
-
-			intersect = intersectLineSelection(this, source, cp[0], cp[1]);
-			
-			var arrowStart = $$.math.shortenIntersection(intersect, cp,
-				CanvasRenderer.arrowShapes[srcArShape].spacing(edge));
-			var edgeStart = $$.math.shortenIntersection(intersect, cp,
-				CanvasRenderer.arrowShapes[srcArShape].gap(edge));
-			
-			rs.startX = edgeStart[0];
-			rs.startY = edgeStart[1];
-
-
-			rs.arrowStartX = arrowStart[0];
-			rs.arrowStartY = arrowStart[1];
-			
-		} else if (rs.edgeType == 'straight') {
-
-			intersect = intersectLineSelection(this, target, source.position().x, source.position().y);
-
-				
-			if (intersect.length == 0) {
-				rs.noArrowPlacement = true;
-	//			return;
-			} else {
-				rs.noArrowPlacement = false;
-			}
-			
-			var arrowEnd = $$.math.shortenIntersection(intersect,
-				[source.position().x, source.position().y],
-				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
-			var edgeEnd = $$.math.shortenIntersection(intersect,
-				[source.position().x, source.position().y],
-				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
-
-			rs.endX = edgeEnd[0];
-			rs.endY = edgeEnd[1];
-			
-			rs.arrowEndX = arrowEnd[0];
-			rs.arrowEndY = arrowEnd[1];
-
-			intersect = intersectLineSelection(this,source, target.position().x, target.position().y);
-
-
-			if (intersect.length == 0) {
-				rs.noArrowPlacement = true;
-	//			return;
-			} else {
-				rs.noArrowPlacement = false;
-			}
-			
-			var arrowStart = $$.math.shortenIntersection(intersect,
-				[target.position().x, target.position().y],
-				CanvasRenderer.arrowShapes[srcArShape].spacing(edge));
-			var edgeStart = $$.math.shortenIntersection(intersect,
-				[target.position().x, target.position().y],
-				CanvasRenderer.arrowShapes[srcArShape].gap(edge));
-
-			rs.startX = edgeStart[0];
-			rs.startY = edgeStart[1];
-			
-			rs.arrowStartX = arrowStart[0];
-			rs.arrowStartY = arrowStart[1];
-						
-		} else if (rs.edgeType == 'bezier') {
-			// if( window.badArrow) debugger;
-			var cp = [rs.cp2x, rs.cp2y];
-
-			intersect = intersectLineSelection(this, target, cp[0], cp[1]);
-			
-			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
-				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
-			var edgeEnd = $$.math.shortenIntersection(intersect, cp,
-				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
-			
-			rs.endX = edgeEnd[0];
-			rs.endY = edgeEnd[1];
-			
-			rs.arrowEndX = arrowEnd[0];
-			rs.arrowEndY = arrowEnd[1];
-			
-			intersect = intersectLineSelection(this, source, cp[0], cp[1]);
-			
-			var arrowStart = $$.math.shortenIntersection(
-				intersect, 
-				cp,
-				CanvasRenderer.arrowShapes[srcArShape].spacing(edge)
-			);
-			var edgeStart = $$.math.shortenIntersection(
-				intersect, 
-				cp,
-				CanvasRenderer.arrowShapes[srcArShape].gap(edge)
-			);
-		
-			rs.startX = edgeStart[0];
-			rs.startY = edgeStart[1];
-			
-			rs.arrowStartX = arrowStart[0];
-			rs.arrowStartY = arrowStart[1];
-			
-			// if( isNaN(rs.startX) || isNaN(rs.startY) ){
-			// 	debugger;
-			// }
-
-		} else if (rs.isArcEdge) {
-			return;
-		}
-	}
-
-	// Draw node
-	CanvasRenderer.prototype.drawNode = function(context, node, drawOverlayInstead) {
-		
-		var nodeWidth, nodeHeight;
-		
-		if ( !node.visible() ) {
-			return;
-		}
-
-		var parentOpacity = node.effectiveOpacity();
-		if( parentOpacity === 0 ){ return; }
-
-		// context.fillStyle = 'orange';
-		// context.fillRect(node.position().x, node.position().y, 2, 2);
-		
-		nodeWidth = this.getNodeWidth(node);
-		nodeHeight = this.getNodeHeight(node);
-		
-		context.lineWidth = node._private.style['border-width'].pxValue;
-
-		if( drawOverlayInstead === undefined || !drawOverlayInstead ){
-
-			// Node color & opacity
-			context.fillStyle = 'rgba(' 
-				+ node._private.style['background-color'].value[0] + ','
-				+ node._private.style['background-color'].value[1] + ','
-				+ node._private.style['background-color'].value[2] + ','
-				+ (node._private.style['background-opacity'].value 
-				* node._private.style['opacity'].value * parentOpacity) + ')';
-			
-			// Node border color & opacity
-			context.strokeStyle = 'rgba(' 
-				+ node._private.style['border-color'].value[0] + ','
-				+ node._private.style['border-color'].value[1] + ','
-				+ node._private.style['border-color'].value[2] + ','
-				+ (node._private.style['border-opacity'].value * node._private.style['opacity'].value * parentOpacity) + ')';
-			
-			context.lineJoin = 'miter'; // so borders are square with the node shape
-			
-			//var image = this.getCachedImage('url');
-			
-			var url = node._private.style['background-image'].value[2] ||
-				node._private.style['background-image'].value[1];
-			
-			if (url != undefined) {
-				
-				var r = this;
-				var image = this.getCachedImage(url,
-						
-						function() {
-							
-//							console.log(e);
-							r.data.canvasNeedsRedraw[CanvasRenderer.NODE] = true;
-							r.data.canvasNeedsRedraw[CanvasRenderer.DRAG] = true;
-							
-							// Replace Image object with Canvas to solve zooming too far
-							// into image graphical errors (Jan 10 2013)
-							r.swapCachedImage(url);
-							
-							r.redraw();
-						}
-				);
-				
-				if (image.complete == false) {
-
-					drawPathSelection(r,context, node);
-					
-					context.stroke();
-					context.fillStyle = '#555555';
-					context.fill();
-					
-				} else {
-					//context.clip
-					this.drawInscribedImage(context, image, node);
-				}
-				
-			} else {
-
-				// Draw node
-				drawSelection(this,context, node);
-			}
-			
-			this.drawPie(context, node);
-
-			// Border width, draw border
-			if (node._private.style['border-width'].pxValue > 0) {
-				drawPathSelection(this,context, node);
-
-				context.stroke();
-			}
-
-		// draw the overlay
-		} else {
-
-			var overlayPadding = node._private.style['overlay-padding'].pxValue;
-			var overlayOpacity = node._private.style['overlay-opacity'].value;
-			var overlayColor = node._private.style['overlay-color'].value;
-			if( overlayOpacity > 0 ){
-				context.fillStyle = 'rgba( ' + overlayColor[0] + ', ' + overlayColor[1] + ', ' + overlayColor[2] + ', ' + overlayOpacity + ' )';
-/*
-				CanvasRenderer.nodeShapes['roundrectangle'].draw(
-					context,
-					node._private.position.x,
-					node._private.position.y,
-					nodeWidth + overlayPadding * 2,
-					nodeHeight + overlayPadding * 2
-				);
-*/
-				// Draw node
-				drawSelection(this, context, node);
-			}
-		}
-
-	};
-
-	// Round rectangle drawing
-	CanvasRenderer.prototype.drawRoundRectanglePath = function(
-		context, x, y, width, height, radius) {
-		
-		var halfWidth = width / 2;
-		var halfHeight = height / 2;
-		//var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
-		var cornerRadius = radius;
-		context.translate(x, y);
-		
-		context.beginPath();
-		
-		// Start at top middle
-		context.moveTo(0, -halfHeight);
-		// Arc from middle top to right side
-		context.arcTo(halfWidth, -halfHeight, halfWidth, 0, cornerRadius);
-		// Arc from right side to bottom
-		context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
-		// Arc from bottom to left side
-		context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
-		// Arc from left side to topBorder
-		context.arcTo(-halfWidth, -halfHeight, 0, -halfHeight, cornerRadius);
-		// Join line
-		context.lineTo(0, -halfHeight);
-		
-		context.closePath();
-		
-		context.translate(-x, -y);
-	}
-
-
-	CanvasRenderer.prototype.getNodeShape = function(node)
-	{
-		// TODO only allow rectangle for a compound node?
-//		if (node._private.style['width'].value == 'auto' ||
-//		    node._private.style['height'].value == 'auto')
-//		{
-//			return 'rectangle';
-//		}
-
-		var shape = node._private.style['shape'].value;
-
-		return shape;
-	};
-
-		// Find edge control points
-	CanvasRenderer.prototype.findEdgeControlPoints = function(edges) {
-		var hashTable = {}; var cy = this.data.cy;
-		var pairIds = [];
-		
-		// create a table of edge (src, tgt) => list of edges between them
-		var pairId;
-		for (var i = 0; i < edges.length; i++){
-			var edge = edges[i];
-
-			// ignore edges who are not to be displayed
-			// they shouldn't take up space
-			if( edge._private.style.display.value === 'none' ){
-				continue;
-			}
-
-			var srcId = edge._private.data.source;
-			var tgtId = edge._private.data.target;
-
-			pairId = srcId > tgtId ?
-				tgtId + '-' + srcId :
-				srcId + '-' + tgtId ;
-
-			if (hashTable[pairId] == undefined) {
-				hashTable[pairId] = [];
-			}
-			
-			hashTable[pairId].push( edge );
-			pairIds.push( pairId );
-		}
-
-		var src, tgt, srcPos, tgtPos, srcW, srcH, tgtW, tgtH, srcShape, tgtShape, srcBorder, tgtBorder;
-		var midpt;
-		var vectorNormInverse;
-		var badBezier;
-		
-		// for each pair (src, tgt), create the ctrl pts
-		// Nested for loop is OK; total number of iterations for both loops = edgeCount	
-		for (var p = 0; p < pairIds.length; p++) {
-			pairId = pairIds[p];
-		
-			src = cy.getElementById( hashTable[pairId][0]._private.data.source );
-			tgt = cy.getElementById( hashTable[pairId][0]._private.data.target );
-
-			srcPos = src._private.position;
-			tgtPos = tgt._private.position;
-
-			srcW = this.getNodeWidth(src);
-			srcH = this.getNodeHeight(src);
-
-			tgtW = this.getNodeWidth(tgt);
-			tgtH = this.getNodeHeight(tgt);
-
-			srcShape = CanvasRenderer.nodeShapes[ this.getNodeShape(src) ];
-			tgtShape = CanvasRenderer.nodeShapes[ this.getNodeShape(tgt) ];
-
-			srcBorder = src._private.style['border-width'].pxValue;
-			tgtBorder = tgt._private.style['border-width'].pxValue;
-
-			badBezier = false;
-			
-
-			if (hashTable[pairId].length > 1) {
-
-				// pt outside src shape to calc distance/displacement from src to tgt
-				/*
-				var srcOutside = srcShape.intersectLine(
-					srcPos.x,
-					srcPos.y,
-					srcW,
-					srcH,
-					tgtPos.x,
-					tgtPos.y,
-					srcBorder / 2
-				);
-				*/
-				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y);
-
-				// pt outside tgt shape to calc distance/displacement from src to tgt
-				/*
-				var tgtOutside = tgtShape.intersectLine(
-					tgtPos.x,
-					tgtPos.y,
-					tgtW,
-					tgtH,
-					srcPos.x,
-					srcPos.y,
-					tgtBorder / 2
-				);
-				*/
-				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y);
-
-				var midpt = {
-					x: ( srcOutside[0] + tgtOutside[0] )/2,
-					y: ( srcOutside[1] + tgtOutside[1] )/2
-				};
-
-				var dy = ( tgtOutside[1] - srcOutside[1] );
-				var dx = ( tgtOutside[0] - srcOutside[0] );
-				var l = Math.sqrt( dx*dx + dy*dy );
-
-				var vector = {
-					x: dx,
-					y: dy
-				};
-				
-				var vectorNorm = {
-					x: vector.x/l,
-					y: vector.y/l
-				};
-				vectorNormInverse = {
-					x: -vectorNorm.y,
-					y: vectorNorm.x
-				};
-
-				// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
-				if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
-					checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
-					/* tgtShape.checkPoint( srcOutside[0], srcOutside[1], tgtBorder/2, tgtW, tgtH, tgtPos.x, tgtPos.y )  ||
-					srcShape.checkPoint( tgtOutside[0], tgtOutside[1], srcBorder/2, srcW, srcH, srcPos.x, srcPos.y ) */ 
-				){
-					vectorNormInverse = {};
-					badBezier = true;
-				}
-				
-			}
-			
-			var edge;
-			var rs;
-			
-			for (var i = 0; i < hashTable[pairId].length; i++) {
-				edge = hashTable[pairId][i];
-				rs = edge._private.rscratch;
-				
-				var edgeIndex1 = rs.lastEdgeIndex;
-				var edgeIndex2 = i;
-
-				var numEdges1 = rs.lastNumEdges;
-				var numEdges2 = hashTable[pairId].length;
-
-				var srcX1 = rs.lastSrcCtlPtX;
-				var srcX2 = srcPos.x;
-				var srcY1 = rs.lastSrcCtlPtY;
-				var srcY2 = srcPos.y;
-				var srcW1 = rs.lastSrcCtlPtW;
-				var srcW2 = src.outerWidth();
-				var srcH1 = rs.lastSrcCtlPtH;
-				var srcH2 = src.outerHeight();
-
-				var tgtX1 = rs.lastTgtCtlPtX;
-				var tgtX2 = tgtPos.x;
-				var tgtY1 = rs.lastTgtCtlPtY;
-				var tgtY2 = tgtPos.y;
-				var tgtW1 = rs.lastTgtCtlPtW;
-				var tgtW2 = tgt.outerWidth();
-				var tgtH1 = rs.lastTgtCtlPtH;
-				var tgtH2 = tgt.outerHeight();
-
-				if( badBezier ){
-					rs.badBezier = true;
-				} else {
-					rs.badBezier = false;
-				}
-
-				if( srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2
-				&&  tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2
-				&&  edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2 ){
-					// console.log('edge ctrl pt cache HIT')
-					continue; // then the control points haven't changed and we can skip calculating them
-				} else {
-					rs.lastSrcCtlPtX = srcX2;
-					rs.lastSrcCtlPtY = srcY2;
-					rs.lastSrcCtlPtW = srcW2;
-					rs.lastSrcCtlPtH = srcH2;
-					rs.lastTgtCtlPtX = tgtX2;
-					rs.lastTgtCtlPtY = tgtY2;
-					rs.lastTgtCtlPtW = tgtW2;
-					rs.lastTgtCtlPtH = tgtH2;
-					rs.lastEdgeIndex = edgeIndex2;
-					rs.lastNumEdges = numEdges2;
-					// console.log('edge ctrl pt cache MISS')
-				}
-
-				var stepSize = edge._private.style['control-point-step-size'].value;
-
-				// Self-edge
-				if ( src.id() == tgt.id() ) {
-						
-					rs.edgeType = 'self';
-					
-					// New -- fix for large nodes
-					rs.cp2ax = srcPos.x;
-					rs.cp2ay = srcPos.y - (1 + Math.pow(srcH, 1.12) / 100) * stepSize * (i / 3 + 1);
-					
-					rs.cp2cx = src._private.position.x - (1 + Math.pow(srcW, 1.12) / 100) * stepSize * (i / 3 + 1);
-					rs.cp2cy = srcPos.y;
-					
-					rs.selfEdgeMidX = (rs.cp2ax + rs.cp2cx) / 2.0;
-					rs.selfEdgeMidY = (rs.cp2ay + rs.cp2cy) / 2.0;
-					
-				// Straight edge
-				} else if (hashTable[pairId].length % 2 == 1
-					&& i == Math.floor(hashTable[pairId].length / 2)) {
-					
-					rs.edgeType = 'straight';
-					
-				// Bezier edge
-				} else {
-					var distanceFromMidpoint = (0.5 - hashTable[pairId].length / 2 + i) * stepSize;
-					
-					rs.edgeType = 'bezier';
-					
-					rs.cp2x = midpt.x + vectorNormInverse.x * distanceFromMidpoint;
-					rs.cp2y = midpt.y + vectorNormInverse.y * distanceFromMidpoint;
-					
-					// console.log(edge, midPointX, displacementX, distanceFromMidpoint);
-				}
-
-				// find endpts for edge
-				this.findEndpoints( edge );
-
-				var badStart = !$$.is.number( rs.startX ) || !$$.is.number( rs.startY );
-				var badAStart = !$$.is.number( rs.arrowStartX ) || !$$.is.number( rs.arrowStartY );
-				var badEnd = !$$.is.number( rs.endX ) || !$$.is.number( rs.endY );
-				var badAEnd = !$$.is.number( rs.arrowEndX ) || !$$.is.number( rs.arrowEndY );
-
-				var minCpADistFactor = 3;
-				var arrowW = this.getArrowWidth( edge._private.style['width'].pxValue ) * CanvasRenderer.arrowShapeHeight;
-				var minCpADist = minCpADistFactor * arrowW;
-				var startACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.startX, y: rs.startY } );
-				var closeStartACp = startACpDist < minCpADist;
-				var endACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.endX, y: rs.endY } );
-				var closeEndACp = endACpDist < minCpADist;
-
-				if( rs.edgeType === 'bezier' ){
-					var overlapping = false;
-
-					if( badStart || badAStart || closeStartACp ){
-						overlapping = true;
-
-						// project control point along line from src centre to outside the src shape
-						// (otherwise intersection will yield nothing)
-						var cpD = { // delta
-							x: rs.cp2x - srcPos.x,
-							y: rs.cp2y - srcPos.y
-						};
-						var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
-						var cpM = { // normalised delta
-							x: cpD.x / cpL,
-							y: cpD.y / cpL
-						};
-						var radius = Math.max(srcW, srcH);
-						var cpProj = { // *2 radius guarantees outside shape
-							x: rs.cp2x + cpM.x * 2 * radius,
-							y: rs.cp2y + cpM.y * 2 * radius
-						};
-						/*
-						var srcCtrlPtIntn = srcShape.intersectLine(
-							srcPos.x,
-							srcPos.y,
-							srcW,
-							srcH,
-							cpProj.x,
-							cpProj.y,
-							srcBorder / 2
-						);
-						*/
-
-						var srcCtrlPtIntn = intersectLineSelection(this, src, cpProj.x, cpProj.y);
-
-						if( closeStartACp ){
-							rs.cp2x = rs.cp2x + cpM.x * (minCpADist - startACpDist); 
-							rs.cp2y = rs.cp2y + cpM.y * (minCpADist - startACpDist)
-						} else {
-							rs.cp2x = srcCtrlPtIntn[0] + cpM.x * minCpADist; 
-							rs.cp2y = srcCtrlPtIntn[1] + cpM.y * minCpADist;
-						}
-					}
-
-					if( badEnd || badAEnd || closeEndACp ){
-						overlapping = true;
-
-						// project control point along line from tgt centre to outside the tgt shape
-						// (otherwise intersection will yield nothing)
-						var cpD = { // delta
-							x: rs.cp2x - tgtPos.x,
-							y: rs.cp2y - tgtPos.y
-						};
-						var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
-						var cpM = { // normalised delta
-							x: cpD.x / cpL,
-							y: cpD.y / cpL
-						};
-						var radius = Math.max(srcW, srcH);
-						var cpProj = { // *2 radius guarantees outside shape
-							x: rs.cp2x + cpM.x * 2 * radius,
-							y: rs.cp2y + cpM.y * 2 * radius
-						};
-						/*
-						var tgtCtrlPtIntn = tgtShape.intersectLine(
-							tgtPos.x,
-							tgtPos.y,
-							tgtW,
-							tgtH,
-							cpProj.x,
-							cpProj.y,
-							tgtBorder / 2
-						);
-						*/
-						var tgtCtrlPtIntn = intersectLineSelection(this, tgt, cpProj.x, cpProj.y);
-
-						if( closeEndACp ){
-							rs.cp2x = rs.cp2x + cpM.x * (minCpADist - endACpDist); 
-							rs.cp2y = rs.cp2y + cpM.y * (minCpADist - endACpDist);
-						} else {
-							rs.cp2x = tgtCtrlPtIntn[0] + cpM.x * minCpADist; 
-							rs.cp2y = tgtCtrlPtIntn[1] + cpM.y * minCpADist;
-						}
-						
-					}
-
-					if( overlapping ){
-						// recalc endpts
-						this.findEndpoints( edge );
-					}
-				}
-
-				// project the edge into rstyle
-				this.projectBezier( edge );
-
-			}
-		}
-		
-		return hashTable;
-	}
-
-
-})( cytoscape );
 
 /*
  * Those are the sbgn node objects
@@ -2100,196 +2096,111 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
-	nodeShapes['unspecified entity'] = {
+	nodeShapes["complex"] = {
+		points: new Array(),
 		multimerPadding:3,
-
+		cornerLength:12,
 		draw: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
 			var width = node.width();
 			var height = node.height();
-			var multimerPadding = nodeShapes['unspecified entity'].multimerPadding;
-			var sbgnClass = node._private.data.sbgnclass;
-
-			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
-		},
-
-		drawPath: function(context, node) {
 			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var multimerPadding = nodeShapes['unspecified entity'].multimerPadding;
-			var sbgnClass = node._private.data.sbgnclass;
-			var label = node._private.data.sbgnlabel;
-			var cloneMarker = node._private.data.sbgnclonemarker;
+			var centerY = node._private.position.y;
+			var stateAndInfos = node._private.data.sbgnstatesandinfos;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
-			$$.sbgn.drawEllipse(context, centerX, centerY, width, height);
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
-			context.stroke();
-
-			$$.sbgn.drawSourceSinkCloneMarker(context, centerX, centerY, 
-					width, height, cloneMarker);
-
-			var textProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
-			
-			$$.sbgn.drawStateAndInfos(renderer, node, context, centerX, centerY);
-		},
-
-		intersectLine: function(node, x, y) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
-				node, x, y);
-
-			var nodeIntersectLines = nodeShapes['ellipse'].intersectLine(centerX, centerY, width, 
-				height, x, y, padding);
-
-			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
-			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
-
-		},
-
-		intersectBox: function(x1, y1, x2, y2, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			var nodeIntersectBox = nodeShapes['ellipse'].intersectBox(
-				x1, y1, x2, y2, width, 
-				height, centerX, centerY, padding);
-
-			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
-				x1, y1, x2, y2, node);
-
-			return nodeIntersectBox || stateAndInfoIntersectBox;
-
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			var nodeCheckPointRough = nodeShapes['ellipse'].checkPointRough(x, y, 
-				padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough;
-
-		},
-
-		checkPoint: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			
-			var nodeCheckPoint =  nodeShapes['ellipse'].checkPoint(x, y, 
-				padding, width, height, 
-				centerX, centerY);
-
-			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
-				threshold);
-
-			return nodeCheckPoint || stateAndInfoCheckPoint;
-		}
-	};
-
-	nodeShapes['simple chemical'] = {
-		multimerPadding:3,
-
-		draw: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var multimerPadding = nodeShapes['simple chemical'].multimerPadding;
-			var padding = node._private.style['border-width'].pxValue;
-			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
-
+			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				renderer.drawRoundRectanglePath(context, centerX + multimerPadding, 
-					centerY + multimerPadding, width, height, cornerRadius);
+				renderer.drawPolygonPath(context,
+					centerX + multimerPadding, centerY + multimerPadding,
+					width, height, nodeShapes["complex"].points);
 			}
 
-			renderer.drawRoundRectanglePath(context, centerX, centerY, width, height, cornerRadius);
+			renderer.drawPolygonPath(context,
+				centerX, centerY,
+				width, height, nodeShapes["complex"].points);
+
 		},
 
 		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
 			var width = node.width();
 			var height = node.height();
-			var multimerPadding = nodeShapes['simple chemical'].multimerPadding;
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var stateAndInfos = node._private.data.sbgnstatesandinfos;
 			var label = node._private.data.sbgnlabel;
-			var padding = node._private.style['border-width'].pxValue;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 			var cloneMarker = node._private.data.sbgnclonemarker;
-			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
+
+			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				renderer.drawRoundRectangle(context, centerX + multimerPadding, 
-					centerY + multimerPadding, width, height, cornerRadius);
+				renderer.drawPolygon(context,
+					centerX + multimerPadding, centerY + multimerPadding,
+					width, height, nodeShapes["complex"].points);
 
 				context.stroke();
 
-				$$.sbgn.drawSimpleChemicalCloneMarker(context, 
+				$$.sbgn.drawComplexCloneMarker(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
-					width, height, cloneMarker, true);
+					width, height, cornerLength, cloneMarker, true);
 
 				context.stroke();
 			}
 
-			renderer.drawRoundRectangle(context, centerX, centerY, width, height, cornerRadius);
+			renderer.drawPolygon(context,
+				centerX, centerY,
+				width, height, nodeShapes["complex"].points);
 
 			context.stroke();
-			
-			$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
-				width, height, cloneMarker, false);
 
-			var textProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
-			
-			$$.sbgn.drawStateAndInfos(renderer, node, context, centerX, centerY);
-
+			$$.sbgn.drawComplexCloneMarker(context, centerX, centerY, 
+				width, height, cornerLength, cloneMarker, false);
+			$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+			var x = 5;
 		},
 
 		intersectLine: function(node, x, y) {
 			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
+			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
 			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
 				node, x, y);
 
-			var nodeIntersectLines = nodeShapes['roundrectangle'].intersectLine(
-    			centerX, centerY, width, height, x, y, padding) ;
+			var nodeIntersectLines = $$.math.polygonIntersectLine(
+					x, y, 
+					nodeShapes["complex"].points,
+					centerX,
+					centerY,
+					width/2, height/2,
+					padding);
 
 			//check whether sbgn class includes multimer substring or not
 			var multimerIntersectionLines = new Array();
 			if($$.sbgn.isMultimer(node)){
-				multimerIntersectionLines = nodeShapes['ellipse'].intersectLine(
-					centerX + multimerPadding, centerY + multimerPadding, width, 
-					height, x, y, padding);
+				multimerIntersectionLines = $$.math.polygonIntersectLine(
+					x, y, 
+					nodeShapes["complex"].points,
+					centerX + multimerPadding,
+					centerY + multimerPadding,
+					width/2, height/2,
+					padding);
 			}
 
 			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines, multimerIntersectionLines);
@@ -2299,15 +2210,21 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 		intersectBox: function(x1, y1, x2, y2, node) {
 			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
+			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var cornerLength = nodeShapes["complex"].cornerLength;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
 
-			var nodeIntersectBox = nodeShapes['roundrectangle'].intersectBox(
-				x1, y1, x2, y2, width, 
-				height, centerX, centerY, padding);
+			var points = nodeShapes["complex"].points;
+
+			var nodeIntersectBox = $$.math.boxIntersectPolygon(
+				x1, y1, x2, y2,
+				points, width, height, centerX, centerY, [0, -1], padding);
 
 			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
 				x1, y1, x2, y2, node);
@@ -2315,26 +2232,30 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			//check whether sbgn class includes multimer substring or not
 			var multimerIntersectBox = false;
 			if($$.sbgn.isMultimer(node)){
-				multimerIntersectBox = nodeShapes['ellipse'].intersectBox(
-				x1, y1, x2, y2, width, height, 
+				multimerIntersectBox = $$.math.boxIntersectPolygon(
+				x1, y1, x2, y2, points, width, height, 
 				centerX + multimerPadding, centerY + multimerPadding, 
-				padding);
+				[0, -1], padding);
 			}
 
 			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
-
 		},
 
 		checkPointRough: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
+			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cornerLength = nodeShapes["complex"].cornerLength;
 
-			var nodeCheckPointRough = nodeShapes['roundrectangle'].checkPointRough(x, y, 
-				padding, width, height, centerX, centerY);
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
+
+			var nodeCheckPointRough = $$.math.checkInBoundingBox(
+				x, y, nodeShapes["complex"].points, 
+					padding, width, height, centerX, centerY);
 
 			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
 				x, y, centerX, centerY);
@@ -2342,9 +2263,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			//check whether sbgn class includes multimer substring or not
 			var multimerCheckPointRough = false;
 			if($$.sbgn.isMultimer(node)){
-				multimerCheckPointRough = nodeShapes['ellipse'].checkPointRough(x, y, 
-				padding, width, height, 
-				centerX + multimerPadding, centerY + multimerPadding);
+				multimerCheckPointRough = $$.math.checkInBoundingBox(
+					x, y, nodeShapes["complex"].points, 
+					padding, width, height, 
+					centerX + multimerPadding, centerY + multimerPadding);
 			}
 
 			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
@@ -2352,15 +2274,18 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var centerY = node._private.position.y;
+			var width = node.width() + threshold;
+			var height = node.height() + threshold;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var cornerLength = nodeShapes["complex"].cornerLength;
 
-			var nodeCheckPoint =  nodeShapes['roundrectangle'].checkPoint(x, y, 
-				padding, width, height, 
-				centerX, centerY);
+			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
+				width, height);
+
+			var nodeCheckPoint =  $$.math.pointInsidePolygon(x, y, nodeShapes["complex"].points,
+				centerX, centerY, width, height, [0, -1], padding);
 
 			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
 				threshold);
@@ -2368,16 +2293,18 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			//check whether sbgn class includes multimer substring or not
 			var multimerCheckPoint = false;
 			if($$.sbgn.isMultimer(node)){
-				multimerCheckPoint = nodeShapes['ellipse'].checkPoint(x, y, 
-				padding, width, height, 
-				centerX + multimerPadding, centerY + multimerPadding);
+				multimerCheckPoint = $$.math.pointInsidePolygon(x, y, 
+					nodeShapes["complex"].points,
+					centerX + multimerPadding, centerY + multimerPadding, 
+					width, height, [0, -1], padding);
+
 			}
 
 			return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
 		}
 	};
 
-	nodeShapes['macromolecule'] = {
+	nodeShapes["macromolecule"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
 		cornerRadius:4,
 		multimerPadding:2,
@@ -2388,8 +2315,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var label = node._private.data.sbgnlabel;
-			var cornerRadius = nodeShapes['macromolecule'].cornerRadius;
-			var multimerPadding = nodeShapes['macromolecule'].multimerPadding;
+			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
 			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
@@ -2403,6 +2330,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			renderer.drawRoundRectanglePath(context,
 				centerX, centerY, width, height,
 				cornerRadius);
+			//context.fill();
+			//drawStateAndInfos(node, context, centerX, centerY);
 		},
 		
 		drawPath: function(context, node) {
@@ -2411,8 +2340,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var label = node._private.data.sbgnlabel;
-			var cornerRadius = nodeShapes['macromolecule'].cornerRadius;
-			var multimerPadding = nodeShapes['macromolecule'].multimerPadding;
+			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			//check whether sbgn class includes multimer substring or not
@@ -2442,11 +2371,11 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			$$.sbgn.drawMacromoleculeCloneMarker(context, centerX, centerY, 
 				width, height, cornerRadius, cloneMarker, false);
 
-			var textProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
 				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
+			$$.sbgn.drawLabelText(context, nodeProp);
 			
-			$$.sbgn.drawStateAndInfos(renderer, node, context, centerX, centerY);
+			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
 		},
 		
 		intersectLine: function(node, x, y) {
@@ -2454,9 +2383,9 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['macromolecule'].multimerPadding;
-			var cornerRadius = nodeShapes['macromolecule'].cornerRadius;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
+			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
 
 			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
 				node, x, y);
@@ -2489,8 +2418,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['macromolecule'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
 			var nodeIntersectBox = $$.math.roundRectangleIntersectBox(
 				x1, y1, x2, y2, 
@@ -2515,11 +2444,11 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width() + threshold;
 			var height = node.height() + threshold;
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['macromolecule'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
 			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes['macromolecule'].points, 
+				x, y, nodeShapes["macromolecule"].points, 
 					padding, width, height, centerX, centerY);
 
 			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
@@ -2529,7 +2458,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var multimerCheckPointRough = false;
 			if($$.sbgn.isMultimer(node)){
 				multimerCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes['macromolecule'].points, 
+				x, y, nodeShapes["macromolecule"].points, 
 					padding, width, height, centerX + multimerPadding, centerY + multimerPadding);
 			}
 
@@ -2541,10 +2470,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width() + threshold;
 			var height = node.height() + threshold;
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['macromolecule'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 
-			var nodeCheckPoint =  nodeShapes['roundrectangle'].checkPoint(x, y, padding, 
+			var nodeCheckPoint =  nodeShapes["roundrectangle"].checkPoint(x, y, padding, 
 				width, height, centerX, centerY);
 			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
 				threshold);
@@ -2552,7 +2481,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			//check whether sbgn class includes multimer substring or not
 			var multimerCheckPoint = false;
 			if($$.sbgn.isMultimer(node)){
-				multimerCheckPoint = nodeShapes['roundrectangle'].checkPoint(x, y, padding, 
+				multimerCheckPoint = nodeShapes["roundrectangle"].checkPoint(x, y, padding, 
 				width, height, centerX + multimerPadding, centerY + multimerPadding);
 			}
 
@@ -2560,7 +2489,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		}
 	};
 
-	nodeShapes['nucleic acid feature'] = {
+	nodeShapes["nucleic acid feature"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
 		cornerRadius:4,
 		multimerPadding:2,
@@ -2571,8 +2500,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
-			var cornerRadius = nodeShapes['nucleic acid feature'].cornerRadius;
-			var multimerPadding = nodeShapes['nucleic acid feature'].multimerPadding;
+			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
 			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
@@ -2593,8 +2522,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
-			var cornerRadius = nodeShapes['nucleic acid feature'].cornerRadius;
-			var multimerPadding = nodeShapes['nucleic acid feature'].multimerPadding;
+			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			//check whether sbgn class includes multimer substring or not
@@ -2623,29 +2552,30 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
 				width, height, cornerRadius, cloneMarker, false);
 
-			var textProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
 				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
+			$$.sbgn.drawLabelText(context, nodeProp);
 
-			$$.sbgn.drawStateAndInfos(renderer, node, context, centerX, centerY);
+			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
 		},
 
 		intersectLine: function(node, x, y) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
 			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
 				node, x, y);
 
 			var nodeIntersectLines = $$.sbgn.nucleicAcidIntersectionLine(node, 
-				x, y, centerX, centerY);
+				x, y, centerX, centerY, this.cornerRadius);
 
 			//check whether sbgn class includes multimer substring or not
 			var multimerIntersectionLines = new Array();
 			if($$.sbgn.isMultimer(node)){
 				multimerIntersectionLines = $$.sbgn.nucleicAcidIntersectionLine(node, 
-					x, y, centerX + multimerPadding, centerY + multimerPadding);
+					x, y, centerX + multimerPadding, centerY + multimerPadding,
+					this.cornerRadius);
 			}
 
 			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines, 
@@ -2657,10 +2587,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		intersectBox: function(x1, y1, x2, y2, node) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
 			var nodeIntersectBox = $$.sbgn.nucleicAcidIntersectionBox(
-				x1, y1, x2, y2, centerX, centerY, node);
+				x1, y1, x2, y2, centerX, centerY, node, this.points, this.cornerRadius);
 
 			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
 				x1, y1, x2, y2, node);
@@ -2671,7 +2601,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 				multimerIntersectBox = $$.sbgn.nucleicAcidIntersectionBox(
 					x1, y1, x2, y2, 
 					centerX + multimerPadding, centerY + multimerPadding, 
-					node);
+					node, this.points, this.cornerRadius);
 			}
 
 			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
@@ -2682,12 +2612,12 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var cornerRadius = nodeShapes['nucleic acid feature'].cornerRadius;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
 
 			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes['nucleic acid feature'].points, 
+				x, y, nodeShapes["nucleic acid feature"].points, 
 					padding, width, height, centerX, centerY);
 
 			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
@@ -2697,7 +2627,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var multimerCheckPointRough = false;
 			if($$.sbgn.isMultimer(node)){
 				multimerCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes['nucleic acid feature'].points, 
+				x, y, nodeShapes["nucleic acid feature"].points, 
 					padding, width, height, 
 					centerX + multimerPadding, centerY + multimerPadding);
 			}
@@ -2708,10 +2638,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var multimerPadding = nodeShapes['nucleic acid feature'].multimerPadding;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
 			var nodeCheckPoint = $$.sbgn.nucleicAcidCheckPoint(x, y, centerX, centerY,
-				node, threshold);
+				node, threshold, this.points, this.cornerRadius);
 			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
 				threshold);
 
@@ -2720,14 +2650,14 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			if($$.sbgn.isMultimer(node)){
 				multimerCheckPoint = $$.sbgn.nucleicAcidCheckPoint(x, y, 
 					centerX + multimerPadding, centerY + multimerPadding,
-					node, threshold);
+					node, threshold, this.points, this.cornerRadius);
 			}
 
 			return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
 		}
 	};
 
-	nodeShapes['perturbing agent'] = {
+	nodeShapes["perturbing agent"] = {
 		points: new Array(-2/3, 0, -1, 1, 1, 1, 2/3, 0, 
 		1, -1, -1, -1),
 
@@ -2741,7 +2671,9 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height,
-				nodeShapes['perturbing agent'].points);
+				nodeShapes["perturbing agent"].points);
+
+			//drawStateAndInfos(node, context, centerX, centerY);
 		},
 
 		drawPath: function(context, node) {
@@ -2755,20 +2687,20 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			renderer.drawPolygonPath(context,
 				centerX, centerY,
 				width, height,
-				nodeShapes['perturbing agent'].points);
+				nodeShapes["perturbing agent"].points);
 
 			context.fill();
 
 			context.stroke();
 
-			$$.sbgn.drawPerturbingAgentCloneMarker(renderer, context, centerX, centerY, 
+			$$.sbgn.drawPerturbingAgentCloneMarker(context, centerX, centerY, 
 				width, height, cloneMarker);
 
-			var textProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
 				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
+			$$.sbgn.drawLabelText(context, nodeProp);
 			
-			$$.sbgn.drawStateAndInfos(renderer, node, context, centerX, centerY);
+			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
 		},
 
 		intersectLine: function(node, x, y) {
@@ -2776,14 +2708,14 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
 				node, x, y);
 
 			var nodeIntersectLines = renderer.polygonIntersectLine(
 				x, y,
-				nodeShapes['perturbing agent'].points,
+				nodeShapes["perturbing agent"].points,
 				centerX,
 				centerY,
 				width / 2, height / 2,
@@ -2796,12 +2728,12 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		},
 
 		intersectBox: function(x1, y1, x2, y2, node) {
-			var points = nodeShapes['perturbing agent'].points;
+			var points = nodeShapes["perturbing agent"].points;
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			var nodeIntersectBox = renderer.boxIntersectPolygon(x1, y1, x2, y2,
 					points, width, height, centerX, centerY, [0, -1], padding);
@@ -2818,10 +2750,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes['perturbing agent'].points, 
+				x, y, nodeShapes["perturbing agent"].points, 
 					padding, width, height, centerX, centerY);
 
 			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
@@ -2835,10 +2767,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			var nodeCheckPoint = $$.math.pointInsidePolygon(x, y, 
-				nodeShapes['perturbing agent'].points,
+				nodeShapes["perturbing agent"].points,
 				centerX, centerY, width, height, [0, -1], padding);
 
 			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
@@ -2849,7 +2781,175 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		}
 	};
 
-	nodeShapes['source and sink'] = {
+	nodeShapes["simple chemical"] = {
+		multimerPadding:3,
+
+		draw: function(context, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
+			var padding = node._private.style["border-width"].pxValue;
+			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+
+			if($$.sbgn.isMultimer(node)){
+				//add multimer shape
+				renderer.drawRoundRectanglePath(context, centerX + multimerPadding, 
+					centerY + multimerPadding, width, height, cornerRadius);
+			}
+
+			renderer.drawRoundRectanglePath(context, centerX, centerY, width, height, cornerRadius);
+		},
+
+		drawPath: function(context, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
+			var label = node._private.data.sbgnlabel;
+			var padding = node._private.style["border-width"].pxValue;
+			var cloneMarker = node._private.data.sbgnclonemarker;
+			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+
+			if($$.sbgn.isMultimer(node)){
+				//add multimer shape
+				renderer.drawRoundRectangle(context, centerX + multimerPadding, 
+					centerY + multimerPadding, width, height, cornerRadius);
+
+				context.stroke();
+
+				$$.sbgn.drawSimpleChemicalCloneMarker(context, 
+					centerX + multimerPadding, centerY + multimerPadding, 
+					width, height, cloneMarker, true);
+
+				context.stroke();
+			}
+
+			renderer.drawRoundRectangle(context, centerX, centerY, width, height, cornerRadius);
+
+			context.stroke();
+			
+			$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
+				width, height, cloneMarker, false);
+
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
+			$$.sbgn.drawLabelText(context, nodeProp);
+			
+			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+
+		},
+
+		intersectLine: function(node, x, y) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+
+			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+				node, x, y);
+
+			var nodeIntersectLines = nodeShapes["roundrectangle"].intersectLine(
+    			centerX, centerY, width, height, x, y, padding) ;
+
+			//check whether sbgn class includes multimer substring or not
+			var multimerIntersectionLines = new Array();
+			if($$.sbgn.isMultimer(node)){
+				multimerIntersectionLines = nodeShapes["ellipse"].intersectLine(
+					centerX + multimerPadding, centerY + multimerPadding, width, 
+					height, x, y, padding);
+			}
+
+			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines, multimerIntersectionLines);
+
+			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
+		},
+
+		intersectBox: function(x1, y1, x2, y2, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+
+			var nodeIntersectBox = nodeShapes["roundrectangle"].intersectBox(
+				x1, y1, x2, y2, width, 
+				height, centerX, centerY, padding);
+
+			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
+				x1, y1, x2, y2, node);
+
+			//check whether sbgn class includes multimer substring or not
+			var multimerIntersectBox = false;
+			if($$.sbgn.isMultimer(node)){
+				multimerIntersectBox = nodeShapes["ellipse"].intersectBox(
+				x1, y1, x2, y2, width, height, 
+				centerX + multimerPadding, centerY + multimerPadding, 
+				padding);
+			}
+
+			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
+
+		},
+
+		checkPointRough: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+
+			var nodeCheckPointRough = nodeShapes["roundrectangle"].checkPointRough(x, y, 
+				padding, width, height, centerX, centerY);
+
+			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
+				x, y, centerX, centerY);
+
+			//check whether sbgn class includes multimer substring or not
+			var multimerCheckPointRough = false;
+			if($$.sbgn.isMultimer(node)){
+				multimerCheckPointRough = nodeShapes["ellipse"].checkPointRough(x, y, 
+				padding, width, height, 
+				centerX + multimerPadding, centerY + multimerPadding);
+			}
+
+			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
+		},
+
+		checkPoint: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+			var multimerPadding = nodeShapes["complex"].multimerPadding;
+
+			var nodeCheckPoint =  nodeShapes["roundrectangle"].checkPoint(x, y, 
+				padding, width, height, 
+				centerX, centerY);
+
+			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
+				threshold);
+
+			//check whether sbgn class includes multimer substring or not
+			var multimerCheckPoint = false;
+			if($$.sbgn.isMultimer(node)){
+				multimerCheckPoint = nodeShapes["ellipse"].checkPoint(x, y, 
+				padding, width, height, 
+				centerX + multimerPadding, centerY + multimerPadding);
+			}
+
+			return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
+		}
+	};
+
+	nodeShapes["source and sink"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
 
 		draw: function(context, node) {
@@ -2858,7 +2958,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
-			var pts = nodeShapes['source and sink'].points;
+			var pts = nodeShapes["source and sink"].points;
 
 			$$.sbgn.drawEllipsePath(context, centerX, centerY,
 				width, height);
@@ -2882,7 +2982,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
-			var pts = nodeShapes['source and sink'].points;
+			var pts = nodeShapes["source and sink"].points;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			$$.sbgn.drawEllipse(context, centerX, centerY,
@@ -2912,9 +3012,287 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
+				height, x, y, padding);
+
+		},
+
+		intersectBox: function(x1, y1, x2, y2, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return nodeShapes["ellipse"].intersectBox(x1, y1, x2, y2, width, height, 
+				centerX, centerY, padding);
+
+		},
+
+		checkPointRough: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width() + threshold;
+			var height = node.height() + threshold;
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return nodeShapes["ellipse"].checkPointRough(x, y, padding, width, height, 
+				centerX, centerY);
+
+		},
+
+		checkPoint: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return nodeShapes["ellipse"].checkPoint(x, y, padding, width, 
+				height, centerX, centerY)
+
+		}
+	};
+
+	nodeShapes["tag"] = {
+		points: new Array(-1, -1, 1/3, -1, 1, 0, 1/3, 1, -1, 1),
+
+		draw: function(context, node) {
+			var width = node.width();
+			var height = node.height();
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+
+			renderer.drawPolygon(context,
+				centerX, centerY,
+				width, height,
+				nodeShapes["tag"].points);
+		},
+
+		drawPath: function(context, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var label = node._private.data.sbgnlabel;
+
+			renderer.drawPolygonPath(context,
+				centerX, centerY,
+				width, height,
+				nodeShapes["tag"].points);
+
+			context.stroke();
+
+			var nodeProp = {'label':label, 'centerX':centerX - width/6, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
+			$$.sbgn.drawLabelText(context, nodeProp);
+		},
+
+		intersectLine: function(node, x, y) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return renderer.polygonIntersectLine(
+				x, y,
+				nodeShapes["tag"].points,
+				centerX,
+				centerY,
+				width / 2, height / 2,
+				padding);
+
+		},
+
+		intersectBox: function(x1, y1, x2, y2, node) {
+			var points = nodeShapes["tag"].points;
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
+					points, width, height, centerX, centerY, [0, -1], padding);
+
+		},
+
+		checkPointRough: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+			
+			return $$.math.checkInBoundingBox(
+				x, y, nodeShapes["tag"].points, 
+					padding, width, height, centerX, centerY);
+		},
+
+		checkPoint: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			return $$.math.pointInsidePolygon(x, y, nodeShapes["tag"].points,
+				centerX, centerY, width, height, [0, -1], padding);
+
+		}
+	};
+
+	nodeShapes["unspecified entity"] = {
+		multimerPadding:3,
+
+		draw: function(context, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
+			var sbgnClass = node._private.data.sbgnclass;
+
+			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
+			//context.fill();
+			//drawStateAndInfos(node, context, centerX, centerY);
+
+		},
+
+		drawPath: function(context, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
+			var sbgnClass = node._private.data.sbgnclass;
+			var label = node._private.data.sbgnlabel;
+			var cloneMarker = node._private.data.sbgnclonemarker;
+
+			$$.sbgn.drawEllipse(context, centerX, centerY, width, height);
+
+			context.stroke();
+
+			$$.sbgn.drawSourceAndSinkCloneMarker(context, centerX, centerY, 
+					width, height, cloneMarker);
+
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
+			$$.sbgn.drawLabelText(context, nodeProp);
+			
+			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+		},
+
+		intersectLine: function(node, x, y) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+				node, x, y);
+
+			var nodeIntersectLines = nodeShapes["ellipse"].intersectLine(centerX, centerY, width, 
+				height, x, y, padding);
+
+			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
+			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
+
+		},
+
+		intersectBox: function(x1, y1, x2, y2, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			var nodeIntersectBox = nodeShapes["ellipse"].intersectBox(
+				x1, y1, x2, y2, width, 
+				height, centerX, centerY, padding);
+
+			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
+				x1, y1, x2, y2, node);
+
+			return nodeIntersectBox || stateAndInfoIntersectBox;
+
+		},
+
+		checkPointRough: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+
+			var nodeCheckPointRough = nodeShapes["ellipse"].checkPointRough(x, y, 
+				padding, width, height, centerX, centerY);
+
+			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
+				x, y, centerX, centerY);
+
+			return nodeCheckPointRough || stateAndInfoCheckPointRough;
+
+		},
+
+		checkPoint: function(x, y, node, threshold) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;;
+			var width = node.width();
+			var height = node.height();
+			var padding = node._private.style["border-width"].pxValue / 2;
+			
+			var nodeCheckPoint =  nodeShapes["ellipse"].checkPoint(x, y, 
+				padding, width, height, 
+				centerX, centerY);
+
+			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
+				threshold);
+
+			return nodeCheckPoint || stateAndInfoCheckPoint;
+		}
+	};
+
+	nodeShapes['and operator'] = {
+
+		draw: function(context, node) {
+			var width = node.width();
+			var height = node.height();
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+
+			nodeShapes['and operator'].drawPath(context, node);
+			context.fill();
+		},
+
+		drawPath: function(context, node) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
+			var label = node._private.data.sbgnlabel;
+
+			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
+
+			context.stroke();
+
+			var textProp = {'label':label, 'centerX':centerX , 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
+			$$.sbgn.drawLabelText(context, textProp);
+		},
+
+		intersectLine: function(node, x, y) {
+			var centerX = node._private.position.x;
+			var centerY = node._private.position.y;
+			var width = node.width();
+			var height = node.height();
 			var padding = node._private.style['border-width'].pxValue / 2;
 
-			return nodeShapes['ellipse'].intersectLine(centerX, centerY, width, 
+			return nodeShapes['ellipse'].intersectLine(centerX, centerY, width,
 				height, x, y, padding);
 
 		},
@@ -2926,21 +3304,12 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var height = node.height();
 			var padding = node._private.style['border-width'].pxValue / 2;
 
-			return nodeShapes['ellipse'].intersectBox(x1, y1, x2, y2, width, height, 
-				centerX, centerY, padding);
-
+			return nodeShapes['ellipse'].intersectLine(x1, y1, x2, y2, width,
+				height, centerX, centerY, padding);
 		},
 
 		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width() + threshold;
-			var height = node.height() + threshold;
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return nodeShapes['ellipse'].checkPointRough(x, y, padding, width, height, 
-				centerX, centerY);
-
+			return true;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -2950,220 +3319,9 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var height = node.height();
 			var padding = node._private.style['border-width'].pxValue / 2;
 
-			return nodeShapes['ellipse'].checkPoint(x, y, padding, width, 
-				height, centerX, centerY)
+			return nodeShapes['ellipse'].checkPoint(x, y, padding, width,
+				height, centerX, centerY);
 
-		}
-	};
-
-	nodeShapes['complex'] = {
-		points: new Array(),
-		multimerPadding:3,
-		cornerLength:12,
-		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var stateAndInfos = node._private.data.sbgnstatesandinfos;
-			var cornerLength = nodeShapes['complex'].cornerLength;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
-
-			nodeShapes['complex'].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			//check whether sbgn class includes multimer substring or not
-			if($$.sbgn.isMultimer(node)){
-				//add multimer shape
-				renderer.drawPolygonPath(context,
-					centerX + multimerPadding, centerY + multimerPadding,
-					width, height, nodeShapes['complex'].points);
-			}
-
-			renderer.drawPolygonPath(context,
-				centerX, centerY,
-				width, height, nodeShapes['complex'].points);
-
-		},
-
-		drawPath: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var stateAndInfos = node._private.data.sbgnstatesandinfos;
-			var label = node._private.data.sbgnlabel;
-			var cornerLength = nodeShapes['complex'].cornerLength;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
-			var cloneMarker = node._private.data.sbgnclonemarker;
-
-			node._private.style['background-opacity'] = 1;
-
-			nodeShapes['complex'].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			//check whether sbgn class includes multimer substring or not
-			if($$.sbgn.isMultimer(node)){
-				//add multimer shape
-				renderer.drawPolygon(context,
-					centerX + multimerPadding, centerY + multimerPadding,
-					width, height, nodeShapes['complex'].points);
-
-				context.stroke();
-
-				$$.sbgn.drawComplexCloneMarker(context, 
-					centerX + multimerPadding, centerY + multimerPadding, 
-					width, height, cornerLength, cloneMarker, true);
-
-				context.stroke();
-			}
-
-			renderer.drawPolygon(context,
-				centerX, centerY,
-				width, height, nodeShapes['complex'].points);
-
-			context.stroke();
-
-			$$.sbgn.drawComplexCloneMarker(context, centerX, centerY, 
-				width, height, cornerLength, cloneMarker, false);
-			$$.sbgn.drawComplexStateAndInfo(renderer, context, node, stateAndInfos, centerX, centerY, width, height);
-		},
-
-		intersectLine: function(node, x, y) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
-			var cornerLength = nodeShapes['complex'].cornerLength;
-
-			node._private.style['background-opacity'] = 1;
-
-			nodeShapes['complex'].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
-				node, x, y);
-
-			var nodeIntersectLines = $$.math.polygonIntersectLine(
-					x, y, 
-					nodeShapes['complex'].points,
-					centerX,
-					centerY,
-					width/2, height/2,
-					padding);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerIntersectionLines = new Array();
-			if($$.sbgn.isMultimer(node)){
-				multimerIntersectionLines = $$.math.polygonIntersectLine(
-					x, y, 
-					nodeShapes['complex'].points,
-					centerX + multimerPadding,
-					centerY + multimerPadding,
-					width/2, height/2,
-					padding);
-			}
-
-			var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines, multimerIntersectionLines);
-
-			return $$.sbgn.closestIntersectionPoint([x, y], intersections);
-		},
-
-		intersectBox: function(x1, y1, x2, y2, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var cornerLength = nodeShapes['complex'].cornerLength;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
-			
-			nodeShapes['complex'].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			var points = nodeShapes['complex'].points;
-
-			var nodeIntersectBox = $$.math.boxIntersectPolygon(
-				x1, y1, x2, y2,
-				points, width, height, centerX, centerY, [0, -1], padding);
-
-			var stateAndInfoIntersectBox = $$.sbgn.intersectBoxStateAndInfoBoxes(
-				x1, y1, x2, y2, node);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerIntersectBox = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerIntersectBox = $$.math.boxIntersectPolygon(
-				x1, y1, x2, y2, points, width, height, 
-				centerX + multimerPadding, centerY + multimerPadding, 
-				[0, -1], padding);
-			}
-
-			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
-			var cornerLength = nodeShapes['complex'].cornerLength;
-
-			nodeShapes['complex'].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes['complex'].points, 
-					padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerCheckPointRough = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerCheckPointRough = $$.math.checkInBoundingBox(
-					x, y, nodeShapes['complex'].points, 
-					padding, width, height, 
-					centerX + multimerPadding, centerY + multimerPadding);
-			}
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
-		},
-
-		checkPoint: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width() + threshold;
-			var height = node.height() + threshold;
-			var padding = node._private.style['border-width'].pxValue / 2;
-			var multimerPadding = nodeShapes['complex'].multimerPadding;
-			var cornerLength = nodeShapes['complex'].cornerLength;
-
-			nodeShapes['complex'].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			var nodeCheckPoint =  $$.math.pointInsidePolygon(x, y, nodeShapes['complex'].points,
-				centerX, centerY, width, height, [0, -1], padding);
-
-			var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node, 
-				threshold);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerCheckPoint = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerCheckPoint = $$.math.pointInsidePolygon(x, y, 
-					nodeShapes['complex'].points,
-					centerX + multimerPadding, centerY + multimerPadding, 
-					width, height, [0, -1], padding);
-
-			}
-
-			return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
 		}
 	};
 
@@ -3252,9 +3410,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		}
 	};
 
-	nodeShapes['dissociation'] = {
+	nodeShapes["dissociation"] = {
+
 		draw: function(context, node) {
-			nodeShapes['dissociation'].drawPath(context, node);
+			nodeShapes["dissociation"].drawPath(context, node);
 			context.fill();
 		},
 
@@ -3290,7 +3449,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var nodeY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.intersectLineEllipse(
 				x, y,
@@ -3305,7 +3464,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return $$.math.boxIntersectEllipse(
 				x1, y1, x2, y2, padding, width, height, centerX, centerY);
@@ -3321,7 +3480,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			x -= centerX;
 			y -= centerY;
@@ -3333,7 +3492,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		}
 	};
 
-	nodeShapes['phenotype'] = {
+	nodeShapes["phenotype"] = {
 		points: new Array(-1, 0, -0.5, -1, 0.5, -1, 
 			1, 0, 0.5, 1, -0.5, 1),
 
@@ -3346,7 +3505,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height,
-				nodeShapes['phenotype'].points);
+				nodeShapes["phenotype"].points);
 		},
 
 		drawPath: function(context, node) {
@@ -3359,7 +3518,7 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			renderer.drawPolygonPath(context,
 				centerX, centerY,
 				width, height,
-				nodeShapes['phenotype'].points);
+				nodeShapes["phenotype"].points);
 
 		},
 
@@ -3368,11 +3527,11 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return renderer.polygonIntersectLine(
 				x, y,
-				nodeShapes['phenotype'].points,
+				nodeShapes["phenotype"].points,
 				centerX,
 				centerY,
 				width / 2, height / 2,
@@ -3381,12 +3540,12 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 		},
 
 		intersectBox: function(x1, y1, x2, y2, node) {
-			var points = nodeShapes['phenotype'].points;
+			var points = nodeShapes["phenotype"].points;
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
 			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
 					points, width, height, centerX, centerY, [0, -1], padding);
@@ -3398,10 +3557,10 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 			
 			return $$.math.checkInBoundingBox(
-				x, y, nodeShapes['phenotype'].points, 
+				x, y, nodeShapes["phenotype"].points, 
 					padding, width, height, centerX, centerY);
 		},
 
@@ -3410,175 +3569,13 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue / 2;
 
-			return $$.math.pointInsidePolygon(x, y, nodeShapes['phenotype'].points,
+			return $$.math.pointInsidePolygon(x, y, nodeShapes["phenotype"].points,
 				centerX, centerY, width, height, [0, -1], padding);
 
 		}
 	};
-
-	nodeShapes['tag'] = {
-		points: new Array(-1, -1, 1/3, -1, 1, 0, 1/3, 1, -1, 1),
-
-		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-
-			renderer.drawPolygon(context,
-				centerX, centerY,
-				width, height,
-				nodeShapes['tag'].points);
-		},
-
-		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var label = node._private.data.sbgnlabel;
-
-			renderer.drawPolygonPath(context,
-				centerX, centerY,
-				width, height,
-				nodeShapes['tag'].points);
-
-			context.stroke();
-
-			var textProp = {'label':label, 'centerX':centerX - width/6, 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
-		},
-
-		intersectLine: function(node, x, y) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return renderer.polygonIntersectLine(
-				x, y,
-				nodeShapes['tag'].points,
-				centerX,
-				centerY,
-				width / 2, height / 2,
-				padding);
-
-		},
-
-		intersectBox: function(x1, y1, x2, y2, node) {
-			var points = nodeShapes['tag'].points;
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
-					points, width, height, centerX, centerY, [0, -1], padding);
-
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-			
-			return $$.math.checkInBoundingBox(
-				x, y, nodeShapes['tag'].points, 
-					padding, width, height, centerX, centerY);
-		},
-
-		checkPoint: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return $$.math.pointInsidePolygon(x, y, nodeShapes['tag'].points,
-				centerX, centerY, width, height, [0, -1], padding);
-
-		}
-	};
-
-	//TODO : add and, or and not operators.
-	nodeShapes['and operator'] = {
-
-		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-
-			nodeShapes['and operator'].drawPath(context, node);
-			context.fill();
-		},
-
-		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var label = node._private.data.sbgnlabel;
-
-			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
-
-			context.stroke();
-
-			var textProp = {'label':label, 'centerX':centerX , 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
-		},
-
-		intersectLine: function(node, x, y) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return nodeShapes['ellipse'].intersectLine(centerX, centerY, width,
-				height, x, y, padding);
-
-		},
-
-		intersectBox: function(x1, y1, x2, y2, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return nodeShapes['ellipse'].intersectLine(x1, y1, x2, y2, width,
-				height, centerX, centerY, padding);
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			return true;
-		},
-
-		checkPoint: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return nodeShapes['ellipse'].checkPoint(x, y, padding, width,
-				height, centerX, centerY);
-
-		}
-	};
-	
-
-	nodeShapes['or operator'] = nodeShapes['and operator'];
-	nodeShapes['not operator'] = nodeShapes['and operator'];
 
 	nodeShapes['omitted process'] = jQuery.extend(true, {}, nodeShapes['process']);
 	nodeShapes['omitted process'].label = '\\\\';
@@ -3587,7 +3584,8 @@ var sbgnShapes = {'unspecified entity' : true, 'simple chemical' : true, 'macrom
 	nodeShapes['uncertain process'].label = '?';
 
 	nodeShapes['association'] = nodeShapes['ellipse'];
-
+	nodeShapes['or operator'] = nodeShapes['and operator'];
+	nodeShapes['not operator'] = nodeShapes['and operator'];
 	nodeShapes['compartment'] = nodeShapes['roundrectangle'];
 	
 })( cytoscape );
