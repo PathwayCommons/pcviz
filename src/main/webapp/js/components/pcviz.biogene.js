@@ -59,6 +59,17 @@ var BioGeneView = Backbone.View.extend({
             $(".add-gene-to-network").hide();
         }
 
+        $(".ext-tools-select").dropkick({
+            change: function(value, label) {
+                if(value == "-") { return; }
+
+                var url = $(this).find("option[value=" + value + "]").attr("data-url");
+                window.open(url, "_blank");
+                $(this).dropkick("reset");
+                return false;
+            }
+        });
+
         return this;
     },
     format: function()
