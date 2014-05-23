@@ -43,6 +43,8 @@
 
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
+	var lineStyles = $$.style.types.lineStyle.enums;
+	lineStyles.push("consumption", "production");
 
 	function drawSelection(render,context, node){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -1126,7 +1128,401 @@
 		}
 		
 		return hashTable;
+	};
+
+  var _genPoints = function(pt, spacing, even) {
+    
+    var approxLen = Math.sqrt(Math.pow(pt[4] - pt[0], 2) + Math.pow(pt[5] - pt[1], 2));
+    approxLen += Math.sqrt(Math.pow((pt[4] + pt[0]) / 2 - pt[2], 2) + Math.pow((pt[5] + pt[1]) / 2 - pt[3], 2));
+
+    var pts = Math.ceil(approxLen / spacing); 
+    var pz;
+    
+    if (pts > 0) {
+      pz = new Array(pts * 2);
+    } else {
+      return null;
+    }
+    
+    for (var i = 0; i < pts; i++) {
+      var cur = i / pts;
+      pz[i * 2] = pt[0] * (1 - cur) * (1 - cur) + 2 * (pt[2]) * (1 - cur) * cur + pt[4] * (cur) * (cur);
+      pz[i * 2 + 1] = pt[1] * (1 - cur) * (1 - cur) + 2 * (pt[3]) * (1 - cur) * cur + pt[5] * (cur) * (cur);
+    }
+    
+    return pz;
+  };
+  
+  var _genStraightLinePoints = function(pt, spacing, even) {
+    
+    var approxLen = Math.sqrt(Math.pow(pt[2] - pt[0], 2) + Math.pow(pt[3] - pt[1], 2));
+    
+    var pts = Math.ceil(approxLen / spacing);
+    var pz;
+    
+    if (pts > 0) {
+      pz = new Array(pts * 2);
+    } else {
+      return null;
+    }
+    
+    var lineOffset = [pt[2] - pt[0], pt[3] - pt[1]];
+    for (var i = 0; i < pts; i++) {
+      var cur = i / pts;
+      pz[i * 2] = lineOffset[0] * cur + pt[0];
+      pz[i * 2 + 1] = lineOffset[1] * cur + pt[1];
+    }
+    
+    return pz;
+  };
+
+	function drawCardinality(context, edge, length, type){
+		//if cardinality is zero, return here.
+		var cardinality = edge._private.data.sbgncardinality;
+		if(cardinality == 0)
+			return;
+	    var dispX, dispY, startX, startY;
+	    var squareLength = 13;
+	    var distanceToTarget = 20;
+	    var distanceToSource = -25;
+
+	    if(type === "consumption"){
+		    startX = edge._private.rscratch.arrowStartX;
+		    startY = edge._private.rscratch.arrowStartY;
+	    }
+	    else{
+	    	startX = edge._private.rscratch.arrowEndX;
+	    	startY = edge._private.rscratch.arrowEndY;
+	    }
+
+	    var style = edge._private.style;
+	    
+	    var srcPos = edge.source().position();
+	    dispX = startX - srcPos.x;
+	    dispY = startY - srcPos.y;
+
+	    var angle = Math.asin(dispY / (Math.sqrt(dispX * dispX + dispY * dispY)));
+	  
+	    if (dispX < 0) {
+	      angle = angle + Math.PI / 2;
+	    } else {
+	      angle = - (Math.PI / 2 + angle);
+	    }
+	    
+	    if(length > distanceToTarget){
+		    context.translate(startX, startY);
+		   	context.rotate(-angle);
+
+		   	if(type === "consumption"){
+				context.rect(0, distanceToSource, squareLength, squareLength);
+				context.rotate(Math.PI/2);
+
+				var textProp = {'centerX':distanceToSource + squareLength/2, 'centerY':-squareLength/2,
+					'opacity':edge._private.style['text-opacity'].value, 
+					'width': squareLength, 'label': cardinality};
+				$$.sbgn.drawLabelText(context, textProp);
+
+				context.rotate(-Math.PI/2);
+			}
+			else{
+				context.rect(0, distanceToTarget, squareLength, squareLength);
+				context.rotate(Math.PI/2);
+
+				var textProp = {'centerX': distanceToTarget + squareLength/2, 'centerY' : -squareLength/2,
+					'opacity':edge._private.style['text-opacity'].value, 
+					'width': squareLength, 'label': cardinality};
+				$$.sbgn.drawLabelText(context, textProp);
+
+				context.rotate(-Math.PI/2);
+			}
+		    
+		    context.rotate(angle);
+		    context.translate(-startX, -startY);
+		}
 	}
+
+	var calls = 0;
+	var time = 0;
+	var avg = 0;
+
+	CanvasRenderer.prototype.drawStyledEdge = function(
+		edge, context, pts, type, width) {
+
+		var start = +new Date();
+
+		// 3 points given -> assume Bezier
+		// 2 -> assume straight
+
+		var cy = this.data.cy;
+		var zoom = cy.zoom();
+		var rs = edge._private.rscratch;
+		var canvasCxt = context;
+		var path;
+		var pathCacheHit = false;
+		var usePaths = CanvasRenderer.usePaths();
+
+		// Adjusted edge width for dotted
+		// width = Math.max(width * 1.6, 3.4) * zoom;
+		// console.log('w', width);
+
+		if (type === 'solid') {
+
+			if( usePaths ){
+				var pathCacheKey = pts;
+				var keyLengthMatches = rs.pathCacheKey && pathCacheKey.length === rs.pathCacheKey.length;
+				var keyMatches = keyLengthMatches;
+
+				for( var i = 0; keyMatches && i < pathCacheKey.length; i++ ){
+					if( rs.pathCacheKey[i] !== pathCacheKey[i] ){
+						keyMatches = false;
+					}
+				}
+
+				if( keyMatches ){
+					path = context = rs.pathCache;
+					pathCacheHit = true;
+				} else {
+					path = context = new Path2D();
+				  	rs.pathCacheKey = pathCacheKey;
+				  	rs.pathCache = path;
+				}
+			}
+
+			if( !pathCacheHit ){
+				if( context.beginPath ){ context.beginPath(); }
+				context.moveTo(pts[0], pts[1]);
+				if (pts.length == 3 * 2) {
+			  		context.quadraticCurveTo(pts[2], pts[3], pts[4], pts[5]);
+				} else {
+			  		context.lineTo(pts[2], pts[3]);
+				}
+			}
+
+			context = canvasCxt;
+			if( usePaths ){
+				context.stroke( path );
+			} else {
+				context.stroke();
+			}
+
+		} else if (type === 'consumption' || type === 'production') {
+
+			if( usePaths ){
+				var pathCacheKey = pts;
+				var keyLengthMatches = rs.pathCacheKey && pathCacheKey.length === rs.pathCacheKey.length;
+				var keyMatches = keyLengthMatches;
+
+				for( var i = 0; keyMatches && i < pathCacheKey.length; i++ ){
+					if( rs.pathCacheKey[i] !== pathCacheKey[i] ){
+						keyMatches = false;
+					}
+				}
+
+				if( keyMatches ){
+					path = context = rs.pathCache;
+					pathCacheHit = true;
+				} else {
+					path = context = new Path2D();
+				  	rs.pathCacheKey = pathCacheKey;
+				  	rs.pathCache = path;
+				}
+			}
+
+			if( !pathCacheHit ){
+				if( context.beginPath ){ context.beginPath(); }
+				context.moveTo(pts[0], pts[1]);
+				if (pts.length == 3 * 2) {
+			  		//context.quadraticCurveTo(pts[2], pts[3], pts[4], pts[5]);
+			  		context.lineTo(pts[4], pts[5]);
+			  		var length = (Math.sqrt((pts[4] - pts[0]) * (pts[4] - pts[0]) + 
+			  			(pts[5] - pts[1]) * (pts[5] - pts[1])));
+			  		drawCardinality(context, edge, length, type);
+				} else {
+			  		context.lineTo(pts[2], pts[3]);
+			  		var length = (Math.sqrt((pts[2] - pts[0]) * (pts[2] - pts[0]) + 
+			  			(pts[3] - pts[1]) * (pts[3] - pts[1])));
+			  		drawCardinality(context, edge, length, type);
+				}
+
+
+			}
+
+			context = canvasCxt;
+			if( usePaths ){
+				context.stroke( path );
+			} else {
+				context.stroke();
+			}
+
+		} else if (type === 'dotted') {
+
+			var pt;
+			if (pts.length == 3 * 2) {
+				pt = _genPoints(pts, 16, true);
+			} else {
+				pt = _genStraightLinePoints(pts, 16, true);
+			}
+
+			if (!pt) { return; }
+
+			var dotRadius = Math.max(width * 1.6, 3.4) * zoom;
+			var bufW = dotRadius * 2, bufH = dotRadius * 2;
+			bufW = Math.max(bufW, 1);
+			bufH = Math.max(bufH, 1);
+
+			var buffer = this.createBuffer(bufW, bufH);
+
+			var context2 = buffer[1];
+			//console.log(buffer);
+			//console.log(bufW, bufH);
+
+			// Draw on buffer
+			context2.setTransform(1, 0, 0, 1, 0, 0);
+			context2.clearRect(0, 0, bufW, bufH);
+
+			context2.fillStyle = context.strokeStyle;
+			context2.beginPath();
+			context2.arc(bufW/2, bufH/2, dotRadius * 0.5, 0, Math.PI * 2, false);
+			context2.fill();
+
+			// Now use buffer
+			context.beginPath();
+			//context.save();
+
+			for (var i=0; i<pt.length/2; i++) {
+
+			//context.beginPath();
+			//context.arc(pt[i*2], pt[i*2+1], width * 0.5, 0, Math.PI * 2, false);
+			//context.fill();
+
+			context.drawImage(
+			    buffer[0],
+			    pt[i*2] - bufW/2 / zoom,
+			    pt[i*2+1] - bufH/2 / zoom,
+			    bufW / zoom,
+			    bufH / zoom);
+			}
+
+			context.closePath();
+
+			//context.restore();
+
+		} else if (type === 'dashed') {
+			var pt;
+			if (pts.length == 3 * 2) {
+				pt = _genPoints(pts, 14, true);
+			} else {
+				pt = _genStraightLinePoints(pts, 14, true);
+			}
+			if (!pt) { return; }
+
+			//var dashSize = Math.max(width * 1.6, 3.4);
+			//dashSize = Math.min(dashSize)
+
+			//var bufW = width * 2 * zoom, bufH = width * 2.5 * zoom;
+			var bufW = width * 2 * zoom;
+			var bufH = 7.8 * zoom;
+			bufW = Math.max(bufW, 1);
+			bufH = Math.max(bufH, 1);
+
+			var buffer = this.createBuffer(bufW, bufH);
+			var context2 = buffer[1];
+
+			// Draw on buffer
+			context2.setTransform(1, 0, 0, 1, 0, 0);
+			context2.clearRect(0, 0, bufW, bufH);
+
+			if (context.strokeStyle) {
+				context2.strokeStyle = context.strokeStyle;
+			}
+
+			context2.lineWidth = width * cy.zoom();
+
+			//context2.fillStyle = context.strokeStyle;
+
+			context2.beginPath();
+			context2.moveTo(bufW / 2, bufH * 0.2);
+			context2.lineTo(bufW / 2,  bufH * 0.8);
+
+			//context2.arc(bufH, dotRadius, dotRadius * 0.5, 0, Math.PI * 2, false);
+
+			//context2.fill();
+			context2.stroke();
+
+			//context.save();
+
+			//document.body.appendChild(buffer[0]);
+
+			var quadraticBezierVaryingTangent = false;
+			var rotateVector, angle;
+
+			//Straight line; constant tangent angle
+			if (pts.length == 2 * 2) {
+				rotateVector = [pts[2] - pts[0], pts[3] - pt[1]];
+
+				angle = Math.acos((rotateVector[0] * 0 + rotateVector[1] * -1) / Math.sqrt(rotateVector[0] * rotateVector[0] 
+				    + rotateVector[1] * rotateVector[1]));
+
+				if (rotateVector[0] < 0) {
+					angle = -angle + 2 * Math.PI;
+				}
+			} else if (pts.length == 3 * 2) {
+				quadraticBezierVaryingTangent = true;
+			}
+
+			for (var i=0; i<pt.length/2; i++) {
+
+				var p = i / (Math.max(pt.length/2 - 1, 1));
+
+				// Quadratic bezier; varying tangent
+				// So, use derivative of quadratic Bezier function to find tangents
+				if (quadraticBezierVaryingTangent) {
+					rotateVector = [2 * (1-p) * (pts[2] - pts[0]) 
+					                + 2 * p * (pts[4] - pts[2]),
+					                  2 * (1-p) * (pts[3] - pts[1]) 
+					                  + 2 * p * (pts[5] - pts[3])];
+
+					angle = Math.acos((rotateVector[0] * 0 + rotateVector[1] * -1) / Math.sqrt(rotateVector[0] * rotateVector[0] 
+					    + rotateVector[1] * rotateVector[1]));
+
+					if (rotateVector[0] < 0) {
+						angle = -angle + 2 * Math.PI;
+					}
+				}
+
+				context.translate(pt[i*2], pt[i*2+1]);
+
+				context.rotate(angle);
+				context.translate(-bufW/2 / zoom, -bufH/2 / zoom);
+
+				context.drawImage(
+				    buffer[0],
+				    0,
+				    0,
+				    bufW / zoom,
+				    bufH / zoom);
+
+				context.translate(bufW/2 / zoom, bufH/2 / zoom);
+				context.rotate(-angle);
+
+				context.translate(-pt[i*2], -pt[i*2+1]);
+
+				context.closePath();
+
+			}
+
+		//context.restore();
+		} else {
+			this.drawStyledEdge(edge, context, pts, 'solid', width);
+		}
+
+		var end = +new Date();
+		time += end - start;
+		avg = time / (++calls);
+		window.avg = avg;
+
+	};
+
 
 
 })( cytoscape );
@@ -3616,135 +4012,9 @@
     	return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
   	};
 
-	arrowShapes['consumption'] = {
-	    points: [
-	      0, -0.15,
-	      0.30, -0.15,
-	      0.30, -0.45,
-	      0, -0.45
-	    ],
+	arrowShapes['consumption'] = arrowShapes['none'];
 
-	    textPoints: [
-	    	0.20, -0.25,
-	    	0.10, -0.25,
-	    	0.20, -0.35,
-	    	0.10, -0.35
-	    ],
-
-	    collide: function(x, y, centerX, centerY, width, height, direction, padding) {
-	      var points = arrowShapes['consumption'].points;
-
-	      return $$.math.pointInsidePolygon(
-	        x, y, points, centerX, centerY, width, height, direction, padding);
-	    },
-	    
-	    roughCollide: bbCollide,
-	    
-	    draw: function(context) {
-	    	var points = arrowShapes['consumption'].points;
-	    	var textPoints = arrowShapes['consumption'].textPoints;
-/*
-	    	//square
-	    	context.beginPath();
-	    	for (var i = 0; i < points.length / 2 ; i++) {
-	        	context.lineTo(points[(i * 2)], 
-	        		points[(i * 2 + 1)]);
-	      	}
-	      	context.closePath();
-
-			//console.log(context.lineWidth);
-	      	context.scale(1/30, 1/30);
-	      	context.rotate(Math.PI /2);
-	      	$$.sbgn.drawLabelText(context, '', -10, -5);
-	      	context.rotate(-Math.PI /2);
-	      	context.scale(30, 30);
-*/
-	    },
-	    
-	    spacing: function(edge) {
-	      return 0;
-	    },
-	    
-	    gap: function(edge) {
-	    	return 0;
-	    }
-	};
-
-	arrowShapes['production'] = {
-	    points: [
-	      0, -0.40,
-	      0.30, -0.40,
-	      0.30, -0.70,
-	      0, -0.70
-	    ],
-
-	   	textPoints: [
-	    	0.20, -0.50,
-	    	0.10, -0.50,
-	    	0.20, -0.60,
-	    	0.10, -0.60
-	    ],
-
-	   	trianglePoints: [
-    		-0.15, -0.3,
-      		0, 0,
-      		0.15, -0.3
-    	],
-
-    	ax : 0,
-    	ay : 0,
-    	awidth : 0,
-    	aheight : 0,
-
-	    collide: function(x, y, centerX, centerY, width, height, direction, padding) {
-	      var points = arrowShapes['production'].trianglePoints;
-	      arrowShapes['production'].ax = centerX;
-	      arrowShapes['production'].ay = centerY;
-	      arrowShapes['production'].awidth = width;
-	      arrowShapes['production'].aheight = height;
-	      return $$.math.pointInsidePolygon(
-	        x, y, points, centerX, centerY, width, height, direction, padding);
-	    },
-	    
-	    roughCollide: bbCollide,
-	    
-	    draw: function(context) {
-	    	var points = arrowShapes['production'].points;
-	    	var trianglePoints = arrowShapes['production'].trianglePoints;
-	    	var textPoints = arrowShapes['production'].textPoints;
-
-	    	//triangle
-	    	for (var i = 0; i < trianglePoints.length / 2 + 1 ; i++) {
-	        	context.lineTo(trianglePoints[(i * 2)% trianglePoints.length], 
-	        		trianglePoints[(i * 2 + 1)% trianglePoints.length]);
-	      	}
-
-			//var oldColor  = context.fillStyle;
-			//context.fillStyle = '#000000';
-			context.fill();
-			//context.fillStyle = oldColor;
-
-	      	context.moveTo(points[0], points[1]);
-/*
-	      	//square
-	      	context.beginPath();
-	    	for (var i = 0; i < points.length / 2 ; i++) {
-	        	context.lineTo(points[(i * 2)], 
-	        		points[(i * 2 + 1)]);
-	      	}
-	      	context.closePath();
-*/
-
-	    },
-	    
-	    spacing: function(edge) {
-	      return 0;
-	    },
-	    
-	    gap: function(edge) {
-	      return edge._private.style['width'].pxValue * 2;
-	    }
-	};
+	arrowShapes['production'] = arrowShapes['triangle'];
 
 	arrowShapes['necessary stimulation'] = {
 	    trianglePoints: [

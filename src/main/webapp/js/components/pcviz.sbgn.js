@@ -37,7 +37,6 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "text-valign" : "bottom",
             "text-halign" : "center"
         })
-
         .selector("edge")
         .css({
             "line-color": "#0f0f0f",
@@ -55,11 +54,13 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("edge[sbgnclass='consumption']")
         .css({
             "target-arrow-shape": "none",
-            "source-arrow-shape": "data(sbgnclass)"
+            "source-arrow-shape": "data(sbgnclass)",
+            "line-style" : "consumption"
         })
         .selector("edge[sbgnclass='production']")
         .css({
-            "target-arrow-fill": "filled"
+            "target-arrow-fill": "filled",
+            "line-style" : "production"
         })
         .selector(":selected")
         .css({

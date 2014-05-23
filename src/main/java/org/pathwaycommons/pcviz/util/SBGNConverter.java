@@ -285,10 +285,19 @@ public class SBGNConverter
                 targetName = portGlyphMap.get(targetName).getId();
             }
 
+            String cardinality = "0";
+
+            for(Glyph glyph : arc.getGlyph()){
+                if(glyph.getClazz().equals("cardinality")){
+                    cardinality = glyph.getLabel().getText();
+                    break;
+                }
+            }
             edge.setProperty(PropertyKey.SOURCE, srcName);
             edge.setProperty(PropertyKey.TARGET, targetName);
             edge.setProperty(PropertyKey.ID, arc.getId());
             edge.setProperty(PropertyKey.SBGNCLASS, arc.getClazz());
+            edge.setProperty(PropertyKey.SBGNCARDINALITY, cardinality);
 
             graph.getEdges().add(edge);
         }
