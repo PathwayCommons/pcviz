@@ -53,7 +53,8 @@ public enum PropertyKey
     SBGNCOMMENT,
     SBGNXREF,
     SBGNEVIDENCEXREF,
-    SBGNEVIDENCECODE;
+    SBGNEVIDENCECODE,
+    SBGNCARDINALITY;
 
     @Override
     public String toString()
