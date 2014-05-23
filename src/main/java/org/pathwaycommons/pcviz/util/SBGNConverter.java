@@ -42,6 +42,7 @@ import org.sbgn.bindings.Sbgn;
 public class SBGNConverter
 {
     private static String UNKNOWN = "unknown";
+    private static String NOT_SPECIFIED = "not specified";
 
     private BlackListService blackListService;
 
@@ -92,7 +93,7 @@ public class SBGNConverter
         extractDataSource(cNode, bpElements);
         extractModifications(cNode, bpElements);
 
-        String lbl = (glyph.getLabel() == null) ? UNKNOWN : glyph.getLabel().getText();
+        String lbl = (glyph.getLabel() == null) ? NOT_SPECIFIED : glyph.getLabel().getText();
         cNode.setProperty(PropertyKey.SBGNLABEL, lbl);
 
         setGlyphPositionAsCenter(glyph, states);
