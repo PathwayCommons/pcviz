@@ -749,37 +749,6 @@
 
 	};
 
-	// Round rectangle drawing
-	CanvasRenderer.prototype.drawRoundRectanglePath = function(
-		context, x, y, width, height, radius) {
-		
-		var halfWidth = width / 2;
-		var halfHeight = height / 2;
-		//var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
-		var cornerRadius = radius;
-		context.translate(x, y);
-		
-		context.beginPath();
-		
-		// Start at top middle
-		context.moveTo(0, -halfHeight);
-		// Arc from middle top to right side
-		context.arcTo(halfWidth, -halfHeight, halfWidth, 0, cornerRadius);
-		// Arc from right side to bottom
-		context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
-		// Arc from bottom to left side
-		context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
-		// Arc from left side to topBorder
-		context.arcTo(-halfWidth, -halfHeight, 0, -halfHeight, cornerRadius);
-		// Join line
-		context.lineTo(0, -halfHeight);
-		
-		context.closePath();
-		
-		context.translate(-x, -y);
-	}
-
-
 	CanvasRenderer.prototype.getNodeShape = function(node)
 	{
 		// TODO only allow rectangle for a compound node?
@@ -1534,10 +1503,11 @@
 ;(function($$){ 'use strict';
 	$$.sbgn = {};
 
+
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
 	var nodeShapes = CanvasRenderer.nodeShapes;
-
+	var sbgnNodeShapes = CanvasRenderer.sbgnShapes = {};
 
 	function truncateText(textProp, context) {
 	    var width;
@@ -1557,11 +1527,11 @@
 		context.textBaseline = "middle";
 		var oldColor  = context.fillStyle;
 		context.fillStyle = textProp.color;
-		var oldOpacity = context.globalAlpha;
-		context.globalAlpha = textProp.opacity;
+		//var oldOpacity = context.globalAlpha;
+		//context.globalAlpha = textProp.opacity;
 		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
 		context.fillStyle = oldColor;
-		context.globalAlpha = oldOpacity;
+		//context.globalAlpha = oldOpacity;
 		context.stroke();
 	}
 
@@ -1628,6 +1598,7 @@
 
 	    context.closePath();
 	    context.translate(-centerX, -centerY);
+	    context.fill();
 	}
 
 	$$.sbgn.drawPathStateAndInfos = function(node, context, centerX, centerY){
@@ -1658,7 +1629,7 @@
 				renderer.drawRoundRectangle(context,
 					stateCenterX, stateCenterY,
 					stateWidth, stateHeight,
-					5);
+					10);
 
 				textProp.label = state.label.text;
 				$$.sbgn.drawInfoText(context, textProp);
@@ -1713,7 +1684,7 @@
 						renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
-							5);
+							10);
 
 						textProp.label = state.label.text;
 						$$.sbgn.drawInfoText(context, textProp);
@@ -1730,7 +1701,7 @@
 						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
 					if(state.clazz == "state variable"){//draw ellipse
-						$$.sbgn.drawEllipse(context,
+						$$.sbgn.drawEllipsePath(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
 
@@ -1741,7 +1712,7 @@
 						renderer.drawRoundRectangle(context,
 							stateCenterX, stateCenterY,
 							stateWidth, stateHeight,
-							5);
+							10);
 						textProp.label = state.label.text;
 						$$.sbgn.drawInfoText(context, textProp);
 					}
@@ -1771,7 +1742,7 @@
 
 	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
-		if(cloneMarker != null){
+		//if(cloneMarker != null){
 			var oldColor  = context.fillStyle;
 			context.fillStyle = "#0f0f0f";
 
@@ -1795,20 +1766,55 @@
 			context.fill();
 
 		 	context.fillStyle = oldColor;
-		}
+		//}
+	}
+
+	$$.sbgn.drawSimpleChemicalPath = function(
+		context, x, y, width, height) {
+		
+		var halfWidth = width / 2;
+		var halfHeight = height / 2;
+		//var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+		var cornerRadius = Math.min(halfWidth, halfHeight);
+		context.translate(x, y);
+		
+		context.beginPath();
+		
+		// Start at top middle
+		context.moveTo(0, -halfHeight);
+		// Arc from middle top to right side
+		context.arcTo(halfWidth, -halfHeight, halfWidth, 0, cornerRadius);
+		// Arc from right side to bottom
+		context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
+		// Arc from bottom to left side
+		context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
+		// Arc from left side to topBorder
+		context.arcTo(-halfWidth, -halfHeight, 0, -halfHeight, cornerRadius);
+		// Join line
+		context.lineTo(0, -halfHeight);
+		
+		context.closePath();
+		
+		context.translate(-x, -y);
+	}
+
+	$$.sbgn.drawSimpleChemical = function(
+		context, x, y, width, height) {
+		$$.sbgn.drawSimpleChemicalPath(context, x, y, width, height);
+		context.fill();
 	}
 
 	$$.sbgn.drawSourceAndSinkCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
 		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
-			width, height, cloneMarker)
+			width, height, cloneMarker);
 	}
 
 	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker, isMultimer){
-		if(cloneMarker != null){
+		//if(cloneMarker != null){
 	
-			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+			var cornerRadius = Math.min(width/2, height/2);
 
 			var firstCircleCenterX = centerX - width/2 + cornerRadius;
 			var firstCircleCenterY = centerY;
@@ -1830,10 +1836,9 @@
 			var cloneWidth = width - 2 * cornerRadius;
 			var cloneHeight = cornerRadius/2;
 
-			renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
-
+			renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight - 1, recPoints);
 			context.fillStyle = oldColor;
-		}
+		//}
 	}
 
 	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
@@ -1870,7 +1875,7 @@
 			context.fillStyle = "#0f0f0f";
 
 			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
-			context.fill();
+
 		 	context.fillStyle = oldColor;
 		}
 	}
@@ -1899,8 +1904,6 @@
 			renderer.drawPolygon(context,
 				cloneX, cloneY,
 				cloneWidth, cloneHeight, markerPoints);
-
-			context.fill();
 
 		 	context.fillStyle = oldColor;
 		}
@@ -2493,36 +2496,11 @@
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
 	nodeShapes["complex"] = {
-		points: new Array(),
+		points: [],
 		multimerPadding:3,
 		cornerLength:12,
+
 		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var stateAndInfos = node._private.data.sbgnstatesandinfos;
-			var cornerLength = nodeShapes["complex"].cornerLength;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
-
-			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			//check whether sbgn class includes multimer substring or not
-			if($$.sbgn.isMultimer(node)){
-				//add multimer shape
-				renderer.drawPolygonPath(context,
-					centerX + multimerPadding, centerY + multimerPadding,
-					width, height, nodeShapes["complex"].points);
-			}
-
-			renderer.drawPolygonPath(context,
-				centerX, centerY,
-				width, height, nodeShapes["complex"].points);
-
-		},
-
-		drawPath: function(context, node) {
 			var width = node.width();
 			var height = node.height();
 			var centerX = node._private.position.x;
@@ -2532,6 +2510,9 @@
 			var cornerLength = nodeShapes["complex"].cornerLength;
 			var multimerPadding = nodeShapes["complex"].multimerPadding;
 			var cloneMarker = node._private.data.sbgnclonemarker;
+
+			//force opacity to 1 since we might have state and info boxes.
+			node._private.style["background-opacity"].value = 1;
 
 			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
 				width, height);
@@ -2560,8 +2541,11 @@
 
 			$$.sbgn.drawComplexCloneMarker(context, centerX, centerY, 
 				width, height, cornerLength, cloneMarker, false);
+
 			$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
-			var x = 5;
+		},
+
+		drawPath: function(context, node) {
 		},
 
 		intersectLine: function(node, x, y) {
@@ -2713,32 +2697,10 @@
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
 			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
-
-			//check whether sbgn class includes multimer substring or not
-			if($$.sbgn.isMultimer(node)){
-				//add multimer shape
-				renderer.drawRoundRectanglePath(context,
-					centerX + multimerPadding, centerY + multimerPadding,
-					width, height,
-					cornerRadius);
-			}
-
-			renderer.drawRoundRectanglePath(context,
-				centerX, centerY, width, height,
-				cornerRadius);
-			//context.fill();
-			//drawStateAndInfos(node, context, centerX, centerY);
-		},
-		
-		drawPath: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var label = node._private.data.sbgnlabel;
-			var cornerRadius = nodeShapes["macromolecule"].cornerRadius;
-			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
 			var cloneMarker = node._private.data.sbgnclonemarker;
+
+			//force opacity to 1 since we might have state and info boxes.
+			node._private.style["background-opacity"].value = 1;
 
 			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
@@ -2772,6 +2734,10 @@
 			$$.sbgn.drawLabelText(context, nodeProp);
 			
 			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+		},
+		
+		drawPath: function(context, node) {
+
 		},
 		
 		intersectLine: function(node, x, y) {
@@ -2898,30 +2864,11 @@
 			var label = node._private.data.sbgnlabel;
 			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
 			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
-
-			//check whether sbgn class includes multimer substring or not
-			if($$.sbgn.isMultimer(node)){
-				//add multimer shape
-				$$.sbgn.drawNucAcidFeature(context, width, height, 
-					centerX + multimerPadding, 
-					centerY + multimerPadding, 
-					cornerRadius);
-			}
-
-			$$.sbgn.drawNucAcidFeature(context, width, height, centerX, 
-				centerY, cornerRadius);
-		},
-
-		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var label = node._private.data.sbgnlabel;
-			var cornerRadius = nodeShapes["nucleic acid feature"].cornerRadius;
-			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
+			//force opacity to 1 since we might have state and info boxes.
+			node._private.style["background-opacity"].value = 1;
+
 			//check whether sbgn class includes multimer substring or not
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
@@ -2929,7 +2876,7 @@
 					centerX + multimerPadding, 
 					centerY + multimerPadding, 
 					cornerRadius);
-				context.fill();
+
 				context.stroke();
 
 				$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, 
@@ -2941,7 +2888,6 @@
 
 			$$.sbgn.drawNucAcidFeature(context, width, height, centerX, 
 				centerY, cornerRadius);
-			context.fill();
 
 			context.stroke();
 
@@ -2953,6 +2899,10 @@
 			$$.sbgn.drawLabelText(context, nodeProp);
 
 			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+		},
+
+		drawPath: function(context, node) {
+
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3058,21 +3008,6 @@
 		1, -1, -1, -1),
 
 		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var label = node._private.data.sbgnlabel;
-
-			renderer.drawPolygon(context,
-				centerX, centerY,
-				width, height,
-				nodeShapes["perturbing agent"].points);
-
-			//drawStateAndInfos(node, context, centerX, centerY);
-		},
-
-		drawPath: function(context, node) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
 			var width = node.width();
@@ -3080,12 +3015,14 @@
 			var label = node._private.data.sbgnlabel;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
-			renderer.drawPolygonPath(context,
+			//force opacity to 1 since we might have state and info boxes.
+			node._private.style["background-opacity"].value = 1;
+
+			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height,
 				nodeShapes["perturbing agent"].points);
 
-			context.fill();
 
 			context.stroke();
 
@@ -3097,6 +3034,10 @@
 			$$.sbgn.drawLabelText(context, nodeProp);
 			
 			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+		},
+
+		drawPath: function(context, node) {
+
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3186,33 +3127,17 @@
 			var width = node.width();
 			var height = node.height();
 			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
-			var padding = node._private.style["border-width"].pxValue;
-			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
-
-			if($$.sbgn.isMultimer(node)){
-				//add multimer shape
-				renderer.drawRoundRectanglePath(context, centerX + multimerPadding, 
-					centerY + multimerPadding, width, height, cornerRadius);
-			}
-
-			renderer.drawRoundRectanglePath(context, centerX, centerY, width, height, cornerRadius);
-		},
-
-		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 			var label = node._private.data.sbgnlabel;
 			var padding = node._private.style["border-width"].pxValue;
 			var cloneMarker = node._private.data.sbgnclonemarker;
-			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+
+			//force opacity to 1 since we might have state and info boxes.
+			node._private.style["background-opacity"].value = 1;
 
 			if($$.sbgn.isMultimer(node)){
 				//add multimer shape
-				renderer.drawRoundRectangle(context, centerX + multimerPadding, 
-					centerY + multimerPadding, width, height, cornerRadius);
+				$$.sbgn.drawSimpleChemical(context, centerX + multimerPadding, 
+					centerY + multimerPadding, width, height);
 
 				context.stroke();
 
@@ -3223,7 +3148,9 @@
 				context.stroke();
 			}
 
-			renderer.drawRoundRectangle(context, centerX, centerY, width, height, cornerRadius);
+			$$.sbgn.drawSimpleChemical(context, 
+				centerX, centerY, 
+				width, height);
 
 			context.stroke();
 			
@@ -3235,6 +3162,9 @@
 			$$.sbgn.drawLabelText(context, nodeProp);
 			
 			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+		},
+
+		drawPath: function(context, node) {
 
 		},
 
@@ -3355,30 +3285,6 @@
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
 			var pts = nodeShapes["source and sink"].points;
-
-			$$.sbgn.drawEllipsePath(context, centerX, centerY,
-				width, height);
-
-			context.beginPath();
-			context.translate(centerX, centerY);
-			context.scale(width * Math.sqrt(2) / 2, height * Math.sqrt(2) / 2);
-
-			context.moveTo(pts[2], pts[3]);
-			context.lineTo(pts[6], pts[7]);
-			context.closePath();
-
-			context.scale(2/(width * Math.sqrt(2)), 2/(height * Math.sqrt(2)));
-			context.translate(-centerX, -centerY);	
-
-		},
-
-		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var label = node._private.data.sbgnlabel;
-			var pts = nodeShapes["source and sink"].points;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
 			$$.sbgn.drawEllipse(context, centerX, centerY,
@@ -3400,7 +3306,12 @@
 			context.stroke();
 
 			$$.sbgn.drawSourceAndSinkCloneMarker(context, centerX, centerY, 
-				width, height, cloneMarker);
+				width, height, cloneMarker);	
+
+		},
+
+		drawPath: function(context, node) {
+
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3551,20 +3462,6 @@
 			var height = node.height();
 			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
-
-			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
-			//context.fill();
-			//drawStateAndInfos(node, context, centerX, centerY);
-
-		},
-
-		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
-			var sbgnClass = node._private.data.sbgnclass;
 			var label = node._private.data.sbgnlabel;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
@@ -3580,6 +3477,11 @@
 			$$.sbgn.drawLabelText(context, nodeProp);
 			
 			$$.sbgn.drawPathStateAndInfos(node, context, centerX, centerY);
+
+		},
+
+		drawPath: function(context, node) {
+
 		},
 
 		intersectLine: function(node, x, y) {

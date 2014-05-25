@@ -24,7 +24,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             "border-color": "#0f0f0f",
             "background-color": "#ffffff",
             "font-size": 11,
-            "shape": "data(sbgnclass)"
+            "shape": "data(sbgnclass)",
+            'background-opacity': 0.5,
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment']")
         .css({
@@ -65,7 +66,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector(":selected")
         .css({
             "background-color": "#777777",
-            "background-opacity" : "1",
+            //"background-opacity" : "1",
             "color":"#000000",
             "line-color": "#000",
             "source-arrow-color": "#000",
@@ -86,7 +87,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector(":active")
         .css({
             "background-color": "#aaaaaa",
-            "background-opacity" : "1",
+            //"background-opacity" : "1",
             "color":"#000000",
             "line-color": "#000",
             "source-arrow-color": "#000",
