@@ -61,7 +61,7 @@
 					render.getNodeWidth(node),
 					render.getNodeHeight(node)); //node._private.data.weight / 5.0
 		}
-	}
+	};
 
 	function drawPathSelection(render,context, node){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -78,7 +78,7 @@
 					render.getNodeWidth(node),
 					render.getNodeHeight(node)); //node._private.data.weight / 5.0
 		}
-	}
+	};
 
 	function intersectLineSelection(render, node, x, y){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -100,7 +100,7 @@
 				node._private.style["border-width"].pxValue / 2
 			);
 		}
-	}
+	};
 
 	function checkPointRoughSelection(render, node, x, y, nodeThreshold){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -117,7 +117,7 @@
 				node._private.position.x,
 				node._private.position.y);
 		}
-	}
+	};
 
 	function checkPointSelection(render, node, x, y, nodeThreshold){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -134,7 +134,7 @@
 				node._private.position.x, 
 				node._private.position.y);
 		}
-	}
+	};
 
 	function intersectBoxSelection(render, x1, y1, x2, y2, node){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -149,7 +149,7 @@
 				node._private.position.y, 
 				node._private.style["border-width"].pxValue / 2);
 		}
-	}
+	};
 
 	CanvasRenderer.prototype.drawPie = function(context, node){
 		node = node[0]; // ensure ele ref
@@ -320,7 +320,7 @@
 		}
 		
 		return box;
-	}
+	};
 
 	// Find nearest element
 	CanvasRenderer.prototype.findNearestElement = function(x, y, visibleElementsOnly) {
@@ -635,7 +635,7 @@
 		} else if (rs.isArcEdge) {
 			return;
 		}
-	}
+	}; 
 
 	// Draw node
 	CanvasRenderer.prototype.drawNode = function(context, node, drawOverlayInstead) {
@@ -1099,51 +1099,51 @@
 		return hashTable;
 	};
 
-  var _genPoints = function(pt, spacing, even) {
-    
-    var approxLen = Math.sqrt(Math.pow(pt[4] - pt[0], 2) + Math.pow(pt[5] - pt[1], 2));
-    approxLen += Math.sqrt(Math.pow((pt[4] + pt[0]) / 2 - pt[2], 2) + Math.pow((pt[5] + pt[1]) / 2 - pt[3], 2));
+	var _genPoints = function(pt, spacing, even) {
 
-    var pts = Math.ceil(approxLen / spacing); 
-    var pz;
-    
-    if (pts > 0) {
-      pz = new Array(pts * 2);
-    } else {
-      return null;
-    }
-    
-    for (var i = 0; i < pts; i++) {
-      var cur = i / pts;
-      pz[i * 2] = pt[0] * (1 - cur) * (1 - cur) + 2 * (pt[2]) * (1 - cur) * cur + pt[4] * (cur) * (cur);
-      pz[i * 2 + 1] = pt[1] * (1 - cur) * (1 - cur) + 2 * (pt[3]) * (1 - cur) * cur + pt[5] * (cur) * (cur);
-    }
-    
-    return pz;
-  };
+		var approxLen = Math.sqrt(Math.pow(pt[4] - pt[0], 2) + Math.pow(pt[5] - pt[1], 2));
+		approxLen += Math.sqrt(Math.pow((pt[4] + pt[0]) / 2 - pt[2], 2) + Math.pow((pt[5] + pt[1]) / 2 - pt[3], 2));
+
+		var pts = Math.ceil(approxLen / spacing); 
+		var pz;
+
+		if (pts > 0) {
+		  	pz = new Array(pts * 2);
+		} else {
+		  	return null;
+		}
+
+		for (var i = 0; i < pts; i++) {
+			var cur = i / pts;
+			pz[i * 2] = pt[0] * (1 - cur) * (1 - cur) + 2 * (pt[2]) * (1 - cur) * cur + pt[4] * (cur) * (cur);
+			pz[i * 2 + 1] = pt[1] * (1 - cur) * (1 - cur) + 2 * (pt[3]) * (1 - cur) * cur + pt[5] * (cur) * (cur);
+		}
+
+		return pz;
+	};
   
-  var _genStraightLinePoints = function(pt, spacing, even) {
-    
-    var approxLen = Math.sqrt(Math.pow(pt[2] - pt[0], 2) + Math.pow(pt[3] - pt[1], 2));
-    
-    var pts = Math.ceil(approxLen / spacing);
-    var pz;
-    
-    if (pts > 0) {
-      pz = new Array(pts * 2);
-    } else {
-      return null;
-    }
-    
-    var lineOffset = [pt[2] - pt[0], pt[3] - pt[1]];
-    for (var i = 0; i < pts; i++) {
-      var cur = i / pts;
-      pz[i * 2] = lineOffset[0] * cur + pt[0];
-      pz[i * 2 + 1] = lineOffset[1] * cur + pt[1];
-    }
-    
-    return pz;
-  };
+	var _genStraightLinePoints = function(pt, spacing, even) {
+
+		var approxLen = Math.sqrt(Math.pow(pt[2] - pt[0], 2) + Math.pow(pt[3] - pt[1], 2));
+
+		var pts = Math.ceil(approxLen / spacing);
+		var pz;
+
+		if (pts > 0) {
+		  	pz = new Array(pts * 2);
+		} else {
+		  	return null;
+		}
+
+		var lineOffset = [pt[2] - pt[0], pt[3] - pt[1]];
+		for (var i = 0; i < pts; i++) {
+			var cur = i / pts;
+			pz[i * 2] = lineOffset[0] * cur + pt[0];
+			pz[i * 2 + 1] = lineOffset[1] * cur + pt[1];
+		}
+
+		return pz;
+	};
 
 	function drawCardinality(context, edge, length, type){
 		//if cardinality is zero, return here.
@@ -1208,7 +1208,7 @@
 		    context.rotate(angle);
 		    context.translate(-startX, -startY);
 		}
-	}
+	};
 
 	var calls = 0;
 	var time = 0;
@@ -1514,7 +1514,7 @@
 	        text = text.substring(0, len) + ellipsis;
 	    }
 	    return text;
-	}
+	};
 
 	$$.sbgn.drawText = function(context, textProp){
 		context.font = textProp.font;
@@ -1528,13 +1528,13 @@
 		context.fillStyle = oldStyle;
 		//context.globalAlpha = oldOpacity;
 		context.stroke();
-	}
+	};
 
 	$$.sbgn.drawLabelText = function(context, textProp){
 		textProp.color = "#0f0f0f";
 		textProp.font = "9px Arial";
 		$$.sbgn.drawText(context, textProp);
-	}
+	};
 
 	$$.sbgn.drawStateText = function(context, textProp){
 		var stateValue = textProp.state.value;
@@ -1547,19 +1547,19 @@
 		textProp.color = "#0f0f0f";
 		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
-	}
+	};
 
 	$$.sbgn.drawInfoText = function(context, textProp){
 		textProp.color = "#0f0f0f";
 		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
-	}
+	};
 
 	$$.sbgn.drawCloneMarkerText = function(context, textProp){
 		textProp.color = "#fff";
 		textProp.font = "4px Arial";
 		$$.sbgn.drawText(context, textProp);	
-	}
+	};
 
 	$$.sbgn.drawEllipsePath = function(context, x, y, width, height){
 		context.beginPath();
@@ -1569,12 +1569,12 @@
 		context.closePath();
 		context.scale(2/width, 2/height);
 		context.translate(-x, -y);
-	}
+	};
 
 	$$.sbgn.drawEllipse = function(context, x, y, width, height){
 		$$.sbgn.drawEllipsePath(context, x, y, width, height);
 		context.fill();
-	}
+	};
 
 	$$.sbgn.drawNucAcidFeature = function(context, width, height, 
 		centerX, centerY, cornerRadius){
@@ -1594,7 +1594,7 @@
 	    context.closePath();
 	    context.translate(-centerX, -centerY);
 	    context.fill();
-	}
+	};
 
 	$$.sbgn.drawStateAndInfos = function(node, context, centerX, centerY){
 		var stateAndInfos = node._private.data.sbgnstatesandinfos;
@@ -1632,7 +1632,7 @@
 			}
 			context.stroke();
 		}
-	}
+	};
 
 	//use this function to sort states according to their x positions
 	$$.sbgn.compareStates = function(st1, st2){
@@ -1641,7 +1641,7 @@
 		if(st1.bbox.x > st2.bbox.x)
 			return 1;
 		return 0;
-	}
+	};
 
 	$$.sbgn.drawComplexStateAndInfo = function(context, node, stateAndInfos, 
 		centerX, centerY, width, height){
@@ -1720,7 +1720,7 @@
 			state.bbox.x = stateCenterX - centerX;
 			state.bbox.y = stateCenterY - centerY;
 		}
-	}
+	};
 
 	//this function is created to have same corner length when
 	//complex's width or height is changed
@@ -1729,11 +1729,11 @@
 		var cpX = cornerLength / width;
 		var cpY = cornerLength / height;
 
-		var complexPoints = new Array(-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX, 
-			1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1);	
+		var complexPoints = [-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX, 
+			1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1];	
 
 		return complexPoints;
-	}
+	};
 
 	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
@@ -1762,7 +1762,7 @@
 
 		 	context.fillStyle = oldStyle;
 		}
-	}
+	};
 
 	$$.sbgn.drawSimpleChemicalPath = function(
 		context, x, y, width, height) {
@@ -1791,19 +1791,19 @@
 		context.closePath();
 		
 		context.translate(-x, -y);
-	}
+	};
 
 	$$.sbgn.drawSimpleChemical = function(
 		context, x, y, width, height) {
 		$$.sbgn.drawSimpleChemicalPath(context, x, y, width, height);
 		context.fill();
-	}
+	};
 
 	$$.sbgn.drawSourceAndSinkCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
 		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
 			width, height, cloneMarker);
-	}
+	};
 
 	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker, isMultimer){
@@ -1834,7 +1834,7 @@
 			renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight - 1, recPoints);
 			context.fillStyle = oldStyle;
 		}
-	}
+	};
 
 	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
@@ -1844,7 +1844,7 @@
 			var cloneX = centerX;
 			var cloneY = centerY + height/2 - height/8;
 
-			var markerPoints = new Array(-5/6, -1, 5/6, -1, 1, 1, -1, 1);
+			var markerPoints = [-5/6, -1, 5/6, -1, 1, 1, -1, 1];
 
 			var oldStyle  = context.fillStyle;
 			context.fillStyle = "#0f0f0f";
@@ -1857,7 +1857,7 @@
 
 		 	context.fillStyle = oldStyle;
 		}
-	}
+	};
 
 	$$.sbgn.drawNucleicAcidFeatureCloneMarker = function(context, centerX, centerY, 
 		width, height, cornerRadius, cloneMarker, isMultimer){
@@ -1873,13 +1873,13 @@
 
 		 	context.fillStyle = oldStyle;
 		}
-	}
+	};
 
 	$$.sbgn.drawMacromoleculeCloneMarker = function(context, centerX, centerY, 
 		width, height, cornerRadius, cloneMarker, isMultimer){
 		$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
 			width, height, cornerRadius, cloneMarker, isMultimer);
-	}
+	};
 
 	$$.sbgn.drawComplexCloneMarker = function(context, centerX, centerY, 
 		width, height, cornerLength, cloneMarker, isMultimer){
@@ -1891,7 +1891,7 @@
 			var cloneX = centerX;
 			var cloneY = centerY + height/2 - cloneHeight/2;
 
-			var markerPoints = new Array(-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1);
+			var markerPoints = [-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1];
 
 			var oldStyle  = context.fillStyle;
 			context.fillStyle = "#0f0f0f";
@@ -1902,14 +1902,14 @@
 
 		 	context.fillStyle = oldStyle;
 		}
-	}
+	};
 
 	$$.sbgn.isMultimer = function(node){
 		var sbgnClass = node._private.data.sbgnclass;
 		if(sbgnClass.indexOf("multimer") != -1)
 			return true;
 		return false;
-	}
+	};
 
 	$$.sbgn.nucleicAcidIntersectionLine = function(node, x, y, nodeX, nodeY, cornerRadius){
 		var nodeX = node._private.position.x;
@@ -2019,7 +2019,7 @@
 			}
 		}
 		return []; // if nothing
-	}
+	};
 
 	$$.sbgn.nucleicAcidIntersectionBox = function(x1, y1, x2, y2, centerX, centerY, node, points, cornerRadius){
 		var width = node.width();
@@ -2038,7 +2038,7 @@
 			centerY + height/2 - cornerRadius, padding);
 
 		return rectIntersectBoxResult || roundRectIntersectBoxResult;
-	}
+	};
 
 	$$.sbgn.nucleicAcidCheckPoint = function(x, y, centerX, centerY, node, threshold, points, cornerRadius){
 		var width = node.width();
@@ -2089,7 +2089,7 @@
 		}
 
 		return false;
-	}
+	};
 
 	$$.sbgn.checkPointStateAndInfoBoxes = function(x, y, node, threshold){
 		var centerX = node._private.position.x;
@@ -2128,7 +2128,7 @@
 
 		}
 		return false;
-	}
+	};
 
 	$$.sbgn.checkPointRoughStateAndInfoBoxes = function(node, x, y, 
 		centerX, centerY){
@@ -2165,7 +2165,7 @@
 
 		}
 		return false;
-	}
+	};
 
 	$$.sbgn.intersectLineStateAndInfoBoxes = function(node, x, y){
 		var centerX = node._private.position.x;
@@ -2176,7 +2176,7 @@
 		
 		var stateCount = 0, infoCount = 0;
 
-		var intersections = new Array();
+		var intersections = [];
 
 		for(var i = 0 ; i < stateAndInfos.length ; i++){
 			var state = stateAndInfos[i];
@@ -2208,7 +2208,7 @@
 		if(intersections.length > 0)
 			return intersections;
 		return [];
-	}
+	};
 
 	$$.sbgn.intersectBoxStateAndInfoBoxes = function(x1, y1, x2, y2, node){
 		var centerX = node._private.position.x;
@@ -2251,12 +2251,12 @@
 		}
 
 		return false;
-	}
+	};
 
 	function calculateDistance(point1, point2){
 		var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
 		return Math.sqrt(distance);
-	}
+	};
 
 	$$.sbgn.closestPoint = function(point, cp1, cp2){
 		if(cp1.length < 1)
@@ -2270,7 +2270,7 @@
 		if(distance1 < distance2)
 			return cp1;
 		return cp2;
-	}
+	};
 
 	//we need to force opacity to 1 since we might have state and info boxes.
 	//having opaque nodes which have state and info boxes gives unpleasent results.
@@ -2283,13 +2283,13 @@
 			+ node._private.style["background-color"].value[1] + ","
 			+ node._private.style["background-color"].value[2] + ","
 			+ (1 * node._private.style["opacity"].value * parentOpacity) + ")";	
-	}
+	};
 
 	$$.sbgn.closestIntersectionPoint = function(point, intersections){
 		if(intersections.length <= 0)
 			return [];
 
-		var closestIntersection = new Array();
+		var closestIntersection = [];
 		var minDistance = Number.MAX_VALUE;
 
 		for(var i = 0 ; i < intersections.length ; i = i + 2){
@@ -2303,7 +2303,7 @@
 		}
 
 		return closestIntersection;
-	}
+	};
 
   	$$.sbgn.intersectLineEllipse = function(
     	x1, y1, x2, y2, centerX, centerY, width, height, padding) {
@@ -2338,7 +2338,7 @@
 		var yMax = m * xMax - m * x2 + y2;
 
 		return [xMin, yMin, xMax, yMax];
-  	}
+  	};
 
   	//this function gives the intersections of any line with a round rectangle 
   	$$.sbgn.roundRectangleIntersectLine = function(
@@ -2348,7 +2348,7 @@
 	    var halfHeight = height / 2;
 	    
 	    // Check intersections with straight line segments
-	    var straightLineIntersections = new Array();
+	    var straightLineIntersections = [];
 	    
 	    // Top segment, left to right
 	    {
@@ -2579,7 +2579,7 @@
 					padding);
 
 			//check whether sbgn class includes multimer substring or not
-			var multimerIntersectionLines = new Array();
+			var multimerIntersectionLines = [];
 			if($$.sbgn.isMultimer(node)){
 				multimerIntersectionLines = $$.math.polygonIntersectLine(
 					x, y, 
@@ -2766,7 +2766,7 @@
 					cornerRadius, padding);
 
 			//check whether sbgn class includes multimer substring or not
-			var multimerIntersectionLines = new Array();
+			var multimerIntersectionLines = [];
 			if($$.sbgn.isMultimer(node)){
 				multimerIntersectionLines = $$.sbgn.roundRectangleIntersectLine(
 					x, y, 
@@ -2922,7 +2922,7 @@
 				x, y, centerX, centerY, this.cornerRadius);
 
 			//check whether sbgn class includes multimer substring or not
-			var multimerIntersectionLines = new Array();
+			var multimerIntersectionLines = [];
 			if($$.sbgn.isMultimer(node)){
 				multimerIntersectionLines = $$.sbgn.nucleicAcidIntersectionLine(node, 
 					x, y, centerX + multimerPadding, centerY + multimerPadding,
@@ -3009,8 +3009,8 @@
 	};
 
 	nodeShapes["perturbing agent"] = {
-		points: new Array(-2/3, 0, -1, 1, 1, 1, 2/3, 0, 
-		1, -1, -1, -1),
+		points: [-2/3, 0, -1, 1, 1, 1, 2/3, 0, 
+		1, -1, -1, -1],
 
 		draw: function(context, node) {
 			var centerX = node._private.position.x;
@@ -3186,7 +3186,7 @@
     			centerX, centerY, width, height, x, y, padding) ;
 
 			//check whether sbgn class includes multimer substring or not
-			var multimerIntersectionLines = new Array();
+			var multimerIntersectionLines = [];
 			if($$.sbgn.isMultimer(node)){
 				multimerIntersectionLines = nodeShapes["ellipse"].intersectLine(
 					centerX + multimerPadding, centerY + multimerPadding, width, 
@@ -3367,7 +3367,7 @@
 	};
 
 	nodeShapes["tag"] = {
-		points: new Array(-1, -1, 1/3, -1, 1, 0, 1/3, 1, -1, 1),
+		points: [-1, -1, 1/3, -1, 1, 0, 1/3, 1, -1, 1],
 
 		draw: function(context, node) {
 			var width = node.width();
@@ -3794,8 +3794,8 @@
 	};
 
 	nodeShapes["phenotype"] = {
-		points: new Array(-1, 0, -0.5, -1, 0.5, -1, 
-			1, 0, 0.5, 1, -0.5, 1),
+		points: [-1, 0, -0.5, -1, 0.5, -1, 
+			1, 0, 0.5, 1, -0.5, 1],
 
 		draw: function(context, node) {
 			var width = node.width();
