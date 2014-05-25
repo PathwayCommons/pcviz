@@ -20,109 +20,91 @@
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
-            "border-width": 1,
-            "border-color": "#0f0f0f",
-            "background-color": "#ffffff",
-            "font-size": 11,
-            "shape": "data(sbgnclass)",
-            'background-opacity': 1
+            'border-width' : 1,
+            'border-color' : '#555',
+            'background-color' : '#DDDDDD',
+            'font-size' : 11,
+            'shape' : 'data(sbgnclass)',
+            'background-opacity' : '0.5'
+        })
+        .selector("node[sbgnclass='complex']")
+        .css({
+            'background-color' : '#F3EFE0'
+        })
+        .selector("[sbgnclass='compartment']")
+        .css({
+            'background-color' : '#FFFFFF'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment']")
         .css({
-            "width": "data(sbgnbbox.w)",
-            "height": "data(sbgnbbox.h)"
+            'width' : 'data(sbgnbbox.w)',
+            'height' : 'data(sbgnbbox.h)'
         })
         .selector("node[sbgnclass='compartment']")
         .css({
-            "content": "data(sbgnlabel)",
-            "text-valign" : "bottom",
-            "text-halign" : "center"
-        })
-        .selector("edge")
-        .css({
-            "line-color": "#0f0f0f",
-            "target-arrow-fill": "hollow",
-            "source-arrow-fill": "hollow",
-            "target-arrow-color": "#919191",
-            'background-opacity': 1,
-            'width': 1.5,
-            "target-arrow-shape": "data(sbgnclass)"
-        })
-        .selector("edge[sbgnclass='inhibition']")
-        .css({
-            "target-arrow-fill": "filled"
-        })
-        .selector("edge[sbgnclass='consumption']")
-        .css({
-            "target-arrow-shape": "none",
-            "source-arrow-shape": "data(sbgnclass)",
-            "line-style" : "consumption"
-        })
-        .selector("edge[sbgnclass='production']")
-        .css({
-            "target-arrow-fill": "filled",
-            "line-style" : "production"
-        })
-        .selector(":selected")
-        .css({
-            "background-color": "#777777",
-            "background-opacity" : "1",
-            "color":"#000000",
-            "line-color": "#000",
-            "source-arrow-color": "#000",
-            "target-arrow-color": "#000"
-        })
-        .selector("edge:selected")
-        .css({
-            "line-color": "magenta",
-            "source-arrow-color": "magenta",
-            "target-arrow-color": "magenta"
+            'content' : 'data(sbgnlabel)',
+            'text-valign' : 'bottom',
+            'text-halign' : 'center'
         })
         .selector("node:selected")
         .css({
-            'border-color': 'magenta',
-            'target-arrow-color': '#000',
-            'text-outline-color': '#000'
+            'border-color' : 'magenta',
+            'target-arrow-color' : '#000',
+            'text-outline-color' : '#000'
         })
-        .selector(":active")
+        .selector("node:active")
         .css({
-            "background-color": "#aaaaaa",
-            "background-opacity" : "1",
-            "color":"#000000",
-            "line-color": "#000",
-            "source-arrow-color": "#000",
-            "target-arrow-color": "#000"
+            'background-opacity' : '0.7',
+            'overlay-color' : '#999999'
         })
-        .selector(":selected[sbgnclass='compartment']")
+        .selector("edge")
         .css({
-            "background-opacity" : "0.7",
-            "background-color": "#444444"
+            'line-color' : '#444',
+            'target-arrow-fill' : 'hollow',
+            'source-arrow-fill' : 'hollow',
+            'width': 1.5,
+            'target-arrow-shape' : 'data(sbgnclass)'
         })
-        .selector(":active[sbgnclass='compartment']")
+        .selector("edge[sbgnclass='inhibition']")
         .css({
-            "background-opacity" : "0.5",
-            "background-color": "#777777"
+            'target-arrow-fill' : 'filled'
+        })
+        .selector("edge[sbgnclass='consumption']")
+        .css({
+            'target-arrow-shape' : 'none',
+            'source-arrow-shape' : 'data(sbgnclass)',
+            'line-style' : 'consumption'
+        })
+        .selector("edge[sbgnclass='production']")
+        .css({
+            'target-arrow-fill' : 'filled',
+            'line-style' : 'production'
+        })
+        .selector("edge:selected")
+        .css({
+            'line-color' : 'magenta',
+            'source-arrow-color': 'magenta',
+            'target-arrow-color': 'magenta'
         })
         .selector(".ui-cytoscape-edgehandles-source")
         .css({
-            "border-color": "#5CC2ED",
-            "border-width": 3
+            'border-color': '#5CC2ED',
+            'border-width': 3
         })
         .selector(".ui-cytoscape-edgehandles-target, node.ui-cytoscape-edgehandles-preview")
         .css({
-            "background-color": "#5CC2ED"
+            'background-color': '#5CC2ED'
         })
         .selector("edge.ui-cytoscape-edgehandles-preview")
         .css({
-            "line-color": "#5CC2ED"
+            'line-color' : '#5CC2ED'
         })
         .selector("node.ui-cytoscape-edgehandles-preview, node.intermediate")
         .css({
-            "shape": "rectangle",
-            "width": 15,
-            "height": 15
-         })
-         ; // end of sbgnStyleSheet
+            'shape' : 'rectangle',
+            'width' : 15,
+            'height' : 15
+         }); // end of sbgnStyleSheet
 
 var SBGNLayoutView = Backbone.View.extend({
     defaultLayoutProperties: {
