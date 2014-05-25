@@ -1742,7 +1742,7 @@
 
 	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker){
-		//if(cloneMarker != null){
+		if(cloneMarker != null){
 			var oldColor  = context.fillStyle;
 			context.fillStyle = "#0f0f0f";
 
@@ -1766,7 +1766,7 @@
 			context.fill();
 
 		 	context.fillStyle = oldColor;
-		//}
+		}
 	}
 
 	$$.sbgn.drawSimpleChemicalPath = function(
@@ -1812,7 +1812,7 @@
 
 	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
 		width, height, cloneMarker, isMultimer){
-		//if(cloneMarker != null){
+		if(cloneMarker != null){
 	
 			var cornerRadius = Math.min(width/2, height/2);
 
@@ -1838,7 +1838,7 @@
 
 			renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight - 1, recPoints);
 			context.fillStyle = oldColor;
-		//}
+		}
 	}
 
 	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
