@@ -918,7 +918,7 @@
 
       <div class="share mrl edge-types">
           <h4 class="demo-panel-title edge-types-title">Layout</h4>
-              <table class="table table-condensed">
+              <table class="table">
                   <tr id="apply-layout">
                       <td>
                           <span class="itx-type-on-off label controls-state-change-of" >Recalculate</span>
@@ -930,6 +930,8 @@
                       </td>
                   </tr>
               </table>
+
+              <div id="layout-table-container" style="display: none;"></div>
       </div>
 
   </script>
@@ -958,7 +960,7 @@
   </script>
 
   <script type="text/template" id="layout-settings-template">
-        <table class="table">
+        <table class="table-condensed layout-table">
             <tr>
               <td>
                   <span class="add-on"> Node Repulsion </span>
@@ -1085,10 +1087,6 @@
         <a href="http://www.ncbi.nlm.nih.gov/pubmed/{{dbid}}" target="_blank">{{dbname}}:{{dbid}}</a>
     </li>
   </script>
-
-  <div id="sbgn-layout-table" title="Layout Properties">
-    <!-- sbgn layout table will be shown here -->
-  </div>
 
   <!-- JS libraries -->
   <script src="js/jquery-1.8.2.min.js"></script>
