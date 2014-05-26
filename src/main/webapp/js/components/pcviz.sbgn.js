@@ -118,42 +118,49 @@ var SBGNLayoutView = Backbone.View.extend({
         numIter: 100
     },
     currentLayoutProperties: null,
-    el: '#sbgn-layout-table',
+    el: '#layout-table-container',
 
     initialize: function() {
         var self = this;
         self.copyProperties();
-        self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+        //self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
     },
 
     copyProperties: function(){
         this.currentLayoutProperties = _.clone(this.defaultLayoutProperties);
     },
 
+    events: {
+        'click #save-layout': 'saveLayout',
+        'click #default-layout': 'defaultLayout'
+    },
+
+    saveLayout: function(){
+        var self = this;
+        
+        self.currentLayoutProperties.nodeRepulsion = document.getElementById("node-repulsion").value;
+        self.currentLayoutProperties.nodeOverlap = document.getElementById("node-overlap").value;
+        self.currentLayoutProperties.idealEdgeLength = document.getElementById("ideal-edge-length").value;
+        self.currentLayoutProperties.edgeElasticity = document.getElementById("edge-elasticity").value;
+        self.currentLayoutProperties.nestingFactor = document.getElementById("nesting-factor").value;
+        self.currentLayoutProperties.gravity = document.getElementById("gravity").value;
+        self.currentLayoutProperties.numIter = document.getElementById("num-iter").value;
+        
+        $(self.el).slideUp();
+    },
+
+    defaultLayout: function(){
+        var self = this;
+        self.copyProperties();
+        self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+        $(self.el).html(self.template);
+    },
+
     render: function(){
         var self = this;
         self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
-        $(self.el).html(self.template);
 
-        $(self.el).dialog();        
-
-        $("#save-layout").die("click").live("click", function(evt){
-            self.currentLayoutProperties.nodeRepulsion = document.getElementById("node-repulsion").value;
-            self.currentLayoutProperties.nodeOverlap = document.getElementById("node-overlap").value;
-            self.currentLayoutProperties.idealEdgeLength = document.getElementById("ideal-edge-length").value;
-            self.currentLayoutProperties.edgeElasticity = document.getElementById("edge-elasticity").value;
-            self.currentLayoutProperties.nestingFactor = document.getElementById("nesting-factor").value;
-            self.currentLayoutProperties.gravity = document.getElementById("gravity").value;
-            self.currentLayoutProperties.numIter = document.getElementById("num-iter").value;
-
-            $(self.el).dialog('close');
-        });
-
-        $("#default-layout").die("click").live("click", function(evt){
-            self.copyProperties();
-            self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
-            $(self.el).html(self.template);
-        });
+        $(self.el).html(self.template).slideDown();
 
         return this;
     }
