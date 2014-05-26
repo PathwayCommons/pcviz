@@ -363,7 +363,7 @@ h4.pcviz-embed-logo small {
 }
 
 #sbgn-main-network {
-    border: 1px solid #424242;
+    border: 1px solid #ddd;
     height: 100%;
     width: 100%;
     overflow: hidden !important;
@@ -373,7 +373,7 @@ h4.pcviz-embed-logo small {
 }
 
 #sbgn-network-loading{
-    border: 1px solid #424242;
+    border: 1px solid #ddd;
     height: 100%;
     width: 100%;
     overflow: hidden !important;
@@ -399,6 +399,9 @@ h4.pcviz-embed-logo small {
      margin:10px !important;
 }
 
-.ui-dialog {
-    z-index : 9020 !important;
+.layout-table {
+    margin-left: 20px !important;
+    margin-right: 10px !important;
+    margin-top: -20px !important;
+    border: 1px solid #ddd;
 }
