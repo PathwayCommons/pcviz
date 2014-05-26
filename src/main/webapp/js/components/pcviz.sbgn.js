@@ -22,7 +22,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .css({
             'border-width' : 1,
             'border-color' : '#555',
-            'background-color' : '#E1E1D6',
+            'background-color' : '#f6f6f6',
             'font-size' : 11,
             'shape' : 'data(sbgnclass)',
             'background-opacity' : '0.5'
