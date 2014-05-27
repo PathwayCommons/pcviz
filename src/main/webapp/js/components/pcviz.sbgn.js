@@ -22,7 +22,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .css({
             'border-width' : 1,
             'border-color' : '#555',
-            'background-color' : '#f6f6f6',
+            'background-color' : '#DDDDDD',
             'font-size' : 11,
             'shape' : 'data(sbgnclass)',
             'background-opacity' : '0.5'
@@ -33,7 +33,6 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("[sbgnclass='compartment']")
         .css({
-            'background-opacity' : '0',
             'background-color' : '#FFFFFF'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment']")
@@ -56,7 +55,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : 'magenta'
+            'overlay-color' : '#999999'
         })
         .selector("edge")
         .css({
@@ -721,8 +720,8 @@ var SBGNView = Backbone.View.extend({
                     elements: data,
                     style: self.cyStyle,
                     layout: { 
-                        name: 'preset',
-                        positions: positionMap
+                        name: 'cose',
+                        //positions: positionMap
                     },
                     showOverlay: false,
                     minZoom: 0.125,
@@ -781,4 +780,12 @@ var SBGNView = Backbone.View.extend({
         return this;
     } // end of render: function()
 
-}); // end of SbgnView
+}); // end of SbgnView = Backbone.View.extend({
+
+
+
+
+
+
+
+
