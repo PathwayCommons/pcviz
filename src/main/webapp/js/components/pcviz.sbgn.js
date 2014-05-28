@@ -721,8 +721,8 @@ var SBGNView = Backbone.View.extend({
                     elements: data,
                     style: self.cyStyle,
                     layout: { 
-                        name: 'cose',
-                       // positions: positionMap
+                        name: 'preset',
+                        positions: positionMap
                     },
                     showOverlay: false,
                     minZoom: 0.125,
