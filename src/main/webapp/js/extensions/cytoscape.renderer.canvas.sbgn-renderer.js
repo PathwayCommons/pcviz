@@ -63,6 +63,12 @@
 		}
 	};
 
+	function strokeSelection(render, context, node){
+		if(!sbgnShapes[render.getNodeShape(node)]){
+			context.stroke();
+		}
+	};
+
 	function drawPathSelection(render,context, node){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
 		if(sbgnShapes[render.getNodeShape(node)]){
@@ -704,7 +710,7 @@
 
 					drawPathSelection(r,context, node);
 					
-					context.stroke();
+					strokeSelection(r, context, node);
 					context.fillStyle = "#555555";
 					context.fill();
 					
@@ -725,7 +731,7 @@
 			if (node._private.style["border-width"].pxValue > 0) {
 				drawPathSelection(this,context, node);
 
-				context.stroke();
+				strokeSelection(this, context, node);
 			}
 
 		// draw the overlay
@@ -1527,7 +1533,7 @@
 		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
 		context.fillStyle = oldStyle;
 		//context.globalAlpha = oldOpacity;
-		context.stroke();
+		//context.stroke();
 	};
 
 	$$.sbgn.drawLabelText = function(context, textProp){
@@ -1562,18 +1568,19 @@
 	};
 
 	$$.sbgn.drawEllipsePath = function(context, x, y, width, height){
-		context.beginPath();
-		context.translate(x, y);
-		context.scale(width / 2, height / 2);
-		context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-		context.closePath();
-		context.scale(2/width, 2/height);
-		context.translate(-x, -y);
+		// context.beginPath();
+		// context.translate(x, y);
+		// context.scale(width / 2, height / 2);
+		// context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
+		// context.closePath();
+		// context.scale(2/width, 2/height);
+		// context.translate(-x, -y);
+		nodeShapes['ellipse'].drawPath(context, x, y, width, height);
 	};
 
 	$$.sbgn.drawEllipse = function(context, x, y, width, height){
-		$$.sbgn.drawEllipsePath(context, x, y, width, height);
-		context.fill();
+		//$$.sbgn.drawEllipsePath(context, x, y, width, height);
+		nodeShapes['ellipse'].draw(context, x, y, width, height);
 	};
 
 	$$.sbgn.drawNucAcidFeature = function(context, width, height, 
@@ -1612,13 +1619,14 @@
 
 			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				//var stateLabel = state.state.value;
-				$$.sbgn.drawEllipse(context,stateCenterX, stateCenterY, 
+				$$.sbgn.drawEllipse(context, stateCenterX, stateCenterY, 
 					stateWidth, stateHeight);
 
 				textProp.state = state.state;
 				$$.sbgn.drawStateText(context, textProp);
 
 				stateCount++;
+
 			}
 			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
 				renderer.drawRoundRectangle(context,
@@ -1735,35 +1743,6 @@
 		return complexPoints;
 	};
 
-	$$.sbgn.drawUnspecifiedEntityCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneMarker){
-		if(cloneMarker != null){
-			var oldStyle  = context.fillStyle;
-			context.fillStyle = "#0f0f0f";
-
-			context.beginPath();
-			context.translate(centerX, centerY);
-			context.scale(width / 2, height / 2);
-
-			var markerBeginX = - 1 * Math.sin(Math.PI/3);
-			var markerBeginY = Math.cos(Math.PI/3);
-			var markerEndX = 1 * Math.sin(Math.PI/3);
-			var markerEndY = markerBeginY;
-
-			context.moveTo(markerBeginX,markerBeginY);
-			context.lineTo(markerEndX,markerEndY);
-			context.arc(0, 0, 1, Math.PI/6, 5*Math.PI/6);
-
-			context.scale(2/width, 2/height);
-			context.translate(-centerX, -centerY);
-			context.closePath();
-
-			context.fill();
-
-		 	context.fillStyle = oldStyle;
-		}
-	};
-
 	$$.sbgn.drawSimpleChemicalPath = function(
 		context, x, y, width, height) {
 		
@@ -1799,108 +1778,138 @@
 		context.fill();
 	};
 
-	$$.sbgn.drawSourceAndSinkCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneMarker){
-		$$.sbgn.drawUnspecifiedEntityCloneMarker(context, centerX, centerY, 
-			width, height, cloneMarker);
-	};
+	$$.sbgn.cloneMarker = {
+		unspecifiedEntity : function(context, centerX, centerY, 
+			width, height, cloneMarker){
+			if(cloneMarker != null){
+				var oldStyle  = context.fillStyle;
+				context.fillStyle = "#0f0f0f";
 
-	$$.sbgn.drawSimpleChemicalCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneMarker, isMultimer){
-		if(cloneMarker != null){
-	
-			var cornerRadius = Math.min(width/2, height/2);
+				context.beginPath();
+				context.translate(centerX, centerY);
+				context.scale(width / 2, height / 2);
 
-			var firstCircleCenterX = centerX - width/2 + cornerRadius;
-			var firstCircleCenterY = centerY;
-			var secondCircleCenterX = centerX + width/2 - cornerRadius;
-			var secondCircleCenterY = centerY;
+				var markerBeginX = - 1 * Math.sin(Math.PI/3);
+				var markerBeginY = Math.cos(Math.PI/3);
+				var markerEndX = 1 * Math.sin(Math.PI/3);
+				var markerEndY = markerBeginY;
 
-			$$.sbgn.drawUnspecifiedEntityCloneMarker(context, firstCircleCenterX, firstCircleCenterY, 
-				2 * cornerRadius, 2 * cornerRadius, cloneMarker);
+				context.moveTo(markerBeginX,markerBeginY);
+				context.lineTo(markerEndX,markerEndY);
+				context.arc(0, 0, 1, Math.PI/6, 5*Math.PI/6);
 
-			$$.sbgn.drawUnspecifiedEntityCloneMarker(context, secondCircleCenterX, secondCircleCenterY, 
-				2 * cornerRadius, 2 * cornerRadius, cloneMarker);
+				context.scale(2/width, 2/height);
+				context.translate(-centerX, -centerY);
+				context.closePath();
 
-			var oldStyle  = context.fillStyle;
-			context.fillStyle = "#0f0f0f";
+				context.fill();
 
-			var recPoints = $$.math.generateUnitNgonPointsFitToSquare(4, 0);
-			var cloneX = centerX;
-			var cloneY = centerY + 3/4 * cornerRadius;
-			var cloneWidth = width - 2 * cornerRadius;
-			var cloneHeight = cornerRadius/2;
+			 	context.fillStyle = oldStyle;
+			}
+		},
 
-			renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight - 1, recPoints);
-			context.fillStyle = oldStyle;
-		}
-	};
+		sourceAndSink : function(context, centerX, centerY, 
+			width, height, cloneMarker){
+			$$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY, 
+				width, height, cloneMarker);
+		},
 
-	$$.sbgn.drawPerturbingAgentCloneMarker = function(context, centerX, centerY, 
-		width, height, cloneMarker){
-		if(cloneMarker != null){
-			var cloneWidth = width;
-			var cloneHeight = height / 4;
-			var cloneX = centerX;
-			var cloneY = centerY + height/2 - height/8;
+		simpleChemical : function(context, centerX, centerY, 
+			width, height, cloneMarker, isMultimer){
+			if(cloneMarker != null){
+				var cornerRadius = Math.min(width/2, height/2);
 
-			var markerPoints = [-5/6, -1, 5/6, -1, 1, 1, -1, 1];
+				var firstCircleCenterX = centerX - width/2 + cornerRadius;
+				var firstCircleCenterY = centerY;
+				var secondCircleCenterX = centerX + width/2 - cornerRadius;
+				var secondCircleCenterY = centerY;
 
-			var oldStyle  = context.fillStyle;
-			context.fillStyle = "#0f0f0f";
+				$$.sbgn.cloneMarker.unspecifiedEntity(context, firstCircleCenterX, firstCircleCenterY, 
+					2 * cornerRadius, 2 * cornerRadius, cloneMarker);
 
-			renderer.drawPolygon(context,
-				cloneX, cloneY,
-				cloneWidth, cloneHeight, markerPoints);
+				$$.sbgn.cloneMarker.unspecifiedEntity(context, secondCircleCenterX, secondCircleCenterY, 
+					2 * cornerRadius, 2 * cornerRadius, cloneMarker);
 
-			context.fill();
+				var oldStyle  = context.fillStyle;
+				context.fillStyle = "#0f0f0f";
 
-		 	context.fillStyle = oldStyle;
-		}
-	};
+				var recPoints = $$.math.generateUnitNgonPointsFitToSquare(4, 0);
+				var cloneX = centerX;
+				var cloneY = centerY + 3/4 * cornerRadius;
+				var cloneWidth = width - 2 * cornerRadius;
+				var cloneHeight = cornerRadius/2;
 
-	$$.sbgn.drawNucleicAcidFeatureCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerRadius, cloneMarker, isMultimer){
-		if(cloneMarker != null){
-			var cloneWidth = width;
-			var cloneHeight = height / 4;
-			var cloneX = centerX;
-			var cloneY = centerY + 3 * height / 8;
-			var oldStyle  = context.fillStyle;
-			context.fillStyle = "#0f0f0f";
+				renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
+				context.fillStyle = oldStyle;
+			}
+		},
 
-			$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
+		perturbingAgent : function(context, centerX, centerY, 
+			width, height, cloneMarker){
+			if(cloneMarker != null){
+				var cloneWidth = width;
+				var cloneHeight = height / 4;
+				var cloneX = centerX;
+				var cloneY = centerY + height/2 - height/8;
 
-		 	context.fillStyle = oldStyle;
-		}
-	};
+				var markerPoints = [-5/6, -1, 5/6, -1, 1, 1, -1, 1];
 
-	$$.sbgn.drawMacromoleculeCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerRadius, cloneMarker, isMultimer){
-		$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
-			width, height, cornerRadius, cloneMarker, isMultimer);
-	};
+				var oldStyle  = context.fillStyle;
+				context.fillStyle = "#0f0f0f";
 
-	$$.sbgn.drawComplexCloneMarker = function(context, centerX, centerY, 
-		width, height, cornerLength, cloneMarker, isMultimer){
-		if(cloneMarker != null){
-			var cpX = cornerLength / width;
-			var cpY = cornerLength / height;
-			var cloneWidth = width - 2;
-			var cloneHeight = height * cpY / 2;
-			var cloneX = centerX;
-			var cloneY = centerY + height/2 - cloneHeight/2;
+				renderer.drawPolygon(context,
+					cloneX, cloneY,
+					cloneWidth, cloneHeight, markerPoints);
 
-			var markerPoints = [-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1];
+				context.fill();
 
-			var oldStyle  = context.fillStyle;
-			context.fillStyle = "#0f0f0f";
+			 	context.fillStyle = oldStyle;
+			}
+		},
 
-			renderer.drawPolygon(context,
-				cloneX, cloneY,
-				cloneWidth, cloneHeight, markerPoints);
+		nucleicAcidFeature : function(context, centerX, centerY, 
+			width, height, cornerRadius, cloneMarker, isMultimer){
+			if(cloneMarker != null){
+				var cloneWidth = width;
+				var cloneHeight = height / 4;
+				var cloneX = centerX;
+				var cloneY = centerY + 3 * height / 8;
+				var oldStyle  = context.fillStyle;
+				context.fillStyle = "#0f0f0f";
 
-		 	context.fillStyle = oldStyle;
+				$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, cloneX, cloneY, cornerRadius);
+
+			 	context.fillStyle = oldStyle;
+			}
+		},
+
+		macromolecule : function(context, centerX, centerY, 
+			width, height, cornerRadius, cloneMarker, isMultimer){
+			$$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY, 
+				width, height, cornerRadius, cloneMarker, isMultimer);
+		},
+
+		complex : function(context, centerX, centerY, 
+			width, height, cornerLength, cloneMarker, isMultimer){
+			if(cloneMarker != null){
+				var cpX = cornerLength / width;
+				var cpY = cornerLength / height;
+				var cloneWidth = width;
+				var cloneHeight = height * cpY / 2;
+				var cloneX = centerX;
+				var cloneY = centerY + height/2 - cloneHeight/2;
+
+				var markerPoints = [-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1];
+
+				var oldStyle  = context.fillStyle;
+				context.fillStyle = "#0f0f0f";
+
+				renderer.drawPolygon(context,
+					cloneX, cloneY,
+					cloneWidth, cloneHeight, markerPoints);
+
+			 	context.fillStyle = oldStyle;
+			}
 		}
 	};
 
@@ -2533,11 +2542,11 @@
 
 				context.stroke();
 
-				$$.sbgn.drawComplexCloneMarker(context, 
+				$$.sbgn.cloneMarker.complex(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
 					width, height, cornerLength, cloneMarker, true);
 
-				context.stroke();
+				//context.stroke();
 			}
 
 			renderer.drawPolygon(context,
@@ -2546,7 +2555,7 @@
 
 			context.stroke();
 
-			$$.sbgn.drawComplexCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.complex(context, centerX, centerY, 
 				width, height, cornerLength, cloneMarker, false);
 
 			$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
@@ -2718,11 +2727,11 @@
 
 				context.stroke();
 
-				$$.sbgn.drawMacromoleculeCloneMarker(context, 
+				$$.sbgn.cloneMarker.macromolecule(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
 					width, height, cornerRadius, cloneMarker, true);
 
-				context.stroke();
+				//context.stroke();
 			}
 
 			renderer.drawRoundRectangle(context,
@@ -2732,15 +2741,14 @@
 
 			context.stroke();
 
-			$$.sbgn.drawMacromoleculeCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.macromolecule(context, centerX, centerY, 
 				width, height, cornerRadius, cloneMarker, false);
 
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
 				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
-			
+			$$.sbgn.drawLabelText(context, nodeProp);			
 		},
 		
 		drawPath: function(context, node) {
@@ -2884,11 +2892,11 @@
 
 				context.stroke();
 
-				$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, 
+				$$.sbgn.cloneMarker.nucleicAcidFeature(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
 					width, height, cornerRadius, cloneMarker, true);
 
-				context.stroke();
+				//context.stroke();
 			}
 
 			$$.sbgn.drawNucAcidFeature(context, width, height, centerX, 
@@ -2896,7 +2904,7 @@
 
 			context.stroke();
 
-			$$.sbgn.drawNucleicAcidFeatureCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY, 
 				width, height, cornerRadius, cloneMarker, false);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
@@ -3027,10 +3035,9 @@
 				width, height,
 				nodeShapes["perturbing agent"].points);
 
-
 			context.stroke();
 
-			$$.sbgn.drawPerturbingAgentCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.perturbingAgent(context, centerX, centerY, 
 				width, height, cloneMarker);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
@@ -3041,7 +3048,6 @@
 		},
 
 		drawPath: function(context, node) {
-
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3144,11 +3150,11 @@
 
 				context.stroke();
 
-				$$.sbgn.drawSimpleChemicalCloneMarker(context, 
+				$$.sbgn.cloneMarker.simpleChemical(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
 					width, height, cloneMarker, true);
 
-				context.stroke();
+				//context.stroke();
 			}
 
 			$$.sbgn.drawSimpleChemical(context, 
@@ -3157,7 +3163,7 @@
 
 			context.stroke();
 			
-			$$.sbgn.drawSimpleChemicalCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.simpleChemical(context, centerX, centerY, 
 				width, height, cloneMarker, false);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
@@ -3168,7 +3174,6 @@
 		},
 
 		drawPath: function(context, node) {
-
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3308,13 +3313,12 @@
 
 			context.stroke();
 
-			$$.sbgn.drawSourceAndSinkCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.sourceAndSink(context, centerX, centerY, 
 				width, height, cloneMarker);	
 
 		},
 
 		drawPath: function(context, node) {
-
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3370,25 +3374,13 @@
 		points: [-1, -1, 1/3, -1, 1, 0, 1/3, 1, -1, 1],
 
 		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-
-			renderer.drawPolygon(context,
-				centerX, centerY,
-				width, height,
-				nodeShapes["tag"].points);
-		},
-
-		drawPath: function(context, node) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
 			var label = node._private.data.sbgnlabel;
 
-			renderer.drawPolygonPath(context,
+			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height,
 				nodeShapes["tag"].points);
@@ -3398,6 +3390,9 @@
 			var nodeProp = {'label':label, 'centerX':centerX - width/6, 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
 			$$.sbgn.drawLabelText(context, nodeProp);
+		},
+
+		drawPath: function(context, node) {
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3468,11 +3463,13 @@
 			var label = node._private.data.sbgnlabel;
 			var cloneMarker = node._private.data.sbgnclonemarker;
 
+			$$.sbgn.forceOpacityToOne(node, context);
+
 			$$.sbgn.drawEllipse(context, centerX, centerY, width, height);
 
 			context.stroke();
 
-			$$.sbgn.drawSourceAndSinkCloneMarker(context, centerX, centerY, 
+			$$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY, 
 					width, height, cloneMarker);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
@@ -3484,7 +3481,6 @@
 		},
 
 		drawPath: function(context, node) {
-
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3561,16 +3557,6 @@
 	nodeShapes['and operator'] = {
 
 		draw: function(context, node) {
-			var width = node.width();
-			var height = node.height();
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-
-			nodeShapes['and operator'].drawPath(context, node);
-			context.fill();
-		},
-
-		drawPath: function(context, node) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
 			var width = node.width();
@@ -3584,6 +3570,9 @@
 			var textProp = {'label':label, 'centerX':centerX , 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
 			$$.sbgn.drawLabelText(context, textProp);
+		},
+
+		drawPath: function(context, node) {
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3640,22 +3629,14 @@
 				width, height,
 				nodeShapes['process'].points);
 
+			context.stroke();
+
 			var textProp = {'label':this.label, 'centerX':centerX, 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': width};
 			$$.sbgn.drawLabelText(context, textProp);
 		},
 
 		drawPath: function(context, node) {
-
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-
-			renderer.drawPolygonPath(context,
-				centerX, centerY,
-				width, height,
-				nodeShapes['process'].points);
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3712,14 +3693,7 @@
 	};
 
 	nodeShapes["dissociation"] = {
-
 		draw: function(context, node) {
-			nodeShapes["dissociation"].drawPath(context, node);
-			context.fill();
-		},
-
-		drawPath: function(context, node) {
-
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
 			var width = node.width();
@@ -3742,10 +3716,16 @@
 
 			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
 
+			context.stroke();
+
+			context.fill();
+		},
+
+		drawPath: function(context, node) {
+
 		},
 
 		intersectLine: function(node, x, y) {
-
 			var nodeX = node._private.position.x;
 			var nodeY = node._private.position.y;
 			var width = node.width();
@@ -3802,25 +3782,19 @@
 			var height = node.height();
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
+			var label = node._private.data.sbgnlabel;
 
 			renderer.drawPolygon(context,
 				centerX, centerY,
 				width, height,
 				nodeShapes["phenotype"].points);
+
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
+			$$.sbgn.drawLabelText(context, nodeProp);
 		},
 
 		drawPath: function(context, node) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var label = node._private.data.sbgnlabel;
-
-			renderer.drawPolygonPath(context,
-				centerX, centerY,
-				width, height,
-				nodeShapes["phenotype"].points);
-
 		},
 
 		intersectLine: function(node, x, y) {
@@ -3917,10 +3891,6 @@
     	return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
   	};
 
-	arrowShapes['consumption'] = arrowShapes['none'];
-
-	arrowShapes['production'] = arrowShapes['triangle'];
-
 	arrowShapes['necessary stimulation'] = {
 	    trianglePoints: [
 	      -0.15, -0.3,
@@ -3966,6 +3936,10 @@
 	      return edge._private.style['width'].pxValue * 2;
 	    }
 	};
+
+	arrowShapes['consumption'] = arrowShapes['none'];
+
+	arrowShapes['production'] = arrowShapes['triangle'];
 
 	arrowShapes['modulation'] = arrowShapes['diamond'];
 
