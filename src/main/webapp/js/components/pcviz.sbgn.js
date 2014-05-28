@@ -56,7 +56,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : 'magenta'
+            'overlay-color' : 'magenta',
+            'overlay-padding' : '8'
         })
         .selector("edge")
         .css({
@@ -64,6 +65,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'target-arrow-fill' : 'hollow',
             'source-arrow-fill' : 'hollow',
             'width': 1.5,
+            'target-arrow-color': '#444',
+            'source-arrow-color': '#444',
             'target-arrow-shape' : 'data(sbgnclass)'
         })
         .selector("edge[sbgnclass='inhibition']")
