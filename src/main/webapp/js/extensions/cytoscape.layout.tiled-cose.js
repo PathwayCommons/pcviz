@@ -95,8 +95,6 @@
     // Initialize layout info
     var layoutInfo = createLayoutInfo(cy, options);
     
-    groupDegreeZeroMembers();
-
     // get complex ordering by finding the inner one first
     var complexOrder = performDFSOnComplexes(layoutInfo, cy, options);
     
@@ -162,6 +160,11 @@
     cy.trigger('layoutstop');
   };
   
+  var groupDegreeZeroMembers = function(cy)
+  {
+    
+  }
+
   /**
   * Make the child graph of each complex visible and adjust the orientations
   */    
