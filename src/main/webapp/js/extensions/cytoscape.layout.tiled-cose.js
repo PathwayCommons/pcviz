@@ -95,14 +95,16 @@
     // Initialize layout info
     var layoutInfo = createLayoutInfo(cy, options);
     
+    groupDegreeZeroMembers();
+
     // get complex ordering by finding the inner one first
     var complexOrder = performDFSOnComplexes(layoutInfo, cy, options);
     
     // clear children of each complex
     var childGraphMap = clearComplexes(complexOrder);
 
-		// tile the removed children
-		var tiledMemberPack = tileComplexMembers(layoutInfo, childGraphMap);
+    // tile the removed children
+    var tiledMemberPack = tileComplexMembers(layoutInfo, childGraphMap);
        
     // Show LayoutInfo contents if debugging
     if (DEBUG) {
@@ -142,8 +144,8 @@
     
     refreshPositions(layoutInfo, cy, options);
 
-		// repopulate the complexes
-		repopulateComplexes(cy, tiledMemberPack);
+    // repopulate the complexes
+    repopulateComplexes(cy, tiledMemberPack);
 
     // Fit the graph if necessary
     if (true === options.fit) {
@@ -160,292 +162,277 @@
     cy.trigger('layoutstop');
   };
   
- 	/**
-	*	Make the child graph of each complex visible and adjust the orientations
-	*/  	
+  /**
+  * Make the child graph of each complex visible and adjust the orientations
+  */    
   var repopulateComplexes = function(cy, tiledMemberPack) {
-  		for(var i in tiledMemberPack){
-				var complex = cy.getElementById(i);
+      for(var i in tiledMemberPack){
+        var complex = cy.getElementById(i);
 
-				adjustLocations(tiledMemberPack[i], complex._private.position.x, complex._private.position.y);
-			
-				complex._private.style.shape.value = "complex";
-		}
-	}
+        adjustLocations(tiledMemberPack[i], complex._private.position.x, complex._private.position.y);
+      
+        complex._private.style.shape.value = "complex";
+    }
+  }
   
   /**
-  *	Tile the children nodes of each complex and set the estimated width and height values
+  * Tile the children nodes of each complex and set the estimated width and height values
   * for future layout operations
   */
   var tileComplexMembers = function(layoutInfo, childGraphMap) {
-  	var tiledMemberPack = [];
-		
-		for(var id in childGraphMap){
-    	// access layoutInfo nodes to set the width and height of complexes
-     	var complexNodeIndex  = layoutInfo.idToIndex[id];
+    var tiledMemberPack = [];
+    
+    for(var id in childGraphMap){
+      // access layoutInfo nodes to set the width and height of complexes
+      var complexNodeIndex  = layoutInfo.idToIndex[id];
       var complexNode = layoutInfo.layoutNodes[complexNodeIndex];
-    	
-    	tiledMemberPack[id] = tileNodes(cy.getElementById(id), childGraphMap[id]);
-    	
-    	complexNode.width = tiledMemberPack[id].width;
-    	complexNode.height = tiledMemberPack[id].height;
+      
+      tiledMemberPack[id] = tileNodes(cy.getElementById(id), childGraphMap[id]);
+      
+      complexNode.width = tiledMemberPack[id].width;
+      complexNode.height = tiledMemberPack[id].height;
     }
     
     return tiledMemberPack;
-	}
-	
-	/**
-	*	Adjust the location of nodes with respect to the given reference point. 
-	*/  
-  var adjustLocations = function(organization, x, y) {
-		var left = x;
-
-		for (var i = 0; i < organization.rows.length; i++) {
-			var row = organization.rows[i];
-			x = left;
-			var maxHeight = 0;
-			
-			for (var j = 0; j < row.length; j++){
-				var node = row[j];
-				node._private.position.x = x;
-				node._private.position.y = y;
-
-				// put the removed node back
-				node.restore();
-				
-				x += node.width() + organization.horizontalPadding;
-
-				if (node.height() > maxHeight)
-					maxHeight = node.height();
-			}
-
-			y += maxHeight + organization.verticalPadding;
-		}
-	}
-
-	/**
-	*	Removes children of each complex in the given list. Return a map of 
-	* complexes and their children.
-	*/
-	var clearComplexes = function(complexOrder) {  
-		var childGraphMap = [];
-	
-		for(var i = 0; i < complexOrder.length; i++) {
-			var removedChildren = complexOrder[i].children().remove();	
-			childGraphMap[complexOrder[i].id()] = removedChildren;
-		}
-	
-		return childGraphMap;
-	}
-  	
-  /**
-	 * Scans the rows of an organization and returns the one with the min width
-	 */
-	var getShortestRowIndex = function(organization) {
-		var r = -1;
-		var min = Number.MAX_VALUE;
-
-		for (var i = 0; i < organization.rows.length; i++) {
-			if (organization.rowWidth[i] < min){
-				r = i;
-				min = organization.rowWidth[i];
-			}
-		}
-		return r;
-	}
-
-	/**
-	 * Scans the rows of an organization and returns the one with the max width
-	 */
-	var getLongestRowIndex = function(organization)	{
-		var r = -1;
-		var max = Number.MIN_VALUE;
-
-		for (var i = 0; i < organization.rows.length; i++) {
-		
-			if (organization.rowWidth[i] > max) {
-				r = i;
-				max = organization.rowWidth[i];
-			}
-			
-		}
-
-		return r;
-	}
-
-	/**
-	*	This method checks whether adding extra width to the organization violates
-	* the aspect ratio(1) or not.
-	*/  	
-  var canAddHorizontal = function(organization, extraWidth, extraHeight) {
-		var sri = getShortestRowIndex(organization);
-
-		if (sri < 0) {
-			return true;
-		}
-		
-		var min = organization.rowWidth[sri];
-
-		if (organization.width - min >= extraWidth + organization.horizontalPadding)	{
-			return true;
-		}
-
-		return organization.height + organization.verticalPadding
-				+ extraHeight > min + extraWidth + organization.horizontalPadding;
-	}
-  	
-  /**
-	 * Finds the maximum height of each row, adds them and updates the height of
-	 * the bounding box with the found value.
-	 */
-	var updateHeight = function(organization) {		
-		var totalHeight = 2 * organization.complexMargin;
-
-		for (var i = 0; i < organization.rows.length; i++) {
-			var maxHeight = 0;
-			var r = organization.rows[i];
-
-			for (var j = 0; j < r.length; j++) {
-				if (r[j].height() > maxHeight)
-					maxHeight = r[j].height();
-			}
-
-			totalHeight += (maxHeight + organization.verticalPadding);
-		}
-		organization.height = totalHeight;
-	}
-  	
-  /**
-	 * If moving the last node from the longest row and adding it to the last
-	 * row makes the bounding box smaller, do it.
-	 */
-	var shiftToLastRow = function(organization) {
-		var longest = getLongestRowIndex(organization);
-		var last = organization.rowWidth.length - 1;
-		var row = organization.rows[longest];
-		var node = row[row.length -1];
-
-		var diff = node.width()	+ organization.horizontalPadding;
-
-		// check if there is enough space on the last row
-		if (organization.width - organization.rowWidth[last] > diff) {
-			// remove the last element of the longest row
-			row.splice(-1, 1);
-			
-			// push it to the last row
-			organization.rows[last].push(node);
-			
-			organization.rowWidth[longest] = organization.rowWidth[longest] - diff;
-			organization.rowWidth[last] = organization.rowWidth[last] + diff;
-			organization.width = organization.rowWidth[getLongestRowIndex(organization)];
-
-			updateHeight(organization);
-			shiftToLastRow(organization);
-		}
-	}
-  	
-  /**
-	 * This method performs tiling. If a new row is needed, it creates the row
-	 * and places the new node there. Otherwise, it places the node to the end
-	 * of the specified row.
-	 */
-	var insertNodeToRow = function(organization, node, rowIndex) {
-		var minComplexWidth = 10;
-		
-		// Add new row if needed
-		if (rowIndex == organization.rows.length)	{
-			if (organization.rows.length > 0)	{
-				organization.height += organization.verticalPadding;
-			}
-			
-			var secondDimension = [];
-			organization.rows.push(secondDimension);
-			
-			organization.height += node.height();
-
-			organization.rowWidth.push(minComplexWidth);
-		}
-
-		// Update row width
-		var w = organization.rowWidth[rowIndex] + node.width();
-
-		if (organization.rows[rowIndex].length > 0)	{
-			w += organization.horizontalPadding;
-		}
-		
-		organization.rowWidth[rowIndex] = w;
-
-		// Insert node
-		organization.rows[rowIndex].push(node);
-
-
-		updateHeight(organization);
-
-		// Update complex width
-		if (organization.width < w)	{
-			organization.width = w;
-		}
-	}
-	
-	/**
-	*	This method places each node in the given list.
-	*/
-	var tileNodes = function (complexNode, nodes) {
-		var organization = {
-			rows: [], 
-			rowWidth: [], 
-			verticalPadding: 10,
-			horizontalPadding: 10,
-			complexMargin: 10,
-			width: 20, 
-			height: 20
-		// did not work, the values are 0.
-		//	verticalPadding: complexNode._private.style["padding-left"].pxValue, 
-		//	horizontalPadding: complexNode._private.style["padding-right"].pxValue
-		};
-	
-		for( var i = 0; i < nodes.length; i++) {
-			var node = nodes[i];
-
-			if (organization.rows.length == 0) {
-				insertNodeToRow(organization, node, 0);
-			}
-			else if (canAddHorizontal(organization, node.width(), node.height())) {
-				insertNodeToRow(organization, node, getShortestRowIndex(organization));
-			} 
-			else {
-				insertNodeToRow(organization, node, organization.rows.length);
-			}
-		
-			shiftToLastRow(organization);
-		}
-	
-		return organization;
-	}
+  }
   
   /**
-	*	This method finds all the roots in the graph and performs depth first search
-	*	to find all complexes.
-	*/
-	var performDFSOnComplexes = function(layoutInfo, cy, options) {  
-		var complexOrder = [];
-		
-		// find roots
-		var roots = cy.filter( function(i, ele){
-			if(ele.isParent() == true)
-				return true;
-			return false;
-		});
-		
-		// perform dfs
-		cy.elements().dfs(roots, function(i, depth){
-			if( this.is("[sbgnclass='complex']") ){
-				complexOrder.push(this);
-			}
+  * Adjust the location of nodes with respect to the given reference point. 
+  */  
+  var adjustLocations = function(organization, x, y) {
+    for (var i = 0; i < organization.rows.length; i++) {
+      var row = organization.rows[i];
+      
+      for (var j = 0; j < row.length; j++){
+        // put the removed node back
+        row[j].restore();
+      }
+    }
+  }
+
+  /**
+  * Removes children of each complex in the given list. Return a map of 
+  * complexes and their children.
+  */
+  var clearComplexes = function(complexOrder) {  
+    var childGraphMap = [];
+  
+    for(var i = 0; i < complexOrder.length; i++) {
+      var removedChildren = complexOrder[i].children().remove();  
+      childGraphMap[complexOrder[i].id()] = removedChildren;
+    }
+  
+    return childGraphMap;
+  }
+    
+  /**
+   * Scans the rows of an organization and returns the one with the min width
+   */
+  var getShortestRowIndex = function(organization) {
+    var r = -1;
+    var min = Number.MAX_VALUE;
+
+    for (var i = 0; i < organization.rows.length; i++) {
+      if (organization.rowWidth[i] < min){
+        r = i;
+        min = organization.rowWidth[i];
+      }
+    }
+    return r;
+  }
+
+  /**
+   * Scans the rows of an organization and returns the one with the max width
+   */
+  var getLongestRowIndex = function(organization) {
+    var r = -1;
+    var max = Number.MIN_VALUE;
+
+    for (var i = 0; i < organization.rows.length; i++) {
+    
+      if (organization.rowWidth[i] > max) {
+        r = i;
+        max = organization.rowWidth[i];
+      }
+      
+    }
+
+    return r;
+  }
+
+  /**
+  * This method checks whether adding extra width to the organization violates
+  * the aspect ratio(1) or not.
+  */    
+  var canAddHorizontal = function(organization, extraWidth, extraHeight) {
+    var sri = getShortestRowIndex(organization);
+
+    if (sri < 0) {
+      return true;
+    }
+    
+    var min = organization.rowWidth[sri];
+
+    if (organization.width - min >= extraWidth + organization.horizontalPadding)  {
+      return true;
+    }
+
+    return organization.height + organization.verticalPadding
+        + extraHeight > min + extraWidth + organization.horizontalPadding;
+  }
+    
+  /**
+   * Finds the maximum height of each row, adds them and updates the height of
+   * the bounding box with the found value.
+   */
+  var updateHeight = function(organization) {   
+    var totalHeight = 2 * organization.complexMargin;
+
+    for (var i = 0; i < organization.rows.length; i++) {
+      var maxHeight = 0;
+      var r = organization.rows[i];
+
+      for (var j = 0; j < r.length; j++) {
+        if (r[j].height() > maxHeight)
+          maxHeight = r[j].height();
+      }
+
+      totalHeight += (maxHeight + organization.verticalPadding);
+    }
+    organization.height = totalHeight;
+  }
+    
+  /**
+   * If moving the last node from the longest row and adding it to the last
+   * row makes the bounding box smaller, do it.
+   */
+  var shiftToLastRow = function(organization) {
+    var longest = getLongestRowIndex(organization);
+    var last = organization.rowWidth.length - 1;
+    var row = organization.rows[longest];
+    var node = row[row.length -1];
+
+    var diff = node.width() + organization.horizontalPadding;
+
+    // check if there is enough space on the last row
+    if (organization.width - organization.rowWidth[last] > diff) {
+      // remove the last element of the longest row
+      row.splice(-1, 1);
+      
+      // push it to the last row
+      organization.rows[last].push(node);
+      
+      organization.rowWidth[longest] = organization.rowWidth[longest] - diff;
+      organization.rowWidth[last] = organization.rowWidth[last] + diff;
+      organization.width = organization.rowWidth[getLongestRowIndex(organization)];
+
+      updateHeight(organization);
+      shiftToLastRow(organization);
+    }
+  }
+    
+  /**
+   * This method performs tiling. If a new row is needed, it creates the row
+   * and places the new node there. Otherwise, it places the node to the end
+   * of the specified row.
+   */
+  var insertNodeToRow = function(organization, node, rowIndex) {
+    var minComplexWidth = 10;
+    
+    // Add new row if needed
+    if (rowIndex == organization.rows.length) {
+      if (organization.rows.length > 0) {
+        organization.height += organization.verticalPadding;
+      }
+      
+      var secondDimension = [];
+      organization.rows.push(secondDimension);
+      
+      organization.height += node.height();
+
+      organization.rowWidth.push(minComplexWidth);
+    }
+
+    // Update row width
+    var w = organization.rowWidth[rowIndex] + node.width();
+
+    if (organization.rows[rowIndex].length > 0) {
+      w += organization.horizontalPadding;
+    }
+    
+    organization.rowWidth[rowIndex] = w;
+
+    // Insert node
+    organization.rows[rowIndex].push(node);
+
+
+    updateHeight(organization);
+
+    // Update complex width
+    if (organization.width < w) {
+      organization.width = w;
+    }
+  }
+  
+  /**
+  * This method places each node in the given list.
+  */
+  var tileNodes = function (complexNode, nodes) {
+    var organization = {
+      rows: [], 
+      rowWidth: [], 
+      verticalPadding: 10,
+      horizontalPadding: 10,
+      complexMargin: 10,
+      width: 20, 
+      height: 20
+    // did not work, the values are 0.
+    //  verticalPadding: complexNode._private.style["padding-left"].pxValue, 
+    //  horizontalPadding: complexNode._private.style["padding-right"].pxValue
+    };
+  
+    for( var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+
+      if (organization.rows.length == 0) {
+        insertNodeToRow(organization, node, 0);
+      }
+      else if (canAddHorizontal(organization, node.width(), node.height())) {
+        insertNodeToRow(organization, node, getShortestRowIndex(organization));
+      } 
+      else {
+        insertNodeToRow(organization, node, organization.rows.length);
+      }
+    
+      shiftToLastRow(organization);
+    }
+  
+    return organization;
+  }
+  
+  /**
+  * This method finds all the roots in the graph and performs depth first search
+  * to find all complexes.
+  */
+  var performDFSOnComplexes = function(layoutInfo, cy, options) {  
+    var complexOrder = [];
+    
+    // find roots
+    var roots = cy.filter( function(i, ele){
+      if(ele.isParent() == true)
+        return true;
+      return false;
+    });
+    
+    // perform dfs
+    cy.elements().dfs(roots, function(i, depth){
+      if( this.is("[sbgnclass='complex']") ){
+        complexOrder.push(this);
+      }
     }, options.directed);
-		
-		return complexOrder;
-	}
+    
+    return complexOrder;
+  }
 
   /**
    * @brief : called on continuous layouts to stop them before they finish
