@@ -1151,15 +1151,106 @@
 		return pz;
 	};
 
-	function drawCardinality(context, edge, length, type){
+	var qBezierLength = function(pts){
+		var x1, y1, x2, y2;
+
+		x1 = pts[0] - 2 * pts[2] + pts[4];
+		y1 = pts[1] - 2 * pts[3] + pts[5];
+		x2 = 2 * pts[2] - 2 * pts[0];
+		y2 = 2 * pts[3] - 2 * pts[1];
+
+		var A = 4 * (x1 * x1 + y1 * y1);
+		var B = 4 * (x1 * x2 + y1 * y2);
+		var C = x2 * x2 + y2 * y2;
+
+		var sabc = 2 * Math.sqrt(A + B + C);
+		var A2 = Math.sqrt(A);
+		var A32 = 2 * A * A2;
+		var C2 = 2 * Math.sqrt(C);
+		var BA = B / A2;
+
+		return (A32 * sabc + A2 * B * (sabc - C2) +
+			(4 * C * A - B * B) * Math.log((2 * A2 + BA + sabc) / (BA + C2))
+			) / (4 * A32);
+	};
+
+	var drawQuadraticLineCardinality = function(context, edge, pts, type){
+		context.moveTo(pts[0], pts[1]);
+  		context.quadraticCurveTo(pts[2], pts[3], pts[4], pts[5]);
+
 		//if cardinality is zero, return here.
 		var cardinality = edge._private.data.sbgncardinality;
 		if(cardinality == 0)
 			return;
+
+  		var carProp = $$.sbgn.cardinalityProperties();
+
+  		var totalLength = qBezierLength(pts);
+
+  		var startLength = totalLength - 25;
+
+  		var startPortion = startLength / totalLength;
+  		
+  		if(type === "consumption"){
+  			startPortion = carProp.distanceToSource / totalLength;
+  		}
+  		else{
+  			startPortion = (totalLength - carProp.distanceToTarget) / totalLength;
+  		}
+
+  		var t = startPortion;
+  		var x1 = (1 - t) * (1 - t) * pts[0] + 2 * (1 - t) * t * pts[2] + t * t * pts[4];
+		var y1 = (1 - t) * (1 - t) * pts[1] + 2 * (1 - t) * t * pts[3] + t * t * pts[5];
+
+		//get a short line to determine tanget line
+		t = startPortion + 0.01;
+  		var x2 = (1 - t) * (1 - t) * pts[0] + 2 * (1 - t) * t * pts[2] + t * t * pts[4];
+		var y2 = (1 - t) * (1 - t) * pts[1] + 2 * (1 - t) * t * pts[3] + t * t * pts[5];
+
+		var dispX = x1 - x2;
+	    var dispY = y1 - y2;
+
+	    var angle = Math.asin(dispY / (Math.sqrt(dispX * dispX + dispY * dispY)));
+	    if (dispX < 0) {
+	      angle = angle + Math.PI / 2;
+	    } else {
+	      angle = - (Math.PI / 2 + angle);
+	    }
+
+	    context.translate(x1, y1);
+		context.rotate(-angle);
+
+		context.rect(0, -13/2, 13, 13);
+
+		context.rotate(-Math.PI/2);
+
+		var textProp = {'centerX': 0, 'centerY' : 13/2,
+			'opacity':edge._private.style['text-opacity'].value, 
+			'width': 13, 'label': cardinality};
+		$$.sbgn.drawLabelText(context, textProp);
+
+		context.rotate(Math.PI/2);
+		
+		context.rotate(angle);
+		context.translate(-x1, -y1);
+
+	};
+
+	function drawStraightLineCardinality(context, edge, pts, type){
+		context.moveTo(pts[0], pts[1]);
+		context.lineTo(pts[2], pts[3]);
+
+		//if cardinality is zero, return here.
+		var cardinality = edge._private.data.sbgncardinality;
+		if(cardinality == 0)
+			return;
+
+  		var carProp = $$.sbgn.cardinalityProperties();
+
+		var length = (Math.sqrt( (pts[2] - pts[0]) * (pts[2] - pts[0]) + 
+			  			(pts[3] - pts[1]) * (pts[3] - pts[1])));
+
 	    var dispX, dispY, startX, startY;
-	    var squareLength = 13;
-	    var distanceToTarget = 20;
-	    var distanceToSource = -25;
 
 	    if(type === "consumption"){
 		    startX = edge._private.rscratch.arrowStartX;
@@ -1169,8 +1260,6 @@
 	    	startX = edge._private.rscratch.arrowEndX;
 	    	startY = edge._private.rscratch.arrowEndY;
 	    }
-
-	    var style = edge._private.style;
 	    
 	    var srcPos = edge.source().position();
 	    dispX = startX - srcPos.x;
@@ -1184,36 +1273,36 @@
 	      angle = - (Math.PI / 2 + angle);
 	    }
 	    
-	    if(length > distanceToTarget){
-		    context.translate(startX, startY);
-		   	context.rotate(-angle);
+	    context.translate(startX, startY);
+	   	context.rotate(-angle);
 
-		   	if(type === "consumption"){
-				context.rect(0, distanceToSource, squareLength, squareLength);
-				context.rotate(Math.PI/2);
+	   	if(type === "consumption" && length > carProp.distanceToSource){
+			context.rect(0, -carProp.distanceToSource, carProp.boxLength, carProp.boxLength);
+			
+			context.rotate(Math.PI/2);
 
-				var textProp = {'centerX':distanceToSource + squareLength/2, 'centerY':-squareLength/2,
-					'opacity':edge._private.style['text-opacity'].value, 
-					'width': squareLength, 'label': cardinality};
-				$$.sbgn.drawLabelText(context, textProp);
+			var textProp = {'centerX': -carProp.distanceToSource + carProp.boxLength/2, 'centerY':-carProp.boxLength/2,
+				'opacity':edge._private.style['text-opacity'].value, 
+				'width': carProp.boxLength, 'label': cardinality};
+			$$.sbgn.drawLabelText(context, textProp);
 
-				context.rotate(-Math.PI/2);
-			}
-			else{
-				context.rect(0, distanceToTarget, squareLength, squareLength);
-				context.rotate(Math.PI/2);
-
-				var textProp = {'centerX': distanceToTarget + squareLength/2, 'centerY' : -squareLength/2,
-					'opacity':edge._private.style['text-opacity'].value, 
-					'width': squareLength, 'label': cardinality};
-				$$.sbgn.drawLabelText(context, textProp);
-
-				context.rotate(-Math.PI/2);
-			}
-		    
-		    context.rotate(angle);
-		    context.translate(-startX, -startY);
+			context.rotate(-Math.PI/2);
 		}
+		else if(length > carProp.distanceToTarget){
+			context.rect(0, carProp.distanceToTarget, carProp.boxLength, carProp.boxLength);
+			
+			context.rotate(Math.PI/2);
+
+			var textProp = {'centerX': carProp.distanceToTarget + carProp.boxLength/2, 'centerY' : -carProp.boxLength/2,
+				'opacity':edge._private.style['text-opacity'].value, 
+				'width': carProp.boxLength, 'label': cardinality};
+			$$.sbgn.drawLabelText(context, textProp);
+
+			context.rotate(-Math.PI/2);
+		}
+	    
+	    context.rotate(angle);
+	    context.translate(-startX, -startY);
 	};
 
 	var calls = 0;
@@ -1305,21 +1394,11 @@
 
 			if( !pathCacheHit ){
 				if( context.beginPath ){ context.beginPath(); }
-				context.moveTo(pts[0], pts[1]);
 				if (pts.length == 3 * 2) {
-			  		//context.quadraticCurveTo(pts[2], pts[3], pts[4], pts[5]);
-			  		context.lineTo(pts[4], pts[5]);
-			  		var length = (Math.sqrt((pts[4] - pts[0]) * (pts[4] - pts[0]) + 
-			  			(pts[5] - pts[1]) * (pts[5] - pts[1])));
-			  		drawCardinality(context, edge, length, type);
+					drawQuadraticLineCardinality(context, edge, pts, type);
 				} else {
-			  		context.lineTo(pts[2], pts[3]);
-			  		var length = (Math.sqrt((pts[2] - pts[0]) * (pts[2] - pts[0]) + 
-			  			(pts[3] - pts[1]) * (pts[3] - pts[1])));
-			  		drawCardinality(context, edge, length, type);
+			  		drawStraightLineCardinality(context, edge, pts, type);
 				}
-
-
 			}
 
 			context = canvasCxt;
@@ -1510,6 +1589,14 @@
 	var nodeShapes = CanvasRenderer.nodeShapes;
 	var sbgnNodeShapes = CanvasRenderer.sbgnShapes = {};
 
+	$$.sbgn.cardinalityProperties = function(){
+		return {
+			boxLength : 13,
+			distanceToTarget : 20,
+			distanceToSource : 25
+		};
+	}
+
 	function truncateText(textProp, context) {
 	    var width;
 	    var text = textProp.label;
@@ -1626,6 +1713,7 @@
 				$$.sbgn.drawStateText(context, textProp);
 
 				stateCount++;
+				context.stroke();
 
 			}
 			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
@@ -1637,8 +1725,8 @@
 				textProp.label = state.label.text;
 				$$.sbgn.drawInfoText(context, textProp);
 					infoCount++;
+					context.stroke();
 			}
-			context.stroke();
 		}
 	};
 
@@ -2262,7 +2350,7 @@
 		return false;
 	};
 
-	function calculateDistance(point1, point2){
+	$$.math.calculateDistance = function(point1, point2){
 		var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
 		return Math.sqrt(distance);
 	};
@@ -2273,8 +2361,8 @@
 		else if(cp2.length < 1)
 			return cp1;
 
-		var distance1 = calculateDistance(point, cp1);
-		var distance2 = calculateDistance(point, cp2);
+		var distance1 = $$.math.calculateDistance(point, cp1);
+		var distance2 = $$.math.calculateDistance(point, cp2);
 
 		if(distance1 < distance2)
 			return cp1;
@@ -2303,7 +2391,7 @@
 
 		for(var i = 0 ; i < intersections.length ; i = i + 2){
 			var checkPoint = [intersections[i], intersections[i+1]];
-			var distance = calculateDistance(point, checkPoint);
+			var distance = $$.math.calculateDistance(point, checkPoint);
 
 			if(distance < minDistance){
 				minDistance = distance;
