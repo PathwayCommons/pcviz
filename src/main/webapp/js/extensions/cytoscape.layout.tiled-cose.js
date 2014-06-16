@@ -97,12 +97,6 @@
 
     // Initialize layout info
     var layoutInfo = createLayoutInfo(cy, options);
-    
-    // Tile and clear children of each complex
-    var tiledMemberPack = clearComplexes(layoutInfo, cy, options);
-    
-    // Separately tile and clear zero degree nodes for each level
-    var tiledZeroDegreeNodes = clearZeroDegreeMembers(layoutInfo, memberGroups);
 
     // Show LayoutInfo contents if debugging
     if (DEBUG) {
@@ -119,6 +113,12 @@
     }
 
     updatePositions(layoutInfo, cy, options);
+    
+    // Tile and clear children of each complex
+    var tiledMemberPack = clearComplexes(layoutInfo, cy, options);
+    
+    // Separately tile and clear zero degree nodes for each level
+    var tiledZeroDegreeNodes = clearZeroDegreeMembers(layoutInfo, memberGroups);
 
     // Main loop
     for (var i = 0; i < options.numIter; i++) {
@@ -143,9 +143,11 @@
     refreshPositions(layoutInfo, cy, options);
 
     // Repopulate members
-    repopulateComplexes(cy, tiledMemberPack);
+    repopulateZeroDegreeMembers(cy, layoutInfo, tiledZeroDegreeNodes);
 
-    repopulateZeroDegreeMembers(cy, tiledZeroDegreeNodes);
+    repopulateComplexes(cy, layoutInfo, tiledMemberPack);
+    
+    cy.nodes().updateCompoundBounds();    
 
     // Fit the graph if necessary
     if (true === options.fit) {
@@ -168,14 +170,13 @@
    * Otherwise, create a dummy complex for each group. 
    */
   var groupZeroDegreeMembers = function(cy){
-    // [parent_id x oneDegreeNode_id] 
+    // array of [parent_id x oneDegreeNode_id] 
     var tempMemberGroups = [];
     var memberGroups = [];
 
     // Find all zero degree nodes which aren't covered by a complex
     var zeroDegree = cy.nodes().filter( function(i, ele){
-      if( this.connectedEdges().length == 0  && this.is("[sbgnclass!='compartment']") &&
-        (this.parent().is("[sbgnclass!='complex']") || this.parent().length == 0 )  )
+      if( this.degree(false) == 0  && this.parent().is("[sbgnclass!='complex']") )
         return true;
       else
         return false;
@@ -186,7 +187,7 @@
     {
       var node = zeroDegree[i];
       var p_id = node.parent().id(); 
-      
+
       if(typeof tempMemberGroups[p_id] === "undefined")
         tempMemberGroups[p_id] = [];
 
@@ -196,21 +197,24 @@
     // If there are at least two nodes at a level, create a dummy complex for them
     for(var p_id in tempMemberGroups){
       if (tempMemberGroups[p_id].length > 1){
-        memberGroups[p_id] = tempMemberGroups[p_id];
+        var dummyComplexId = "DummyComplex_" + p_id;
+        memberGroups[dummyComplexId] = tempMemberGroups[p_id];
 
-        // Create a new complex
-        if(cy.getElementById("DummyComplex_" + p_id).empty()){
-          var newComplex = cy.add({
+        // Create a dummy complex
+        if(cy.getElementById(dummyComplexId).empty()){
+          cy.add({
             group: "nodes",
-            data: { id: "DummyComplex_" + p_id, parent: p_id, sbgnclass: 'complex', sbgnstatesandinfos: []},
-            position: { x: 200, y: 200 }
+            data: { id: dummyComplexId, parent: p_id, 
+                    sbgnclass: 'complex', sbgnstatesandinfos: []},
+            position: { x: Math.random() * cy.container().clientWidth, 
+                        y: Math.random() * cy.container().clientHeight }
           });
         }
       }
     }
 
     return memberGroups;
-  }
+  };
 
   /**
    *  This method finds all the roots in the graph and performs depth first search
@@ -232,9 +236,9 @@
         complexOrder.push(this);
       }
     }, options.directed);
-    
+
     return complexOrder;
-  }
+  };
 
   /**
    * Removes children of each complex in the given list. Return a map of 
@@ -245,17 +249,23 @@
 
     // Get complex ordering by finding the inner one first
     var complexOrder = performDFSOnComplexes(layoutInfo, cy, options);
-  
+
     for(var i = 0; i < complexOrder.length; i++) {
-      var removedChildren = complexOrder[i].children().remove();  
-      childGraphMap[complexOrder[i].id()] = removedChildren;
+      // find the corresponding layout node
+      var lComplexIndex  = layoutInfo.idToIndex[complexOrder[i].id()];
+      var lComplexNode = layoutInfo.layoutNodes[lComplexIndex];
+
+      childGraphMap[complexOrder[i].id()] = complexOrder[i].children();
+
+      // Remove children of complexes 
+      lComplexNode.children = []; 
     }
   
     // Tile the removed children
     var tiledMemberPack = tileComplexMembers(layoutInfo, childGraphMap);  
 
     return tiledMemberPack;
-  }
+  };
 
   /**
    * This method tiles each given member group separately. After each group is tiled,
@@ -264,66 +274,58 @@
   var clearZeroDegreeMembers = function(layoutInfo, memberGroups){
     var tiledZeroDegreePack = [];
 
-    for(var p_id in memberGroups){
-      var complexNodeIndex  = layoutInfo.idToIndex["DummyComplex_" + p_id];
+    for(var id in memberGroups){
+      var complexNodeIndex  = layoutInfo.idToIndex[id];
       var complexNode = layoutInfo.layoutNodes[complexNodeIndex];
 
-      tiledZeroDegreePack[p_id] = tileNodes(complexNode, memberGroups[p_id]);
-
-      // Remove the zero degree nodes at this level
-      for(var j = 0; j < memberGroups[p_id].length; j++){
-        memberGroups[p_id][j].remove();
-      }
+      tiledZeroDegreePack[id] = tileNodes(layoutInfo, complexNode, memberGroups[id]);
 
       // Set the width and height of the dummy complex as calculated
-      complexNode.width = tiledZeroDegreePack[p_id].width;
-      complexNode.height = tiledZeroDegreePack[p_id].height;
-
+      complexNode.width = tiledZeroDegreePack[id].width;
+      complexNode.height = tiledZeroDegreePack[id].height;
     }
     return tiledZeroDegreePack;
-  }
+  };
   
   /**
    *  Make the child graph of each complex visible and adjust the orientations
    */   
-  var repopulateComplexes = function(cy, tiledMemberPack) {
+  var repopulateComplexes = function(cy, layoutInfo, tiledMemberPack) {
     for(var i in tiledMemberPack){
-      var complex = cy.getElementById(i);
+      var lComplexIndex  = layoutInfo.idToIndex[i];
+      var lComplexNode = layoutInfo.layoutNodes[lComplexIndex];
 
-      // Restore the elements in the complex
-      for (var k = 0; k < tiledMemberPack[i].rows.length; k++) {
-        var row = tiledMemberPack[i].rows[k];
-        
-        for (var j = 0; j < row.length; j++){
-          // Put the removed node back
-          row[j].restore();
-        }
-      }
-    
-      complex._private.style.shape.value = "complex";
+      adjustLocations(cy, tiledMemberPack[i], lComplexNode.positionX - lComplexNode.width / 2, 
+        lComplexNode.positionY - lComplexNode.height / 2 );
    }
-  }
+  };
 
   /**
    * This method restores the deleted zero degree members and when the repopulation 
    * is completed, associated dummy complex is removed from the graph.
    */
-  var repopulateZeroDegreeMembers = function(cy, tiledPack){
+  var repopulateZeroDegreeMembers = function(cy, layoutInfo, tiledPack){
     for(var i in tiledPack){
-        var complex = cy.getElementById("DummyComplex_" + i);
+        var complex = cy.getElementById(i);
+        var complexNodeIndex  = layoutInfo.idToIndex[i];
+        var complexNode = layoutInfo.layoutNodes[complexNodeIndex];
 
         // Adjust the positions of nodes wrt its complex
-        adjustLocations(tiledPack[i], complex._private.position.x, complex._private.position.y);
-      
+        adjustLocations(cy, tiledPack[i], complexNode.positionX - complexNode.width / 2, 
+          complexNode.positionY - complexNode.height / 2 );
+
         // Remove the dummy complex
         complex.remove();
     }
-  }
+  };
   
   /**
    * This method places each zero degree member wrt given (x,y) coordinates (top left). 
    */
-  var adjustLocations = function (organization, x, y){
+  var adjustLocations = function (cy, organization, x, y){
+    x += organization.complexMargin;
+    y += organization.complexMargin;
+
     var left = x;
 
     for(var i = 0; i < organization.rows.length; i++){
@@ -332,20 +334,26 @@
       var maxHeight = 0;
 
       for(var j = 0; j < row.length; j++){
-        var node = row[j];
-        node._private.position.x = x;
-        node._private.position.y = y;
+        var lnode = row[j];
 
-        node.restore();
-        x += node.width() + organization.horizontalPadding;
+        var node = cy.getElementById(lnode.id);
 
-        if(node.height() > maxHeight)
-          maxHeight = node.height();
+        node._private.position.x = x + lnode.width / 2;
+        node._private.position.y = y + lnode.height / 2;
+
+        lnode.positionX = x + lnode.width / 2;
+        lnode.positionY = y + lnode.height / 2;
+
+        lnode.removed = false;
+        x += lnode.width + organization.horizontalPadding;
+
+        if(lnode.height > maxHeight)
+          maxHeight = lnode.height;
       }
 
       y += maxHeight + organization.verticalPadding;
     }
-  }
+  };
 
   /**
    * Tile the children nodes of each complex and set the estimated width and height values
@@ -359,50 +367,72 @@
       var complexNodeIndex  = layoutInfo.idToIndex[id];
       var complexNode = layoutInfo.layoutNodes[complexNodeIndex];
       
-      tiledMemberPack[id] = tileNodes(cy.getElementById(id), childGraphMap[id]);
+      tiledMemberPack[id] = tileNodes(layoutInfo, complexNode, childGraphMap[id]);
       
       complexNode.width = tiledMemberPack[id].width;
       complexNode.height = tiledMemberPack[id].height;
     }
     
     return tiledMemberPack;
-  }
+  };
   
   /**
    *  This method places each node in the given list.
    */
-  var tileNodes = function (complexNode, nodes) {
+  var tileNodes = function (layoutInfo, complexNode, nodes) {
     var organization = {
       rows: [], 
       rowWidth: [], 
-      verticalPadding: 10,
-      horizontalPadding: 10,
+      rowHeight: [], 
       complexMargin: 10,
       width: 20, 
-      height: 20
-    // Did not work, the values are 0.
-    //  verticalPadding: complexNode._private.style["padding-left"].pxValue, 
-    //  horizontalPadding: complexNode._private.style["padding-right"].pxValue
+      height: 20,
+      verticalPadding: 10,
+      horizontalPadding: 10
+     // verticalPadding: complexNode.padLeft, 
+     // horizontalPadding: complexNode.padRight
     };
-  
+
+    var layoutNodes = [];
+    
+    // Get layout nodes
     for( var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
+      var lNodeIndex  = layoutInfo.idToIndex[node.id()];
+      var lNode = layoutInfo.layoutNodes[lNodeIndex];
+      lNode.removed = true;
+
+      layoutNodes.push(lNode);
+    }
+    
+    // Sort the nodes in ascending order of their areas
+    layoutNodes.sort(function(n1, n2){
+      if(n1.width * n1.height > n2.width * n2.height)
+        return -1;
+      if(n1.width * n1.height < n2.width * n2.height)
+        return 1;
+      return 0;
+    });
+
+    // Create the organization -> tile members
+    for( var i = 0; i < layoutNodes.length; i++) {
+      var lNode = layoutNodes[i];
 
       if (organization.rows.length == 0) {
-        insertNodeToRow(organization, node, 0);
+        insertNodeToRow(organization, lNode, 0);
       }
-      else if (canAddHorizontal(organization, node.width(), node.height())) {
-        insertNodeToRow(organization, node, getShortestRowIndex(organization));
+      else if (canAddHorizontal(organization, lNode.width, lNode.height)) {
+        insertNodeToRow(organization, lNode, getShortestRowIndex(organization));
       } 
       else {
-        insertNodeToRow(organization, node, organization.rows.length);
+        insertNodeToRow(organization, lNode, organization.rows.length);
       }
-    
+
       shiftToLastRow(organization);
     }
   
     return organization;
-  }
+  };
     
   /**
    * This method performs tiling. If a new row is needed, it creates the row
@@ -410,42 +440,47 @@
    * of the specified row.
    */
   var insertNodeToRow = function(organization, node, rowIndex) {
-    var minComplexWidth = 10;
+    var minComplexSize = organization.complexMargin * 2 ;
     
     // Add new row if needed
     if (rowIndex == organization.rows.length) {
-      if (organization.rows.length > 0) {
-        organization.height += organization.verticalPadding;
-      }
-      
       var secondDimension = [];
-      organization.rows.push(secondDimension);
-      
-      organization.height += node.height();
 
-      organization.rowWidth.push(minComplexWidth);
+      organization.rows.push(secondDimension);
+      organization.rowWidth.push(minComplexSize);
+      organization.rowHeight.push(0);
     }
 
     // Update row width
-    var w = organization.rowWidth[rowIndex] + node.width();
+    var w = organization.rowWidth[rowIndex] + node.width;
 
     if (organization.rows[rowIndex].length > 0) {
       w += organization.horizontalPadding;
     }
-    
+
     organization.rowWidth[rowIndex] = w;
-
-    // Insert node
-    organization.rows[rowIndex].push(node);
-
-
-    updateHeight(organization);
-
     // Update complex width
     if (organization.width < w) {
       organization.width = w;
     }
-  }
+
+    // Update height
+    var h = node.height;
+    if(rowIndex > 0)
+      h += organization.verticalPadding;
+
+    var extraHeight = 0;
+    if(h > organization.rowHeight[rowIndex]){
+      extraHeight = organization.rowHeight[rowIndex];
+      organization.rowHeight[rowIndex] = h;
+      extraHeight = organization.rowHeight[rowIndex] - extraHeight;
+    }
+
+    organization.height += extraHeight;
+
+    // Insert node
+    organization.rows[rowIndex].push(node);
+  };
 
   /**
    * Scans the rows of an organization and returns the one with the min width
@@ -461,7 +496,7 @@
       }
     }
     return r;
-  }
+  };
 
   /**
    * Scans the rows of an organization and returns the one with the max width
@@ -476,11 +511,10 @@
         r = i;
         max = organization.rowWidth[i];
       }
-      
     }
 
     return r;
-  }
+  };
 
   /**
    * This method checks whether adding extra width to the organization violates
@@ -495,34 +529,17 @@
     
     var min = organization.rowWidth[sri];
 
+    var hDiff = 0;
+    if(organization.rowHeight[sri] < extraHeight){
+      if(sri > 0)
+        hDiff = extraHeight + organization.verticalPadding - organization.rowHeight[sri];
+    }
     if (organization.width - min >= extraWidth + organization.horizontalPadding)  {
       return true;
     }
 
-    return organization.height + organization.verticalPadding
-        + extraHeight > min + extraWidth + organization.horizontalPadding;
-  }
-    
-  /**
-   * Finds the maximum height of each row, adds them and updates the height of
-   * the bounding box with the found value.
-   */
-  var updateHeight = function(organization) {   
-    var totalHeight = 2 * organization.complexMargin;
-
-    for (var i = 0; i < organization.rows.length; i++) {
-      var maxHeight = 0;
-      var r = organization.rows[i];
-
-      for (var j = 0; j < r.length; j++) {
-        if (r[j].height() > maxHeight)
-          maxHeight = r[j].height();
-      }
-
-      totalHeight += (maxHeight + organization.verticalPadding);
-    }
-    organization.height = totalHeight;
-  }
+    return organization.height + hDiff > min + extraWidth + organization.horizontalPadding;
+  };
     
   /**
    * If moving the last node from the longest row and adding it to the last
@@ -532,26 +549,43 @@
     var longest = getLongestRowIndex(organization);
     var last = organization.rowWidth.length - 1;
     var row = organization.rows[longest];
-    var node = row[row.length -1];
+    var node = row[row.length - 1];
 
-    var diff = node.width() + organization.horizontalPadding;
+    var diff = node.width + organization.horizontalPadding;
 
     // Check if there is enough space on the last row
-    if (organization.width - organization.rowWidth[last] > diff) {
-      // remove the last element of the longest row
+    if (organization.width - organization.rowWidth[last] > diff && longest != last) {
+      // Remove the last element of the longest row
       row.splice(-1, 1);
       
       // Push it to the last row
       organization.rows[last].push(node);
-      
+
       organization.rowWidth[longest] = organization.rowWidth[longest] - diff;
       organization.rowWidth[last] = organization.rowWidth[last] + diff;
       organization.width = organization.rowWidth[getLongestRowIndex(organization)];
 
-      updateHeight(organization);
+      // Update heights of the organization
+      var maxHeight = Number.MIN_VALUE;
+      for(var i = 0; i < row.length; i++){
+        if(row[i].height > maxHeight)
+          maxHeight = row[i].height;
+      }
+      if(longest > 0)
+        maxHeight += organization.verticalPadding;
+
+      var prevTotal = organization.rowHeight[longest] + organization.rowHeight[last];
+      
+      organization.rowHeight[longest] = maxHeight;
+      if(organization.rowHeight[last] < node.height + organization.verticalPadding)
+        organization.rowHeight[last] = node.height + organization.verticalPadding   ;
+
+      var finalTotal = organization.rowHeight[longest] + organization.rowHeight[last];
+      organization.height += (finalTotal - prevTotal);
+
       shiftToLastRow(organization);
     }
-  }
+  };
     
   /**
    * @brief : called on continuous layouts to stop them before they finish
@@ -607,6 +641,8 @@
       tempNode.padRight   = nodes[i]._private.style['padding-right'].pxValue;
       tempNode.padTop     = nodes[i]._private.style['padding-top'].pxValue;
       tempNode.padBottom  = nodes[i]._private.style['padding-bottom'].pxValue;
+      // this flag is used for tiling 
+      tempNode.removed    = false;
       
       // Add new node
       layoutInfo.layoutNodes.push(tempNode);
@@ -961,11 +997,17 @@
       // Now get all the pairs of nodes 
       // Only get each pair once, (A, B) = (B, A)
       for (var j = 0; j < numNodes; j++) {
-      var node1 = layoutInfo.layoutNodes[layoutInfo.idToIndex[graph[j]]];
-      for (var k = j + 1; k < numNodes; k++) {
-        var node2 = layoutInfo.layoutNodes[layoutInfo.idToIndex[graph[k]]];
-        nodeRepulsion(node1, node2, layoutInfo, cy, options);
-      } 
+        var node1 = layoutInfo.layoutNodes[layoutInfo.idToIndex[graph[j]]];
+        if(node1.removed) 
+          continue;
+
+        for (var k = j + 1; k < numNodes; k++) {
+          var node2 = layoutInfo.layoutNodes[layoutInfo.idToIndex[graph[k]]];
+          if(node2.removed)
+            continue;
+
+          nodeRepulsion(node1, node2, layoutInfo, cy, options);
+        } 
       }
     } 
   };
@@ -1161,6 +1203,9 @@
       var source   = layoutInfo.layoutNodes[sourceIx];
       var targetIx = layoutInfo.idToIndex[edge.targetId];
       var target   = layoutInfo.layoutNodes[targetIx];
+
+      if (source.removed || target.removed)
+        continue;
 
       // Get direction of line connecting both node centers
       var directionX = target.positionX - source.positionX;
