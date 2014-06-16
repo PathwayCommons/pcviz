@@ -176,7 +176,7 @@
 
     // Find all zero degree nodes which aren't covered by a complex
     var zeroDegree = cy.nodes().filter( function(i, ele){
-      if( this.degree(false) == 0  && this.parent().is("[sbgnclass!='complex']") )
+      if( this.degree(false) == 0  && ( this.parent().length == 0 || this.parent().is("[sbgnclass!='complex']") ) )
         return true;
       else
         return false;
