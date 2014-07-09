@@ -79,6 +79,17 @@ public class SBGNConverter
         }
     }
 
+    public void addPort(CytoscapeJsNode cNode, Glyph glyph){
+        List<Port> ports = glyph.getPort();
+
+        //update positions to center
+        for(int i = 0 ; i < ports.size() ; i++){
+            ports.get(i).setX(ports.get(i).getX() - glyph.getBbox().getX());
+            ports.get(i).setY(ports.get(i).getY() - glyph.getBbox().getY());
+        }
+        cNode.setProperty(PropertyKey.PORTS, ports);
+    }
+
     public void addGlyph(Glyph parent, HashSet<BioPAXElement> bpElements, Glyph glyph, ArrayList<Glyph> states,
                          CytoscapeJsGraph graph, Collection<String> genes)
     {
@@ -109,6 +120,9 @@ public class SBGNConverter
         cNode.setProperty(PropertyKey.ISSEED, isSeed);
 
         cNode.setProperty(PropertyKey.SBGNCLONEMARKER, glyph.getClone());
+
+        //add port
+        addPort(cNode, glyph);
 
         graph.getNodes().add(cNode);
     }
@@ -264,28 +278,38 @@ public class SBGNConverter
         {
             CytoscapeJsEdge edge = new CytoscapeJsEdge();
 
-            String srcName = "", targetName = "";
+            String srcName = "", tgtName = "", srcPort = "", tgtPort = "";
+
 
             if(arc.getSource() instanceof Port)
             {
-                srcName = ((Port)arc.getSource()).getId();
-                targetName = ((Port)arc.getTarget()).getId();
+                srcPort = ((Port)arc.getSource()).getId();
+                srcName = portGlyphMap.get(srcPort).getId();
             }
             else if(arc.getSource() instanceof Glyph)
             {
                 srcName = ((Glyph)arc.getSource()).getId();
-                targetName = ((Glyph)arc.getTarget()).getId();
+                srcPort = srcName;
             }
-
-
+            if(arc.getTarget() instanceof Port)
+            {
+                tgtPort = ((Port)arc.getTarget()).getId();
+                tgtName = portGlyphMap.get(tgtPort).getId();
+            }
+            else if(arc.getTarget() instanceof Glyph)
+            {
+                tgtName = ((Glyph)arc.getTarget()).getId();
+                tgtPort = tgtName;
+            }
+/*
             if (portGlyphMap.get(srcName) != null) {
                 srcName = portGlyphMap.get(srcName).getId();
             }
 
-            if (portGlyphMap.get(targetName) != null) {
-                targetName = portGlyphMap.get(targetName).getId();
+            if (portGlyphMap.get(tgtName) != null) {
+                tgtName = portGlyphMap.get(tgtName).getId();
             }
-
+*/
             String cardinality = "0";
 
             for(Glyph glyph : arc.getGlyph()){
@@ -295,7 +319,11 @@ public class SBGNConverter
                 }
             }
             edge.setProperty(PropertyKey.SOURCE, srcName);
-            edge.setProperty(PropertyKey.TARGET, targetName);
+            edge.setProperty(PropertyKey.TARGET, tgtName);
+            
+            edge.setProperty(PropertyKey.PORTSOURCE, srcPort);
+            edge.setProperty(PropertyKey.PORTTARGET, tgtPort);
+
             edge.setProperty(PropertyKey.ID, arc.getId());
             edge.setProperty(PropertyKey.SBGNCLASS, arc.getClazz());
             edge.setProperty(PropertyKey.SBGNCARDINALITY, cardinality);
