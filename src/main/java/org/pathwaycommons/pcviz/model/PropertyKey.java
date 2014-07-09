@@ -54,7 +54,10 @@ public enum PropertyKey
     SBGNXREF,
     SBGNEVIDENCEXREF,
     SBGNEVIDENCECODE,
-    SBGNCARDINALITY;
+    SBGNCARDINALITY,
+    PORTS,
+    PORTSOURCE,
+    PORTTARGET;
 
     @Override
     public String toString()
