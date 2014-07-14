@@ -87,7 +87,7 @@ public class CancerController {
 
         try {
             context = cancerContextService.loadContext(studyId, profiles, genes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), headers, HttpStatus.BAD_REQUEST);
         }
 
