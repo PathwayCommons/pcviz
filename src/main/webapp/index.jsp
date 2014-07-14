@@ -396,6 +396,36 @@
                           <p>loading...</p>
                           <img src="images/loading.gif" alt="loading..." height="17" width="50">
                       </div>
+
+                      <hr>
+
+                      <div id="srmatlas-all">
+                          <div class="todo mrm stmatlas-context">
+                              <div class="tile">
+                                  <a class="btn btn-primary btn-large btn-block" href="#" id="send-to-srmatlas">
+                                      Analyze genes on SRMAtlas
+                                  </a>
+                              </div>
+                          </div>
+
+                          <div id="srm-context-hint">
+                              <table>
+                                  <tr>
+                                      <td width="100">
+                                          <img src="images/help-up-arrow2.png" width="90">
+                                      </td>
+
+                                      <td>
+                                          <p class="help-slider-text palette palette-silver">
+                                              ... or you can query all genes shown in the network
+                                              on <a href="http://www.srmatlas.org/">SRMAtlas</a> web service.
+                                          </p>
+                                      </td>
+                                  </tr>
+                              </table>
+                          </div>
+                      </div>
+
                   </div>
               </div>
           </div>

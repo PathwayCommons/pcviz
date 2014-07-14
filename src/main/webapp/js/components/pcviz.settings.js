@@ -86,6 +86,21 @@ var SettingsView = Backbone.View.extend({
             $(this).toggleClass("itx-removed");
         });
 
+        $("#send-to-srmatlas").click(function(e) {
+            e.preventDefault();
+            $("#srm-context-hint").hide();
+            var srmUrl = "https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/GetTransitions?pabst_build_id=120;default_search=1;protein_name_constraint=";
+            var uniprotIds = [];
+
+            _.each(cy.$("node"), function(node) {
+                var uid = node.data("uniprot");
+                if(uid != null) {
+                    uniprotIds.push(uid);
+                }
+            });
+
+            window.open(srmUrl + uniprotIds.join("%3B") + ";apply_action=QUERY", "_blank");
+        });
 
         $("#add-cancer-study").click(function(e) {
             e.preventDefault();

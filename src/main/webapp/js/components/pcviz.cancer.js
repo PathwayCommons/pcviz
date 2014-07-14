@@ -48,6 +48,7 @@ var CancerContextDialogView = Backbone.View.extend({
         $("#rightMenuTabs").scrollTo("#step1", 750);
         $("#step-loading").show();
         $("#context-load-button").hide();
+        $("#srmatlas-all").hide();
 
         var studies = new CancerStudies();
         studies.fetch({
@@ -168,6 +169,7 @@ var CancerContextDialogView = Backbone.View.extend({
 
                                                 $("#step-loading").hide();
                                                 $(this).removeClass("disabled");
+                                                $("#srmatlas-all").show();
 
                                                 (new ContextAwareNetworkView()).render();
                                                 selfEl.fadeOut().html("");
