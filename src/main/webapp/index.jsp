@@ -417,7 +417,7 @@
 
                                       <td>
                                           <p class="help-slider-text palette palette-silver">
-                                              ... or you can query all genes shown in the network
+                                              ... or you can query all or selected genes shown in the network
                                               on <a href="http://www.srmatlas.org/">SRMAtlas</a> web service.
                                           </p>
                                       </td>
@@ -514,7 +514,7 @@
               <select value="0" class="span3 ext-tools-select" tabindex="1" name="herolist">
                   <option selected="selected" value="-" data-url="">Analysis tools</option>
                   <option value="cbioportal" data-url="http://www.cbioportal.org/public-portal/cross_cancer.do?tab_index=tab_visualize&clinical_param_selection=null&cancer_study_id=all&genetic_profile_ids_PROFILE_MUTATION_EXTENDED=gbm_tcga_mutations&genetic_profile_ids_PROFILE_COPY_NUMBER_ALTERATION=gbm_tcga_gistic&Z_SCORE_THRESHOLD=2.0&RPPA_SCORE_THRESHOLD=1.0&case_set_id=gbm_tcga_cnaseq&case_ids=&gene_list={{geneSymbol}}&gene_set_choice=user-defined-list&Action=Submit">cBioPortal</option>
-                  <option value="srmatlas" data-url="https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/GetTransitions?pabst_build_id=120;default_search=1;protein_name_constraint={{geneUniprotId}};apply_action=QUERY">SRMAtlas</option>
+                  <option value="srmatlas" data-url="https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/GetTransitions?organism_name=human;default_search=1;protein_name_constraint={{geneUniprotId}};apply_action=QUERY">SRMAtlas</option>
               </select>
           </div>
 

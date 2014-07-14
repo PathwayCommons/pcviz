@@ -89,10 +89,13 @@ var SettingsView = Backbone.View.extend({
         $("#send-to-srmatlas").click(function(e) {
             e.preventDefault();
             $("#srm-context-hint").hide();
-            var srmUrl = "https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/GetTransitions?pabst_build_id=120;default_search=1;protein_name_constraint=";
+            var srmUrl = "https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/GetTransitions?organism_name=human;default_search=1;protein_name_constraint=";
             var uniprotIds = [];
 
-            _.each(cy.$("node"), function(node) {
+            var selectedNodes = cy.$("node:selected");
+            var allNodes = cy.$("node");
+
+            _.each(selectedNodes.length > 0 ? selectedNodes : allNodes, function(node) {
                 var uid = node.data("uniprot");
                 if(uid != null) {
                     uniprotIds.push(uid);
