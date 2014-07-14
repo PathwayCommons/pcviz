@@ -140,6 +140,7 @@ public class CancerContextService {
 
         for (String gene : genes.split(",")) {
             AlterationPack alterations = portal.getAlterations(gene);
+            alterations.complete(Alteration.ANY);
             double altered = alterations.calcAlteredRatio(Alteration.ANY);
             HashMap<String, Double> dataMap = new HashMap<String, Double>();
             dataMap.put(PropertyKey.ALTERED.toString(), altered);
