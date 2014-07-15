@@ -42,11 +42,12 @@
         });
 
         // Then update the visited nodes
-        cy.$("node[?isseed]").bfs(function(i, depth) {
+        cy.elements().bfs("node[?isseed]", function(i, depth) {
                 var nodeData = {};
                 nodeData[options.attrName] = Math.max(options.minScore, options.maxScore-depth);
                 pooledData[this.id()] = nodeData;
-            }
+            },
+            false
         );
 
         var nodes = [];
