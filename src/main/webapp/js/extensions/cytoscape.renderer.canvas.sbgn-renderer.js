@@ -1700,7 +1700,7 @@
 		
 		//if(context.measureText(text).width < textProp.width)
 		//	return text;
-		var textWidth = ( textProp.width > 10) ? textProp.width - 10 : textProp.width;
+		var textWidth = ( textProp.width > 30) ? textProp.width - 10 : textProp.width;
 		
 	    while ((width = context.measureText(text).width) > textWidth) {
 	        --len;
