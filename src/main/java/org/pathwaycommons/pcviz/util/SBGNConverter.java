@@ -320,7 +320,7 @@ public class SBGNConverter
             }
             edge.setProperty(PropertyKey.SOURCE, srcName);
             edge.setProperty(PropertyKey.TARGET, tgtName);
-            
+
             edge.setProperty(PropertyKey.PORTSOURCE, srcPort);
             edge.setProperty(PropertyKey.PORTTARGET, tgtPort);
 

@@ -1461,26 +1461,26 @@
 
 		} else if (type === 'consumption' || type === 'production') {
 
-			if( usePaths ){
-				var pathCacheKey = pts;
-				var keyLengthMatches = rs.pathCacheKey && pathCacheKey.length === rs.pathCacheKey.length;
-				var keyMatches = keyLengthMatches;
+			// if( usePaths ){
+			// 	var pathCacheKey = pts;
+			// 	var keyLengthMatches = rs.pathCacheKey && pathCacheKey.length === rs.pathCacheKey.length;
+			// 	var keyMatches = keyLengthMatches;
 
-				for( var i = 0; keyMatches && i < pathCacheKey.length; i++ ){
-					if( rs.pathCacheKey[i] !== pathCacheKey[i] ){
-						keyMatches = false;
-					}
-				}
+			// 	for( var i = 0; keyMatches && i < pathCacheKey.length; i++ ){
+			// 		if( rs.pathCacheKey[i] !== pathCacheKey[i] ){
+			// 			keyMatches = false;
+			// 		}
+			// 	}
 
-				if( keyMatches ){
-					path = context = rs.pathCache;
-					pathCacheHit = true;
-				} else {
-					path = context = new Path2D();
-				  	rs.pathCacheKey = pathCacheKey;
-				  	rs.pathCache = path;
-				}
-			}
+			// 	if( keyMatches ){
+			// 		path = context = rs.pathCache;
+			// 		pathCacheHit = true;
+			// 	} else {
+			// 		path = context = new Path2D();
+			// 	  	rs.pathCacheKey = pathCacheKey;
+			// 	  	rs.pathCache = path;
+			// 	}
+			// }
 
 			if( !pathCacheHit ){
 				if( context.beginPath ){ context.beginPath(); }
@@ -1492,11 +1492,11 @@
 			}
 
 			context = canvasCxt;
-			if( usePaths ){
-				context.stroke( path );
-			} else {
-				context.stroke();
-			}
+			// if( usePaths ){
+			// 	context.stroke( path );
+			// } else {
+			 	context.stroke();
+			// }
 
 		} else if (type === 'dotted') {
 
