@@ -44,8 +44,10 @@ function fetch(inputStream, buffer, outDir)
 	{
 		var page = webPage.create();
 
-		// recursion...
-		chainedFetch(page, inputStream, buffer, outDir);
+		page.onClosing = function(closingPage) {
+			// recursion...
+			fetch(inputStream, buffer, outDir);
+		};
 
 		// fetch n-hood and screenshot from the web page
 		fetchNhood(page, uniprotId, outDir);
@@ -54,20 +56,12 @@ function fetch(inputStream, buffer, outDir)
 	return uniprotId;
 }
 
-function chainedFetch(page, inputStream, buffer, outDir)
-{
-	page.onClosing = function(closingPage) {
-		// recursion...
-		fetch(inputStream, buffer, outDir);
-	};
-}
-
 /**
  * Extracts the next valid uniprot id from the given input stream
  *
  * @param inputStream   source input stream
  * @param buffer        buffer for previous fetch
- * @returns {*}
+ * @returns String      next valid uniprot ID
  */
 function getNextUniprotId(inputStream, buffer)
 {
@@ -80,6 +74,7 @@ function getNextUniprotId(inputStream, buffer)
 	// nothing to read...
 	if (inputStream.atEnd())
 	{
+		inputStream.close();
 		return null;
 	}
 
@@ -118,21 +113,51 @@ function getNextUniprotId(inputStream, buffer)
  * Fetches the result of n-hood query for the given input identifier (gene or uniprot id).
  * Writes the result as a JSON string into the output file.
  *
- * @param page
- * @param queryString identifier (gene symbol or uniprot id)
- * @param outputDir directory to save output files
+ * @param page          page connection to PCViz
+ * @param queryString   identifier (gene symbol or uniprot id)
+ * @param outputDir     directory to save output files
  */
 function fetchNhood(page, queryString, outputDir)
 {
 	console.log("fetchNHood(): " + queryString);
 
+	var same = 0;
+	var prevMsg = "";
+	var interval = null;
+
+	page.onConsoleMessage = function(msg) {
+		// TODO this is really a bad of checking layout end
+		if (msg.split("__")[0] == "NODE_POSITION")
+		{
+			// checking if node position changed within the interval
+			if (msg == prevMsg)
+			{
+				same++;
+			}
+			else
+			{
+				prevMsg = msg;
+				same = 0;
+			}
+
+			// if no change for more than 3 successive intervals,
+			// assuming that layout is finished...
+			if (same > 3)
+			{
+				clearInterval(interval);
+				saveGraph(page, queryString, outputDir);
+				page.close();
+			}
+		}
+
+		console.log(msg);
+	};
+
 	page.open('http://www.pathwaycommons.org/pcviz/#neighborhood/' + queryString, function() {
-		var same = 0;
-		var prevMsg = "";
 		var maxRetry = 50;
 		var retry = 0;
 
-		var interval = setInterval(function() {
+		interval = setInterval(function() {
 			retry += page.evaluate(function() {
 				if (window.cy)
 				{
@@ -154,61 +179,40 @@ function fetchNhood(page, queryString, outputDir)
 				clearInterval(interval);
 				page.close();
 			}
-
 		}, 200);
-
-		function saveGraph()
-		{
-			// get graph json for the current uniprot id
-			var graphJson = page.evaluate(function() {
-				if (window.cy)
-				{
-					return JSON.stringify(window.cy.elements().jsons());
-				}
-
-				return null;
-			});
-
-			if (graphJson)
-			{
-				page.render(outputDir + "/" + queryString + ".png");
-
-				try {
-					fs.write(outputDir + "/" + queryString + ".json", graphJson, 'w');
-				} catch(e) {
-					console.log(e);
-				}
-			}
-		}
-
-		page.onConsoleMessage = function(msg) {
-			// TODO this is really a bad of checking layout end
-			if (msg.split("__")[0] == "NODE_POSITION")
-			{
-				// checking if node position changed within the interval
-				if (msg == prevMsg)
-				{
-					same++;
-				}
-				else
-				{
-					prevMsg = msg;
-					same = 0;
-				}
-
-				// if no change for more than 3 successive intervals,
-				// assuming that layout is finished...
-				if (same > 3)
-				{
-					clearInterval(interval);
-					saveGraph();
-					page.close();
-				}
-			}
-
-			console.log(msg);
-		};
 	});
 }
 
+/**
+ * Saves the cytoscape.js graph json and PCViz screenshot on the disk.
+ *
+ * @param page          page connection to PCViz
+ * @param queryString   identifier (gene symbol or uniprot id)
+ * @param outputDir     directory to save output files
+ */
+function saveGraph(page, queryString, outputDir)
+{
+	// get graph json for the current uniprot id
+	var graphJson = page.evaluate(function() {
+		if (window.cy)
+		{
+			return JSON.stringify(window.cy.elements().jsons());
+		}
+
+		return null;
+	});
+
+	if (graphJson)
+	{
+		page.render(outputDir + "/" + queryString + ".png");
+
+		try {
+			fs.write(outputDir + "/" + queryString + ".json", graphJson, 'w');
+		} catch(e) {
+			console.log(e);
+		}
+	}
+}
+
+// run!
 main(system.args);
