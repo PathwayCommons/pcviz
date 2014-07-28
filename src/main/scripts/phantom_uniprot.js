@@ -129,22 +129,39 @@ function fetchNhood(page, queryString, outputDir)
 	page.open('http://www.pathwaycommons.org/pcviz/#neighborhood/' + queryString, function() {
 		var same = 0;
 		var prevMsg = "";
+		var maxRetry = 50;
+		var retry = 0;
 
 		var interval = setInterval(function() {
-			page.evaluate(function() {
-				if (cy)
+			retry += page.evaluate(function() {
+				if (window.cy)
 				{
 					// TODO see if there is way to check the layout is finished!
-					console.log("NODE_POSITION__" + JSON.stringify(cy.elements("node").position()));
+					console.log("NODE_POSITION__" + JSON.stringify(window.cy.elements("node").position()));
+					// proper evaluation
+					return 0;
+				}
+				else
+				{
+					// window.cy is not initialized, retry++
+					return 1;
 				}
 			});
+
+			if (retry > maxRetry)
+			{
+				console.log("[timeout] skipping query " + queryString);
+				clearInterval(interval);
+				page.close();
+			}
+
 		}, 200);
 
 		function saveGraph()
 		{
 			// get graph json for the current uniprot id
 			var graphJson = page.evaluate(function() {
-				if (cy)
+				if (window.cy)
 				{
 					return JSON.stringify(window.cy.elements().jsons());
 				}
