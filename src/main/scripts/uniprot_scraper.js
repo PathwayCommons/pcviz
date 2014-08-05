@@ -1,5 +1,7 @@
-// NOTE: Due to a phantomjs memory leak, this script is not stable for now.
-// Use the uniprot_scrapper.sh (bash script)
+/**
+ * Generates a laid out cytoscape.js json, and a screen shot from a PCViz query
+ * for the provided uniprot id.
+ */
 
 var webPage = require('webpage');
 var fs = require('fs');
@@ -9,106 +11,41 @@ function main(args)
 {
 	if (args.length < 3)
 	{
-		console.log("Usage: phantom_uniprot.js <input_hgnc_file> <output_directory>");
+		console.log("Usage: uniprot_scraper.js <uniprot_id> <output_directory>");
 		phantom.exit(1);
 	}
 	else
 	{
-		var inFile = args[1];
+		var uniprotId = args[1];
 		var outDir = args[2];
 
-		var inputStream = fs.open(inFile, 'r');
-		var buffer = [];
-
-		// skip first line
-		inputStream.readLine();
-
 		// fetch all for the given inputStream
-		fetch(inputStream, buffer, outDir);
-
-		// TODO find a way to properly phantom.exit();
+		scrape(uniprotId, outDir);
 	}
 }
 
 /**
- * Fetches the web page content for the next uniprot id.
+ * Scrapes the web page content for the given uniprot id.
  *
  *
- * @param inputStream   input stream containing uniprot ids
- * @param buffer        buffer that may contain uniprot ids
- * @param outDir        target output directory
- * @returns String  next uniprot id
+ * @param uniprotId uniprot id
+ * @param outDir    target output directory
  */
-function fetch(inputStream, buffer, outDir)
+function scrape(uniprotId, outDir)
 {
-	var uniprotId = getNextUniprotId(inputStream, buffer);
-
 	if (uniprotId)
 	{
 		var page = webPage.create();
 
 		page.onClosing = function(closingPage) {
-			// recursion...
-			fetch(inputStream, buffer, outDir);
+			// wait a little to prevent phantom js crashing
+			setTimeout(function(){
+				phantom.exit(0);
+			}, 20);
 		};
 
 		// fetch n-hood and screenshot from the web page
 		fetchNhood(page, uniprotId, outDir);
-	}
-
-	return uniprotId;
-}
-
-/**
- * Extracts the next valid uniprot id from the given input stream
- *
- * @param inputStream   source input stream
- * @param buffer        buffer for previous fetch
- * @returns String      next valid uniprot ID
- */
-function getNextUniprotId(inputStream, buffer)
-{
-	// (one line may contain more than one uniprot id)
-	if (buffer.length > 0)
-	{
-		return buffer.pop();
-	}
-
-	// nothing to read...
-	if (inputStream.atEnd())
-	{
-		inputStream.close();
-		return null;
-	}
-
-	var line = inputStream.readLine();
-	var parts = line.split("\t");
-
-	if (parts.length > 2)
-	{
-		// get uniprot ids
-		var uniprots = parts[2].split(",");
-
-		// fetch n-hood for each uniprot id
-		for (var i=0; i<uniprots.length; i++)
-		{
-			var uniprotId = uniprots[i].trim();
-
-			if (uniprotId.length > 0)
-			{
-				buffer.push(uniprotId);
-			}
-		}
-	}
-
-	if (buffer.length > 0)
-	{
-		return buffer.pop();
-	}
-	else
-	{
-		// tail recursion...
-		return getNextUniprotId(inputStream, buffer);
 	}
 }
 
