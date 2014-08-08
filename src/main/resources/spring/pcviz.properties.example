@@ -13,8 +13,11 @@ cocitation.shelflife=30
 cocitation.cache.folder=/tmp/cocitations
 cocitation.cache.folder.test=/tmp/cocitations-test
 
+# Pre-calculated networks and screenshots
+precalculated.folder=/tmp/precalculated
+
 # If the number of cocitations is below is this number, don't show it
-cocitation.min.edge=1
+cocitation.min.edge=0
 cocitation.min.node=0
 
 # HGNC util

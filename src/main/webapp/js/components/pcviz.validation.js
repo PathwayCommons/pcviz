@@ -29,7 +29,12 @@ var GeneValidations = Backbone.Collection.extend({
 
     getPrimaryNames: function() {
         return _.reduce(this.models, function(seed, aValidation) {
-            seed.push(aValidation.get("matches"));
+            var matches = aValidation.get("matches");
+            if(matches.length > 0) {
+                seed.push(matches);
+            } else {
+                seed.push(aValidation.get("query"))
+            }
             return seed;
         }, []).join(",");
     }
