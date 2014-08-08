@@ -453,7 +453,7 @@ var EmbedNetworkView = Backbone.View.extend({
                             elements: data,
                             style: self.cyStyle,
                             showOverlay: false,
-                    layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
+                            layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
                             minZoom: 0.25,
                             maxZoom: 16,
 

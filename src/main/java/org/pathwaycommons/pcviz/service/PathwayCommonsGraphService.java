@@ -33,8 +33,13 @@ import org.pathwaycommons.pcviz.model.PropertyKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class PathwayCommonsGraphService {
@@ -79,6 +84,16 @@ public class PathwayCommonsGraphService {
         this.geneNameService = geneNameService;
     }
 
+    private String precalculatedFolder;
+
+    public String getPrecalculatedFolder() {
+        return precalculatedFolder;
+    }
+
+    public void setPrecalculatedFolder(String precalculatedFolder) {
+        this.precalculatedFolder = precalculatedFolder;
+    }
+
     /**
      * Cache for co-citations.
      */
@@ -113,6 +128,11 @@ public class PathwayCommonsGraphService {
     public PathwayCommonsGraphService() {
     }
 
+    private String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
     @Cacheable("networkCache")
     public String createNetwork(NETWORK_TYPE type, Collection<String> genes) {
         String networkJson;
@@ -120,6 +140,24 @@ public class PathwayCommonsGraphService {
         CytoscapeJsGraph graph = new CytoscapeJsGraph();
 
         HashSet<String> nodeNames = new HashSet<String>();
+
+        /*
+        if(genes.size() == 1) { // If it is a singleton
+            String gene = genes.iterator().next();
+            String uniprotId = geneNameService.getUniprotId(gene);
+
+            String filePath = getPrecalculatedFolder() + "/" + uniprotId + ".json";
+            File file = new File(filePath);
+            if(file.exists()) {
+                log.debug("Found cache for " + gene + ": " + uniprotId + ".json");
+                try {
+                    return readFile(filePath, Charset.defaultCharset());
+                } catch (IOException e) {
+                    log.error("Problem reading cached file: " + filePath + ". Falling back to normal method.");
+                }
+            }
+        }
+        */
 
         // TODO: Use cpath2 client for this
         String biopaxUrl = getPathwayCommonsUrl() + "/graph?";

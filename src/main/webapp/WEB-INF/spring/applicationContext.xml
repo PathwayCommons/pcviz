@@ -37,6 +37,7 @@
         <property name="geneNameService" ref="geneNameService"/>
         <property name="minNumberOfCoCitationsForEdges" value="${cocitation.min.edge}"/>
         <property name="minNumberOfCoCitationsForNodes" value="${cocitation.min.node}"/>
+        <property name="precalculatedFolder" value="${precalculated.folder}"/>
     </bean>
 
     <bean class="org.pathwaycommons.pcviz.service.BioGeneService" id="bioGeneService">
