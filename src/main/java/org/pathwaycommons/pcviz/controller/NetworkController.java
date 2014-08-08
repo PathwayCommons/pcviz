@@ -61,7 +61,13 @@ public class NetworkController
 
         HashSet<String> geneSet = new HashSet<String>();
         geneSet.addAll(Arrays.asList(genes.split(",")));
-        String networkJson = getPathwayCommonsGraphService().createNetwork(nType, geneSet);
+
+	String networkJson = "";
+	try {
+        	networkJson = getPathwayCommonsGraphService().createNetwork(nType, geneSet);
+	} catch(Exception e) {
+		e.printStackTrace();
+	}
 
 		return new ResponseEntity<String>(
 			networkJson,
