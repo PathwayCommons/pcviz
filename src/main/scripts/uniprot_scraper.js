@@ -136,7 +136,8 @@ function saveGraph(page, queryString, outputDir)
 	var graphJson = page.evaluate(function() {
 		if (window.cy)
 		{
-			return JSON.stringify(window.cy.elements().jsons());
+			//return JSON.stringify(window.cy.elements().jsons());
+			return JSON.stringify(window.cy.json().elements);
 		}
 
 		return null;
