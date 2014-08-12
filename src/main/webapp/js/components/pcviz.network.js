@@ -214,15 +214,18 @@ var NetworkView = Backbone.View.extend({
 				        controlsContainer.show();
 				        $(self.tooSlowMessage).hide();
 
-				        var windowSize = self.options.windowSize;
-				        if(windowSize == undefined)
-				            windowSize = {};
+                        var layoutOptions = pcVizLayoutOptions;
+                        if(data.nodes[0].position != undefined) {
+                            layoutOptions = { name: "preset" };
+                        } else if(data.nodes.length == 1) { // If a singleton
+                            layoutOptions = { name: "random", fit: false };
+                        }
 
 				        var cyOptions = {
 				            elements: data,
 				            style: self.cyStyle,
 				            showOverlay: false,
-                            layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
+                            layout: layoutOptions,
                             minZoom: 0.125,
 				            maxZoom: 16,
 
@@ -266,8 +269,8 @@ var NetworkView = Backbone.View.extend({
 				                    localStorage.setItem(node.id(), JSON.stringify(position));
 				                });
 				                var numberOfNodes = cy.nodes().length;
-						// update the edgeLengthArray according to citation distribution
-						calcEdgeDistribution(data, numberOfNodes);
+                                // update the edgeLengthArray according to citation distribution
+                                calcEdgeDistribution(data, numberOfNodes);
 				                // make the canvas is size propotoinal to the square root of the number of nodes
 				                // see extensions.cytoscape.layout.pcvix.arbor.js
 				                // so the zoom level should change accordingly
@@ -445,15 +448,18 @@ var EmbedNetworkView = Backbone.View.extend({
                         container.html("");
                         container.show();
 
-                        var windowSize = self.options.windowSize;
-                        if(windowSize == undefined)
-                            windowSize = {};
+                        var layoutOptions = pcVizLayoutOptions;
+                        if(data.nodes[0].position != undefined) {
+                            layoutOptions = { name: "preset" };
+                        } else if(data.nodes.length == 1) { // If a singleton
+                            layoutOptions = { name: "random", fit: false };
+                        }
 
                         var cyOptions = {
                             elements: data,
                             style: self.cyStyle,
                             showOverlay: false,
-                            layout: data.nodes.length > 1 ? pcVizLayoutOptions : { name: "random", fit: false },
+                            layout: layoutOptions,
                             minZoom: 0.25,
                             maxZoom: 16,
 
