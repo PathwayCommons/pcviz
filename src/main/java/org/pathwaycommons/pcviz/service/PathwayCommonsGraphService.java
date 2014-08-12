@@ -141,7 +141,7 @@ public class PathwayCommonsGraphService {
 
         HashSet<String> nodeNames = new HashSet<String>();
 
-        /*
+        /* Short-cut start! */
         if(genes.size() == 1) { // If it is a singleton
             String gene = genes.iterator().next();
             String uniprotId = geneNameService.getUniprotId(gene);
@@ -157,7 +157,7 @@ public class PathwayCommonsGraphService {
                 }
             }
         }
-        */
+        /* Short-cut end */
 
         // TODO: Use cpath2 client for this
         String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
