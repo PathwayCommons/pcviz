@@ -32,6 +32,17 @@ var EdgeInfoView = Backbone.View.extend({
             })).render();
         });
 
+        var dataSrcCont = this.$el.find("ul.datasrc-list");
+        _.each(model.datasource, function(aSource) {
+            (new DataSourceView({
+                el: dataSrcCont,
+                model: {
+                    source: aSource,
+                    metadata: window.metadata
+                }
+            })).render();
+        });
+
         (new BlinkDetailsTabView()).render();
 
         var detailsText = _.template($("#edge-type-text-" + model.type + "-template").html(), model);
@@ -50,7 +61,13 @@ var EdgeInfoView = Backbone.View.extend({
     }
 });
 
+var DataSourceView = Backbone.View.extend({
+    template: _.template($("#datasrc-id-template").html()),
 
+    render: function() {
+        this.$el.append(this.template(this.model));
+    }
+});
 
 var PubMedView = Backbone.View.extend({
     template: _.template($("#pubmed-id-template").html()),

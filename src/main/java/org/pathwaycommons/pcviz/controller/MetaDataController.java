@@ -19,7 +19,6 @@
 
 package org.pathwaycommons.pcviz.controller;
 
-import org.pathwaycommons.pcviz.service.BioGeneService;
 import org.pathwaycommons.pcviz.service.PathwayCommonsGraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

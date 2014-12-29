@@ -102,4 +102,16 @@
         Backbone.history.start();
     });
 
+    // Load metada
+    $.getJSON("metadata/datasources", function(metadata) {
+        var metaDataMap = {};
+        _.each(metadata, function(aMeta) {
+            metaDataMap[aMeta.id] = aMeta;
+            _.each(aMeta.name, function(aName) {
+                metaDataMap[aName] = aMeta;
+            });
+        });
+        window.metadata = metaDataMap;
+    });
+
 }(window.jQuery);
