@@ -20,6 +20,7 @@
 package org.pathwaycommons.pcviz.model;
 
 /**
+ * @author B. Arman Aksoy
  * @author Ozgun Babur
  */
 public enum PropertyKey
@@ -36,7 +37,8 @@ public enum PropertyKey
     IMPORTANCE,
 	PUBMED,
     UNIPROT,
-    RANK;
+    RANK,
+	DATASOURCE;
 
 	@Override
 	public String toString()

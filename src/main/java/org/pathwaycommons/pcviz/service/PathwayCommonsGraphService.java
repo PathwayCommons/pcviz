@@ -35,6 +35,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -128,6 +129,29 @@ public class PathwayCommonsGraphService {
     public PathwayCommonsGraphService() {
     }
 
+    @Cacheable("metadataCache")
+    public String getMetadata(String datatype) {
+        String urlStr = getPathwayCommonsUrl() + "/metadata/" + datatype;
+        try {
+            URL url = new URL(urlStr);
+            URLConnection urlConnection = url.openConnection();
+            StringBuilder builder = new StringBuilder();
+            Scanner scanner = new Scanner(urlConnection.getInputStream());
+            while(scanner.hasNextLine()) {
+                builder.append(scanner.nextLine() + "\n");
+            }
+            scanner.close();
+
+            return builder.toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
@@ -201,6 +225,7 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.TARGET, targetName);
                 edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
                 edge.setProperty(PropertyKey.TYPE, sifType.getTag());
+                edge.setProperty(PropertyKey.DATASOURCE, sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
 
 				edge.setProperty(PropertyKey.PUBMED,
 					sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
