@@ -562,6 +562,15 @@
                   </td>
               </tr>
               <tr>
+                  <th>Data sources</th>
+                  <td>
+                      {{datasource.length}} data source(s)
+                      <ul class="datasrc-list">
+                      </ul>
+                  </td>
+              </tr>
+
+              <tr>
                   <th>References</th>
                   <td>
                       {{pubmed.length}} publication(s)
@@ -586,6 +595,12 @@
     <li>
         <a class="pubmed-link" target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/{{pmid}}">Pubmed: {{pmid}}</a>
     </li>
+  </script>
+
+  <script type="text/template" id="datasrc-id-template">
+      <li>
+          <a href="{{metadata[source].urlToHomepage}}" target="_blank">{{metadata[source].description}}</a>
+      </li>
   </script>
 
   <script type="text/template" id="edge-controls-state-change-of-template">

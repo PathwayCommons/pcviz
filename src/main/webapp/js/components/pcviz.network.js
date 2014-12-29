@@ -529,7 +529,8 @@ var EmbedNetworkView = Backbone.View.extend({
                             type: "pcvizloaded",
                             content: {
                                 numberOfEdges: numberOfEdges,
-                                numberOfNodes: numberOfNodes
+                                numberOfNodes: numberOfNodes,
+								metadata: window.metadata
                             }
                         };
 
