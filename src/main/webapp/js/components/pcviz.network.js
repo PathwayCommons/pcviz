@@ -36,7 +36,7 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge")
         .css({
-            "width": "mapData(cited, 5, 50, 0.4, 0.5)",
+            "width": "mapData(cited, 0, 100, 1, 1.22)",
             "line-color": "#444"
         })
         .selector("[?isdirected]")
