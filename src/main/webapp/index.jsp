@@ -249,7 +249,13 @@
                                               <a href="#" class="btn btn-danger" id="embed-close-button"><i class="icon-remove"></i> Cancel</a>
                                           </td>
                                       </tr>
-
+                                      <tr>
+                                          <td colspan="1"></td>
+                                          <td colspan="4">
+                                              <br>
+                                              ... or you can use <a href="http://registry.biojs.net/#/detail/biojs-pcviz" id="biojs-pcviz" title="biojs-pcviz">our BioJS component</a>.
+                                          </td>
+                                      </tr>
                                   </table>
                               </div>
                       </div>
