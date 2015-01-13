@@ -83,7 +83,7 @@ public class IHOPSpider
             reader.close();
             return map;
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			log.warn("Cannot parse co-citations for " + symbol + ".", e);
             return null;
