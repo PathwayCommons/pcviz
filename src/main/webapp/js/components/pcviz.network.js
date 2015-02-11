@@ -377,10 +377,11 @@ var NetworkView = Backbone.View.extend({
 			    geneInfo["isseed"] = node.data("isseed");
 			    geneInfo["altered"] = parseInt(node.data("altered") * 100);
                 geneInfo["uniprot"] = node.data("uniprot");
+				geneInfo["uniprotdesc"] = node.data("uniprotdesc");
 
-			    var biogeneView = new BioGeneView({
-				el: self.detailsContent,
-				model: geneInfo
+				var biogeneView = new BioGeneView({
+					el: self.detailsContent,
+					model: geneInfo
 			    });
 			    biogeneView.render();
 			}

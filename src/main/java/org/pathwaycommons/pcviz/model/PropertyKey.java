@@ -38,6 +38,7 @@ public enum PropertyKey
 	PUBMED,
     UNIPROT,
     RANK,
+	UNIPROTDESC,
 	DATASOURCE;
 
 	@Override

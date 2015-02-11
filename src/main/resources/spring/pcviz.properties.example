@@ -32,3 +32,6 @@ cbioportal.cache.folder.test=/tmp/cocitations/portal-test
 
 # PCViz self URL
 pcviz.url=http://awabi.cbio.mskcc.org/pc2-demo/
+
+# UniProt Base URL for extracting descriptions
+uniprot.base.url=http://www.uniprot.org/

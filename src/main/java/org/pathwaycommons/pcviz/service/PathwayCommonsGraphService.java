@@ -105,6 +105,16 @@ public class PathwayCommonsGraphService {
      */
     private CocitationManager cocitMan;
 
+    private UniProtService uniProtService;
+
+    public UniProtService getUniProtService() {
+        return uniProtService;
+    }
+
+    public void setUniProtService(UniProtService uniProtService) {
+        this.uniProtService = uniProtService;
+    }
+
     public static Map<String, Map<String, Integer>> getCocitationMap() {
         return cocitationMap;
     }
@@ -226,7 +236,6 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
                 edge.setProperty(PropertyKey.TYPE, sifType.getTag());
                 edge.setProperty(PropertyKey.DATASOURCE, sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
-
 				edge.setProperty(PropertyKey.PUBMED,
 					sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
 
@@ -253,9 +262,11 @@ public class PathwayCommonsGraphService {
                 node.setProperty(PropertyKey.ISSEED, isSeed);
                 node.setProperty(PropertyKey.RANK, 0);
                 node.setProperty(PropertyKey.ALTERED, 0);
-                node.setProperty(PropertyKey.UNIPROT, geneNameService.getUniprotId(nodeName));
+                String uniprotId = geneNameService.getUniprotId(nodeName);
+                node.setProperty(PropertyKey.UNIPROT, uniprotId);
+                String description = uniProtService.getDescription(uniprotId);
+                node.setProperty(PropertyKey.UNIPROTDESC, description);
                 graph.getNodes().add(node);
-
             }
         }
 
