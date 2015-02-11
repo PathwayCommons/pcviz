@@ -33,7 +33,8 @@ var BioGeneView = Backbone.View.extend({
             geneUniprotId: this.model.uniprot =! undefined ? this.model.uniprot : this.extractFirstUniprotId(this.model.geneUniprotMapping),
             geneUniprotLinks: this.generateUniprotLinks(this.model.geneUniprotMapping),
             geneSummary: this.model.geneSummary,
-            altered: this.model.altered
+            altered: this.model.altered,
+            geneUniprotDescription: this.model.uniprotdesc
         };
 
         // compile the template using underscore
