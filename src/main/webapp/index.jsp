@@ -105,7 +105,7 @@
                       <h3 class="footer-title">About</h3>
 
                       <p>
-                          PCViz is a open-source web-based network visualization tool that helps users
+                          PCViz is an open-source web-based network visualization tool that helps users
                           query <a href="http://www.pathwaycommons.org">Pathway Commons</a>
                           and obtain details about genes and their interactions extracted from multiple pathway
                           data resources.
