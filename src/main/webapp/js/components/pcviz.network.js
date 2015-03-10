@@ -324,7 +324,7 @@ var NetworkView = Backbone.View.extend({
 			        		model: 
 						{
 						        nodes: data.nodes.length,
-						        edges: data.edges.length,
+						        edges: data.edges ? data.edges.length : 0,
 						        type: networkType.capitalize(),
 						        timeout: 4000
 						 }
@@ -524,7 +524,7 @@ var EmbedNetworkView = Backbone.View.extend({
 
                         // Post this message to the main web-page
                         var numberOfNodes = data.nodes.length;
-                        var numberOfEdges = data.edges.length;
+                        var numberOfEdges = data.edges ? data.edges.length : 0;
 
                         var message = {
                             type: "pcvizloaded",
@@ -570,7 +570,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 	{
 	    return (b - a);
 	}
-	var edges = data.edges; // all edges
+	var edges = data.edges ? data.edges : []; // all edges
 	var nodes = data.nodes; // all nodes
 	var hopAverage = new Array(); // average citation of each hop radius
 	var hopCount = new Array(); // number of nodes on each hop radius
