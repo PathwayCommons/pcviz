@@ -240,8 +240,13 @@ public class IHOPSpider
 		{
 			if (line.startsWith("<title>"))
 			{
-				String symbol = line.substring(line.indexOf("[ ") + 2, line.indexOf(" ]"));
-				return symbol;
+				int start = line.indexOf("[");
+				int end = line.indexOf("]");
+
+				if (start > 0 && end > start)
+				{
+					return line.substring(start + 1, end).trim();
+				}
 			}
 		}
 		return null;
