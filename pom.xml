@@ -76,14 +76,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-		<repository>
-			<id>ozgun.repo</id>
-			<name>Research project at cBio</name>
-			<url>http://cbio.mskcc.org/~ozgun/m2repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 	</repositories>
 
 
@@ -104,7 +96,7 @@
         <dependency>
             <groupId>org.cbio</groupId>
             <artifactId>causality</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
