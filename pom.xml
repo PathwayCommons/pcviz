@@ -166,13 +166,5 @@
             <version>2.2</version>
         </dependency>
 
-		<!-- required for CORS filtering -->
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-catalina</artifactId>
-			<version>7.0.50</version>
-			<scope>provided</scope>
-		</dependency>
-
 	</dependencies>
 </project>
