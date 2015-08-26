@@ -76,7 +76,16 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+		<repository>
+			<id>ozgun.repo</id>
+			<name>Research project at cBio</name>
+			<url>http://cbio.mskcc.org/~ozgun/m2repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
+
 
 	<dependencies>
 		<dependency>
@@ -164,6 +173,14 @@
             <artifactId>cglib</artifactId>
             <version>2.2</version>
         </dependency>
+
+		<!-- required for CORS filtering -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>8.0.24</version>
+			<scope>runtime</scope>
+		</dependency>
 
 	</dependencies>
 </project>
