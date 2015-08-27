@@ -1,0 +1,9 @@
+sudo: false
+language: java
+jdk:
+  - openjdk7
+  - oraclejdk7
+
+script: >
+	cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties
+	mvn clean install
