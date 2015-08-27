@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/PathwayCommons/pcviz.svg)](https://travis-ci.org/PathwayCommons/pcviz)
 
 # About
-Pathway Commons Network Visualizer, PCViz in short, is a joint project of [Sander Lab - cBio MSKCC](http://cbio.mskcc.org) and [Bader Lab - uToronto](http://baderlab.org).
+Pathway Commons Network Visualizer, PCViz in short, is a joint project of [Sander Lab - cBio MSKCC](http://cbio.mskcc.org) and [Bader Lab - uToronto](http://baderlab.org). PCViz currently runs at http://www.pathwaycommons.org/pcviz/
+
+[![PCViz](./pcviz-screenshot.png)](http://www.pathwaycommons.org/pcviz/)
 
 # Deploy
 Clone the repository and in the main directory, use the following command to copy/edit the configuration file:
@@ -23,10 +25,6 @@ If you would like to use your own Tomcat installation for the installation, then
 
 	mvn clean install
 	cp -f target/target/pcviz-VERSION.war /path/to/tomcat/webapps/pcviz.war
-
-## Mock-up
-Here is how this web-page should look for the first sprint:
-![PCViz myBalsamiq Mock-up](https://cbiomskcc.mybalsamiq.com/mockups/793048.png?key=f4b2c8bd9f042189a68577dd4427a72eaddcc655)
 
 # License
 This program is free software: you can redistribute it and/or modify
