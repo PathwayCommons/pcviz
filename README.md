@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/PathwayCommons/pcviz.svg)](https://travis-ci.org/PathwayCommons/pcviz)
+
 # About
 Pathway Commons Network Visualizer, PCViz in short, is a joint project of [Sander Lab - cBio MSKCC](http://cbio.mskcc.org) and [Bader Lab - uToronto](http://baderlab.org).
 
