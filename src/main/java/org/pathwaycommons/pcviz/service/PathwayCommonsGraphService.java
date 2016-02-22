@@ -30,7 +30,6 @@ import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.io.File;
@@ -196,10 +195,7 @@ public class PathwayCommonsGraphService {
         // TODO: Use cpath2 client for this
         String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
         for (String gene : genes)
-        {
             biopaxUrl += "source=" + gene + "&";
-            nodeNames.add(gene);
-        }
         biopaxUrl += "kind=" + type.toString();
 
         SimpleIOHandler ioHandler = new SimpleIOHandler();
@@ -209,8 +205,8 @@ public class PathwayCommonsGraphService {
             URLConnection urlConnection = url.openConnection();
             Model model = ioHandler.convertFromOWL(urlConnection.getInputStream());
 
-            // the Pattern framework can generate SIF too
-            SIFSearcher searcher = new SIFSearcher(
+            // the Pattern framework generates SIF
+            SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
                 SIFEnum.CONTROLS_STATE_CHANGE_OF,
 				SIFEnum.CONTROLS_EXPRESSION_OF,
                 SIFEnum.CATALYSIS_PRECEDES
@@ -245,7 +241,9 @@ public class PathwayCommonsGraphService {
         }
         catch (Exception e)
         {
-            log.debug("There was a problem loading the network: " + e.getMessage());
+            log.error("Failed to load/convert the network: " + e.getMessage());
+            for (String gene : genes)
+                nodeNames.add(gene);
         } finally {
             for (String nodeName : nodeNames)
             {
