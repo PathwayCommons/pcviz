@@ -19,10 +19,11 @@
 
 package org.pathwaycommons.pcviz.service;
 
+import cpath.client.CPathClient;
+import cpath.service.GraphType;
 import flexjson.JSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.pattern.miner.*;
 import org.pathwaycommons.pcviz.cocitation.CocitationManager;
@@ -30,7 +31,6 @@ import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.io.File;
@@ -45,6 +45,8 @@ import java.util.*;
 
 public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
+
+    private CPathClient client;
 
     private Integer minNumberOfCoCitationsForEdges = 0;
     private Integer minNumberOfCoCitationsForNodes = 0;
@@ -132,11 +134,13 @@ public class PathwayCommonsGraphService {
     }
 
     public PathwayCommonsGraphService(String pathwayCommonsUrl, CocitationManager cocitMan) {
+        this();
         this.pathwayCommonsUrl = pathwayCommonsUrl;
         this.cocitMan = cocitMan;
     }
 
     public PathwayCommonsGraphService() {
+        client = CPathClient.newInstance();
     }
 
     @Cacheable("metadataCache")
@@ -168,18 +172,16 @@ public class PathwayCommonsGraphService {
     }
 
     @Cacheable("networkCache")
-    public String createNetwork(NETWORK_TYPE type, Collection<String> genes) {
+    public String createNetwork(GraphType type, Collection<String> genes) {
         String networkJson;
         JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
         CytoscapeJsGraph graph = new CytoscapeJsGraph();
-
         HashSet<String> nodeNames = new HashSet<String>();
 
         /* Short-cut start! */
         if(genes.size() == 1) { // If it is a singleton
             String gene = genes.iterator().next();
             String uniprotId = geneNameService.getUniprotId(gene);
-
             String filePath = getPrecalculatedFolder() + "/" + uniprotId + ".json";
             File file = new File(filePath);
             if(file.exists()) {
@@ -193,21 +195,9 @@ public class PathwayCommonsGraphService {
         }
         /* Short-cut end */
 
-        // TODO: Use cpath2 client for this
-        String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
-        for (String gene : genes)
-        {
-            biopaxUrl += "source=" + gene + "&";
-            nodeNames.add(gene);
-        }
-        biopaxUrl += "kind=" + type.toString();
-
-        SimpleIOHandler ioHandler = new SimpleIOHandler();
-        try
-        {
-            URL url = new URL(biopaxUrl);
-            URLConnection urlConnection = url.openConnection();
-            Model model = ioHandler.convertFromOWL(urlConnection.getInputStream());
+        // Execute a graph query using the cpath2 client
+        try {
+            Model model = client.createGraphQuery().kind(type).sources(genes).result();
 
             // the Pattern framework can generate SIF too
             SIFSearcher searcher = new SIFSearcher(
@@ -243,9 +233,11 @@ public class PathwayCommonsGraphService {
                 graph.getEdges().add(edge);
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             log.debug("There was a problem loading the network: " + e.getMessage());
+            //add the query genes (to be displayed as disconnected nodes...)
+            for (String gene : genes)
+                nodeNames.add(gene);
         } finally {
             for (String nodeName : nodeNames)
             {

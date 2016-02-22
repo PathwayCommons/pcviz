@@ -31,7 +31,6 @@ import org.springframework.cache.annotation.Cacheable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class CancerContextService {
     @Autowired
