@@ -23,6 +23,11 @@ public class UniProtService {
 
     @Cacheable("uniprotCache")
     public String getDescription(String uniprotId) {
+        if(uniprotId==null) {
+            log.error("setUniProtBaseURL: UniProt ID was NULL.");
+            return null;
+        }
+
         String txtFileURL = uniProtBaseURL + "uniprot/" + uniprotId + ".txt";
 
         try {
@@ -58,8 +63,7 @@ public class UniProtService {
             ;
             return desc;
         } catch(Exception e) {
-            e.printStackTrace();
-            log.error("Could not load uniprot description for " + uniprotId + ". Exception: " + e.getMessage());
+            log.error("Could not load uniprot description for " + uniprotId, e);
         }
 
         return null;

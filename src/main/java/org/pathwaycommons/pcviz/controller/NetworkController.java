@@ -69,7 +69,7 @@ public class NetworkController
         if(bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(errorFromBindingResult(bindingResult));
         } else if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
-            // TODO: Should we support commonstream and pathsfromto, too?
+            // TODO: support commonstream and pathsfromto?
             return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
         }
 

@@ -200,7 +200,7 @@ public class PathwayCommonsGraphService {
             Model model = client.createGraphQuery().kind(type).sources(genes).result();
 
             // the Pattern framework can generate SIF too
-            SIFSearcher searcher = new SIFSearcher(
+            SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
                 SIFEnum.CONTROLS_STATE_CHANGE_OF,
 				SIFEnum.CONTROLS_EXPRESSION_OF,
                 SIFEnum.CATALYSIS_PRECEDES
@@ -317,26 +317,6 @@ public class PathwayCommonsGraphService {
             cnt += i;
         }
         return cnt;
-    }
-
-    public enum NETWORK_TYPE {
-        NEIGHBOORHOOD("neighborhood"),
-        PATHSBETWEEN("pathsbetween");
-
-        private final String name;
-
-        NETWORK_TYPE(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
     }
 
 }
