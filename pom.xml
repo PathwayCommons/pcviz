@@ -11,11 +11,11 @@
 	<url>http://cbio.mskcc.org/pcviz</url>
 
 	<properties>
-		<java.version>1.6</java.version>
+		<java.version>1.7</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.7</slf4j.version>
-		<spring.version>3.1.0.RELEASE</spring.version>
-		<paxtools.version>4.3.1-SNAPSHOT</paxtools.version>
+		<spring.version>3.2.16.RELEASE</spring.version>
+		<paxtools.version>5.0.0-SNAPSHOT</paxtools.version>
 	</properties>
 
 	<build>
@@ -24,8 +24,8 @@
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -45,39 +45,19 @@
 
 	<repositories>
 		<repository>
-			<id>biopax.releases</id>
-			<name>BioPAX Repository at Sourceforge</name>
-			<url>http://biopax.sourceforge.net/m2repo/releases/</url>
+			<id>ossrh</id>
+			<name>OSSRH Repository</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</repository>
-		<repository>
-			<id>biopax.snapshots</id>
-			<name>BioPAX Repository at Sourceforge</name>
-			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-		<repository>
-			<id>pathwaycommons</id>
-			<name>PC Repository at Google Code</name>
-			<url>http://repo.pathway-commons.googlecode.com/hg/</url>
-		</repository>
-		<repository>
-			<id>pattern.repo</id>
-			<name>Repository of BioPAX Pattern Framework</name>
-			<url>http://maven-repo.biopax-pattern.googlecode.com/hg/</url>
-			<snapshots><enabled>true</enabled></snapshots>
-		</repository>
-        <repository>
-            <id>causality.repo</id>
-            <name>Repository of BioPAX Causality Framework</name>
-            <url>http://cbio.mskcc.org/~ozgun/m2repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
+        	<repository>
+            		<id>causality.repo</id>
+            		<name>Repository of BioPAX Causality Framework</name>
+            		<url>http://cbio.mskcc.org/~ozgun/m2repo/</url>
+            		<snapshots>
+                		<enabled>true</enabled>
+            		</snapshots>
+        	</repository>
 	</repositories>
-
 
 	<dependencies>
 		<dependency>
@@ -131,6 +111,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 
