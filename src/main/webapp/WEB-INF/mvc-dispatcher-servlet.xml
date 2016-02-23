@@ -29,6 +29,7 @@
         </property>
     </bean>
 
+    <!-- this should normally go last-->
     <mvc:annotation-driven/>
 
 </beans>

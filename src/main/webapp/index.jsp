@@ -1,7 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%--
   ~ Copyright 2013 Memorial-Sloan Kettering Cancer Center.
   ~
@@ -131,7 +131,7 @@
                           <h3 class="footer-title">PCViz: More</h3>
                           <ul>
                               <li>
-                                  <a href="https://code.google.com/p/pathway-commons/wiki/PCViz">Tutorials / Help</a>
+                                  <a href="https://github.com/PathwayCommons/pcviz/wiki">Tutorials / Help</a>
                               </li>
                               <li>
                                   <a href="http://www.pathwaycommons.org">Pathway Commons</a>
@@ -149,7 +149,7 @@
                                   <a href="http://www.ihop-net.org/">iHOP</a>
                               </li>
                               <li>
-                                  <a href="http://code.google.com/p/pathway-commons/">Code</a>
+                                  <a href="https://github.com/PathwayCommons/pcviz/">Code</a>
                               </li>
 
                           </ul>

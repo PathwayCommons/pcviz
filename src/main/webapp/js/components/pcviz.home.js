@@ -33,7 +33,7 @@ var HomeView = Backbone.View.extend({
     template:_.template($("#main-template").html()),
 
     render: function() {
-        var terms = this.model.terms.replace("<", "").replace(">", "").toUpperCase();
+        var terms = this.model.terms.replace("<", "").replace(">", "").replace(" ","").toUpperCase();
         this.model.terms = terms;
         var kind = this.model.networkType;
 
@@ -129,9 +129,13 @@ var HomeView = Backbone.View.extend({
             e.preventDefault();
             $("#download-network").trigger('click');
 
-            var url = $(this).data("pcurl") + "/graph?source=" + terms
-                + "&kind=" + kind
-                + "&format=BINARY_SIF";
+            var t = terms.split(",");
+            var url = $(this).data("pcurl") + "graph?";
+            for(var i=0; i < t.length; i++) {
+                url += "source=" + t[i] + "&";
+            }
+            url += "kind=" + kind + "&format=BINARY_SIF";
+
             window.open(url, "_blank");
         });
 
@@ -139,9 +143,13 @@ var HomeView = Backbone.View.extend({
             e.preventDefault();
             $("#download-network").trigger('click');
 
-            var url = $(this).data("pcurl") + "/graph?source=" + terms
-                + "&kind=" + kind
-                + "&format=BIOPAX";
+            var t = terms.split(",");
+            var url = $(this).data("pcurl") + "graph?";
+            for(var i=0; i < t.length; i++) {
+                url += "source=" + t[i] + "&";
+            }
+            url += "kind=" + kind;
+
             window.open(url, "_blank");
         });
 
