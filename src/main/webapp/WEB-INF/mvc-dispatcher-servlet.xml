@@ -4,13 +4,8 @@
     <!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
     <context:component-scan base-package="org.pathwaycommons.pcviz.controller"/>
 
-    <mvc:annotation-driven/>
-
-    <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources -->
-    <mvc:resources location="/" mapping="/resources/**"/>
-
-    <!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource 
-    requests to the container's default Servlet -->
+    <!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource
+    (css, js, images) requests to the container's default Servlet -->
     <mvc:default-servlet-handler/>
 
     <!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views.
@@ -26,4 +21,8 @@
             </props>
         </property>
     </bean>
+
+    <!-- this should normally go last-->
+    <mvc:annotation-driven/>
+
 </beans>
