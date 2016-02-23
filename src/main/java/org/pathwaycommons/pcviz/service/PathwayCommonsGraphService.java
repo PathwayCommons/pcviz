@@ -198,6 +198,8 @@ public class PathwayCommonsGraphService {
         // Execute a graph query using the cpath2 client
         try {
             Model model = client.createGraphQuery().kind(type).sources(genes).result();
+            if(model != null)
+                log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
 
             // the Pattern framework can generate SIF too
             SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),

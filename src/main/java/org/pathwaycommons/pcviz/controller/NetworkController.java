@@ -64,11 +64,9 @@ public class NetworkController
     }
 
     @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
-    public ResponseEntity<String> getEntityInJson(@PathVariable GraphType type, @PathVariable String genes, BindingResult bindingResult)
+    public ResponseEntity<String> getEntityInJson(@PathVariable GraphType type, @PathVariable String genes)
     {
-        if(bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(errorFromBindingResult(bindingResult));
-        } else if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
+        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
             // TODO: support commonstream and pathsfromto?
             return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
         }
@@ -86,24 +84,6 @@ public class NetworkController
         }
 
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(networkJson);
-    }
-
-    private final String errorFromBindingResult(BindingResult bindingResult) {
-        StringBuilder sb = new StringBuilder();
-        for (ObjectError e : bindingResult.getAllErrors()) {
-            sb.append(e.toString()).append(" ");
-//            Object rejectedVal = e.getRejectedValue();
-//            if(rejectedVal instanceof Object[]) {
-//                if(((Object[]) rejectedVal).length > 0) {
-//                    rejectedVal = Arrays.toString((Object[])rejectedVal);
-//                } else {
-//                    rejectedVal = "empty array";
-//                }
-//            }
-//            sb.append(e.getField() + " was '" + rejectedVal + "'; "
-//                    + e.getDefaultMessage() + ". ");
-        }
-        return sb.toString();
     }
 
     final class GraphTypeEditor extends PropertyEditorSupport {
