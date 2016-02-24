@@ -66,14 +66,6 @@
 			<name>OSSRH Repository</name>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</repository>
-		<!--<repository>-->
-			<!--<id>causality.repo</id>-->
-			<!--<name>Repository of BioPAX Causality Framework</name>-->
-			<!--<url>http://cbio.mskcc.org/~ozgun/m2repo/</url>-->
-			<!--<snapshots>-->
-				<!--<enabled>true</enabled>-->
-			<!--</snapshots>-->
-		<!--</repository>-->
 	</repositories>
 
 	<dependencies>
@@ -164,6 +156,12 @@
             <version>2.2</version>
         </dependency>
 
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+			<scope>runtime</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

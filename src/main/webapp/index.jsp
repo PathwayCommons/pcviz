@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--
   ~ Copyright 2013 Memorial-Sloan Kettering Cancer Center.
   ~
@@ -19,6 +21,12 @@
   ~ You should have received a copy of the GNU Lesser General Public License
   ~ along with PCViz. If not, see <http://www.gnu.org/licenses/>.
   --%>
+
+<c:set var="req" value="${pageContext.request}" />
+<c:set var="baseUrl" value="${fn:replace(req.requestURL, fn:substring(req.requestURI, 1, fn:length(req.requestURI)), req.contextPath)}" />
+
+<spring:eval var="pc2url" expression="@pcvizProperties.getProperty('pathwaycommons.url')" />
+
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -211,8 +219,6 @@
                           <div class="share download-options">
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
-                                  <%--TODO @environment.getProperty doesn't work yet...--%>
-                                  <spring:eval var="pc2url" expression="@environment.getProperty('pathwaycommons.url')" />
                                   <a class="btn" id="download-sif"
                                      data-pcurl="${pc2url}"
                                      href="#">Network (SIF)</a>
@@ -408,8 +414,10 @@
   </script>
 
   <script type="text/template" id="embed-code-template">
-      <iframe width="{{width}}" height="{{height}}" src="<spring:url value='#embed/{{networkType}}/{{genes}}'/>"
-              scrolling="no" frameborder="0" seamless="seamless"></iframe>
+      <iframe width="{{width}}" height="{{height}}"
+            src="${baseUrl}/#embed/{{networkType}}/{{genes}}"
+            scrolling="no" frameborder="0" seamless="seamless">
+      </iframe>
   </script>
 
   <script type="text/template" id="main-embed-template">
@@ -430,10 +438,11 @@
       <div class="palette-silver" id="embed-footer">
           <div id="pcviz-footerline">
               <p class="pull-right">
-                  <a class="btn" id="embed-explore-button" target="_blank" href="<spring:url value='#{{networkType}}/{{genes}}'/>"
+                  <a class="btn" id="embed-explore-button" target="_blank"
+                     href="${baseUrl}/#{{networkType}}/{{genes}}"
                      title="explore this network in PCViz"><i class="icon-share"></i></a>
               </p>
-              <h4 class="pcviz-embed-logo" data-url="<spring:url value='#'/>">
+              <h4 class="pcviz-embed-logo" data-url="${baseURL}">
                   PCViz
                   <small>Pathway Commons Network Visualizer</small>
               </h4>
@@ -590,7 +599,6 @@
               </tr>
               <tr>
                   <td colspan="2">
-                      <spring:eval var="pc2url" expression="@environment.getProperty('pathwaycommons.url')" />
                       <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank"
                          href="${pc2url}graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
                           <i class="icon-download-alt"></i>
