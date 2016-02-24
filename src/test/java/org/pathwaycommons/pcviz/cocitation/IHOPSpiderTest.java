@@ -13,7 +13,7 @@ import java.util.Map;
 public class IHOPSpiderTest
 {
     protected ClassPathXmlApplicationContext context
-            = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/testContext.xml");
+            = new ClassPathXmlApplicationContext("classpath:/spring/testContext.xml");
 
 	@Test
 	public void spiderTest()

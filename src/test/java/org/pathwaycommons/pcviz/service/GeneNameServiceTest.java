@@ -32,7 +32,7 @@ public class GeneNameServiceTest {
 
     @Before
     public void initialize() {
-        context = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/testContext.xml");
+        context = new ClassPathXmlApplicationContext("classpath:/spring/testContext.xml");
         geneNameService = (GeneNameService) context.getBean("geneNameService");
     }
 

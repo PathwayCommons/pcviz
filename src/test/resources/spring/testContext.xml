@@ -7,7 +7,7 @@
                         http://www.springframework.org/schema/context
                         http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:property-placeholder location="classpath:/META-INF/pcviz.properties" />
+    <context:property-placeholder location="classpath:/test.properties" />
 
     <bean class="org.pathwaycommons.pcviz.cocitation.IHOPSpider" id="iHopSpider">
         <constructor-arg name="iHopURL" value="${ihop.url}"/>
