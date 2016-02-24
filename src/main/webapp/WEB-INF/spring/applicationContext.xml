@@ -60,20 +60,12 @@
         <property name="autoCompleteLimit" value="${autoCompleteResult.limit}"/>
     </bean>
 
-    <bean class="java.lang.String" id="pathwayCommonsURLStr">
-        <constructor-arg index="0" value="${pathwaycommons.url}"/>
-    </bean>
-
     <bean class="org.pathwaycommons.pcviz.service.CancerContextService" id="cancerContextService">
         <property name="cBioPortalAccessor" ref="cBioPortalAccessor"/>
         <property name="dataCacheFolder" value="${cbioportal.cache.folder}"/>
     </bean>
 
     <bean class="org.cbio.causality.data.portal.CBioPortalAccessor" id="cBioPortalAccessor"/>
-
-    <bean class="java.lang.String" id="pcVizURLStr">
-        <constructor-arg index="0" value="${pcviz.url}"/>
-    </bean>
 
     <bean class="org.pathwaycommons.pcviz.service.UniProtService" id="uniProtService">
         <property name="uniProtBaseURL" value="${uniprot.base.url}"/>

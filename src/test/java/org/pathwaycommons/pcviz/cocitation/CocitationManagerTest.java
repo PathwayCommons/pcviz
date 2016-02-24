@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 public class CocitationManagerTest
 {
     protected ClassPathXmlApplicationContext context
-            = new ClassPathXmlApplicationContext("classpath*:META-INF/spring/testContext.xml");
+            = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/testContext.xml");
 
     /**
 	 * Beware! This test first clears the co-citation cache.

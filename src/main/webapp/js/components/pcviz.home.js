@@ -142,7 +142,6 @@ var HomeView = Backbone.View.extend({
         $("#download-biopax").click(function(e) {
             e.preventDefault();
             $("#download-network").trigger('click');
-
             var t = terms.split(",");
             var url = $(this).data("pcurl") + "graph?";
             for(var i=0; i < t.length; i++) {

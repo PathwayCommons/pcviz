@@ -2,4 +2,9 @@ target/
 .idea/
 .DS_Store/
 cocitations/
+uniprot/
+tmp/
+data/
+precalculated/
+portal/
 pcviz.properties

@@ -156,7 +156,8 @@ function fetchNhood(page, queryString, outputDir)
 		console.log(msg);
 	};
 
-	page.open('http://www.pathwaycommons.org/pcviz/#neighborhood/' + queryString, function() {
+
+	page.open('http://localhost:8080/pcviz/#neighborhood/' + queryString, function() {
 		var maxRetry = 50;
 		var retry = 0;
 

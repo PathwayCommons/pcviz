@@ -1,7 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ page import="org.springframework.web.context.WebApplicationContext"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%--
   ~ Copyright 2013 Memorial-Sloan Kettering Cancer Center.
   ~
@@ -20,12 +19,6 @@
   ~ You should have received a copy of the GNU Lesser General Public License
   ~ along with PCViz. If not, see <http://www.gnu.org/licenses/>.
   --%>
-
-<%
-    WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
-    String pcURL = (String) context.getBean("pathwayCommonsURLStr");
-    String pcVizURL = (String) context.getBean("pcVizURLStr");
-%>
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -62,13 +55,13 @@
    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
    ga('create', 'UA-43341809-2', 'pathwaycommons.org');
    ga('send', 'pageview');
   </script>
 
   </head>
   <body>
+
   <div id="pcviz-header">
   </div>
 
@@ -218,8 +211,14 @@
                           <div class="share download-options">
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
-                                  <a class="btn" id="download-sif" data-pcurl="<%=pcURL%>" href="#">Network (SIF)</a>
-                                  <a class="btn" id="download-biopax" data-pcurl="<%=pcURL%>" href="#">Network (BioPAX)</a>
+                                  <%--TODO @environment.getProperty doesn't work yet...--%>
+                                  <spring:eval var="pc2url" expression="@environment.getProperty('pathwaycommons.url')" />
+                                  <a class="btn" id="download-sif"
+                                     data-pcurl="${pc2url}"
+                                     href="#">Network (SIF)</a>
+                                  <a class="btn" id="download-biopax"
+                                     data-pcurl="${pc2url}"
+                                     href="#">Network (BioPAX)</a>
                               </div>
                           </div>
                       </div>
@@ -409,7 +408,8 @@
   </script>
 
   <script type="text/template" id="embed-code-template">
-      <iframe width="{{width}}" height="{{height}}" src="<%=pcVizURL%>/#embed/{{networkType}}/{{genes}}" scrolling="no" frameborder="0" seamless="seamless"></iframe>
+      <iframe width="{{width}}" height="{{height}}" src="<spring:url value='#embed/{{networkType}}/{{genes}}'/>"
+              scrolling="no" frameborder="0" seamless="seamless"></iframe>
   </script>
 
   <script type="text/template" id="main-embed-template">
@@ -430,9 +430,10 @@
       <div class="palette-silver" id="embed-footer">
           <div id="pcviz-footerline">
               <p class="pull-right">
-                  <a class="btn" id="embed-explore-button" target="_blank" href="<%=pcVizURL%>/#{{networkType}}/{{genes}}" title="explore this network in PCViz"><i class="icon-share"></i></a>
+                  <a class="btn" id="embed-explore-button" target="_blank" href="<spring:url value='#{{networkType}}/{{genes}}'/>"
+                     title="explore this network in PCViz"><i class="icon-share"></i></a>
               </p>
-              <h4 class="pcviz-embed-logo" data-url="<%=pcVizURL%>">
+              <h4 class="pcviz-embed-logo" data-url="<spring:url value='#'/>">
                   PCViz
                   <small>Pathway Commons Network Visualizer</small>
               </h4>
@@ -448,7 +449,8 @@
       <div class='node-details-info'>
           <h3>
               {{geneSymbol}}
-              <sup class="tagsinput-add fui-plus-16 add-gene-to-network" title="add this gene to the genes of interest" data-gene="{{geneSymbol}}"></sup>
+              <sup class="tagsinput-add fui-plus-16 add-gene-to-network" title="add this gene to the genes of interest"
+                   data-gene="{{geneSymbol}}"></sup>
           </h3>
 
           <table class="table table-condensed table-striped">
@@ -588,11 +590,12 @@
               </tr>
               <tr>
                   <td colspan="2">
-                      <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank" href="<%=pcURL%>/graph?source={{source}}&target={{target}}&kind=PATHSFROMTO&format=BIOPAX">
+                      <spring:eval var="pc2url" expression="@environment.getProperty('pathwaycommons.url')" />
+                      <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank"
+                         href="${pc2url}graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
                           <i class="icon-download-alt"></i>
                           Download detailed process (BioPAX)
                       </a>
-
                   </td>
               </tr>
           </table>

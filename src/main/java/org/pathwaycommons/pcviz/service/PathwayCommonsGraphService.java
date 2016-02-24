@@ -75,6 +75,7 @@ public class PathwayCommonsGraphService {
 
     public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
+        client = CPathClient.newInstance(pathwayCommonsUrl);
     }
 
     private GeneNameService geneNameService;
@@ -134,13 +135,11 @@ public class PathwayCommonsGraphService {
     }
 
     public PathwayCommonsGraphService(String pathwayCommonsUrl, CocitationManager cocitMan) {
-        this();
         this.pathwayCommonsUrl = pathwayCommonsUrl;
         this.cocitMan = cocitMan;
     }
 
     public PathwayCommonsGraphService() {
-        client = CPathClient.newInstance();
     }
 
     @Cacheable("metadataCache")
@@ -201,7 +200,8 @@ public class PathwayCommonsGraphService {
             if(model != null)
                 log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
 
-            // the Pattern framework can generate SIF too
+            // generate SIF
+
             SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
                 SIFEnum.CONTROLS_STATE_CHANGE_OF,
 				SIFEnum.CONTROLS_EXPRESSION_OF,
