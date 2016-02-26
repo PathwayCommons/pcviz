@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 <%--
   ~ Copyright 2013 Memorial-Sloan Kettering Cancer Center.
   ~
-  ~ This file is part of PCViz.
+  ~ This file is part of Pathway Commons' PCViz.
   ~
   ~ PCViz is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU Lesser General Public License as published by
@@ -23,9 +23,10 @@
   --%>
 
 <c:set var="req" value="${pageContext.request}" />
-<c:set var="baseUrl" value="${fn:replace(req.requestURL, fn:substring(req.requestURI, 1, fn:length(req.requestURI)), req.contextPath)}" />
-
-<spring:eval var="pc2url" expression="@pcvizProperties.getProperty('pathwaycommons.url')" />
+<c:set var="url">${req.requestURL}</c:set>
+<c:set var="uri" value="${req.requestURI}" />
+<c:set var="pcvizUrl" value="${fn:substring(url, 0, fn:length(url) - fn:length(uri))}${req.contextPath}/" />
+<spring:eval var="pc2Url" expression="@pcvizProps.getProperty('pathwaycommons.url')" />
 
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
@@ -220,10 +221,10 @@
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
                                   <a class="btn" id="download-sif"
-                                     data-pcurl="${pc2url}"
+                                     data-pcurl="${pc2Url}"
                                      href="#">Network (SIF)</a>
                                   <a class="btn" id="download-biopax"
-                                     data-pcurl="${pc2url}"
+                                     data-pcurl="${pc2Url}"
                                      href="#">Network (BioPAX)</a>
                               </div>
                           </div>
@@ -415,7 +416,7 @@
 
   <script type="text/template" id="embed-code-template">
       <iframe width="{{width}}" height="{{height}}"
-            src="${baseUrl}/#embed/{{networkType}}/{{genes}}"
+            src="${pcvizUrl}#embed/{{networkType}}/{{genes}}"
             scrolling="no" frameborder="0" seamless="seamless">
       </iframe>
   </script>
@@ -439,10 +440,10 @@
           <div id="pcviz-footerline">
               <p class="pull-right">
                   <a class="btn" id="embed-explore-button" target="_blank"
-                     href="${baseUrl}/#{{networkType}}/{{genes}}"
+                     href="${pcvizUrl}#{{networkType}}/{{genes}}"
                      title="explore this network in PCViz"><i class="icon-share"></i></a>
               </p>
-              <h4 class="pcviz-embed-logo" data-url="${baseURL}">
+              <h4 class="pcviz-embed-logo" data-url="${pcvizUrl}">
                   PCViz
                   <small>Pathway Commons Network Visualizer</small>
               </h4>
@@ -600,7 +601,7 @@
               <tr>
                   <td colspan="2">
                       <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank"
-                         href="${pc2url}graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
+                         href="${pc2Url}graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
                           <i class="icon-download-alt"></i>
                           Download detailed process (BioPAX)
                       </a>

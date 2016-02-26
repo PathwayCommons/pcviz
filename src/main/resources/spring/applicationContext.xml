@@ -2,17 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!-- this is also to inject a pcviz property to a JSP page using <spring:eval/> etc.-->
-    <util:properties id="pcvizProperties" location="classpath:/spring/pcviz.properties" />
-    <!--this is to inject pcviz property values here to bean properties-->
-    <context:property-placeholder properties-ref="pcvizProperties" />
+    <!--this is to inject pcviz properties into JSP views-->
+    <util:properties id="pcvizProps" location="classpath:spring/pcviz.properties" />
+    <context:property-placeholder  properties-ref="pcvizProps" />
 
     <cache:annotation-driven cache-manager="cacheManager"/>
 
