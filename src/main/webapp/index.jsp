@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="java.util.Properties" %>
 <%--
   ~ Copyright 2013 Memorial-Sloan Kettering Cancer Center.
   ~
@@ -22,12 +22,15 @@
   ~ along with PCViz. If not, see <http://www.gnu.org/licenses/>.
   --%>
 
-<c:set var="req" value="${pageContext.request}" />
-<c:set var="url">${req.requestURL}</c:set>
-<c:set var="uri" value="${req.requestURI}" />
-<c:set var="pcvizUrl" value="${fn:substring(url, 0, fn:length(url) - fn:length(uri))}${req.contextPath}/" />
-<spring:eval var="pc2Url" expression="@pcvizProps.getProperty('pathwaycommons.url')" />
+<%--<spring:eval var="pc2Url" expression="@pcvizProps.getProperty('pathwaycommons.url')" />--%>
+<%--<spring:eval var="pcvizUrl" expression="@pcvizProps.getProperty('pcviz.url')" />--%>
 
+<%
+    WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
+    Properties pcvizProps = (Properties) context.getBean("pcvizProps");
+    String pc2Url = pcvizProps.getProperty("pathwaycommons.url");
+    String pcvizUrl = pcvizProps.getProperty("pcviz.url");
+%>
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -52,8 +55,8 @@
     <link href="css/jquery.cytoscape-panzoom.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 
-      <!-- Loading PCViz; this should always be the last to call! -->
-      <link href="css/pcviz.css" rel="stylesheet">
+    <!-- Loading PCViz; this should always be the last to call! -->
+    <link href="css/pcviz.css" rel="stylesheet">
 
       <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
     <!--[if lt IE 9]>
@@ -67,7 +70,6 @@
    ga('create', 'UA-43341809-2', 'pathwaycommons.org');
    ga('send', 'pageview');
   </script>
-
   </head>
   <body>
 
@@ -221,10 +223,10 @@
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
                                   <a class="btn" id="download-sif"
-                                     data-pcurl="${pc2Url}"
+                                     data-pcurl="<%=pc2Url%>"
                                      href="#">Network (SIF)</a>
                                   <a class="btn" id="download-biopax"
-                                     data-pcurl="${pc2Url}"
+                                     data-pcurl="<%=pc2Url%>"
                                      href="#">Network (BioPAX)</a>
                               </div>
                           </div>
@@ -416,7 +418,7 @@
 
   <script type="text/template" id="embed-code-template">
       <iframe width="{{width}}" height="{{height}}"
-            src="${pcvizUrl}#embed/{{networkType}}/{{genes}}"
+            src="<%=pcvizUrl%>#embed/{{networkType}}/{{genes}}"
             scrolling="no" frameborder="0" seamless="seamless">
       </iframe>
   </script>
@@ -440,10 +442,10 @@
           <div id="pcviz-footerline">
               <p class="pull-right">
                   <a class="btn" id="embed-explore-button" target="_blank"
-                     href="${pcvizUrl}#{{networkType}}/{{genes}}"
+                     href="<%=pcvizUrl%>#{{networkType}}/{{genes}}"
                      title="explore this network in PCViz"><i class="icon-share"></i></a>
               </p>
-              <h4 class="pcviz-embed-logo" data-url="${pcvizUrl}">
+              <h4 class="pcviz-embed-logo" data-url="<%=pcvizUrl%>">
                   PCViz
                   <small>Pathway Commons Network Visualizer</small>
               </h4>
@@ -513,7 +515,7 @@
               <h3>Cancer Context</h3>
               <h4>Alteration Frequency <small>({{altered}}%)</small></h4>
               <div class="progress">
-                  <div class="bar bar-danger" style="width: {{altered}}%;"></div>
+                  <div class="bar bar-danger" style="width: ${altered}%;"></div>
               </div>
 
               <a href="http://www.cbioportal.org/public-portal/cross_cancer.do?tab_index=tab_visualize&clinical_param_selection=null&cancer_study_id=all&genetic_profile_ids_PROFILE_MUTATION_EXTENDED=gbm_tcga_mutations&genetic_profile_ids_PROFILE_COPY_NUMBER_ALTERATION=gbm_tcga_gistic&Z_SCORE_THRESHOLD=2.0&RPPA_SCORE_THRESHOLD=1.0&case_set_id=gbm_tcga_cnaseq&case_ids=&gene_list={{geneSymbol}}&gene_set_choice=user-defined-list&Action=Submit" target="_blank" class="btn btn-inverse btn-block cbioportal">
@@ -601,7 +603,7 @@
               <tr>
                   <td colspan="2">
                       <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank"
-                         href="${pc2Url}graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
+                         href="<%=pc2Url%>graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
                           <i class="icon-download-alt"></i>
                           Download detailed process (BioPAX)
                       </a>

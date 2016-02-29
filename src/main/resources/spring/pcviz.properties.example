@@ -26,6 +26,10 @@ autoCompleteResult.limit=10
 
 # CBioPortal
 cbioportal.cache.folder=/tmp/cocitations/portal
+cbioportal.cache.folder.test=/tmp/cocitations/portal-test
+
+# PCViz self URL (for the link in the iframe to embed into other sites)
+pcviz.url=http://www.pathwaycommons.org/pcviz/
 
 # UniProt Base URL for extracting descriptions
 uniprot.base.url=http://www.uniprot.org/

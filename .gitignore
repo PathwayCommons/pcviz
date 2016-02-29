@@ -1,5 +1,6 @@
 target/
 .idea/
+.extract/
 *.iml
 .DS_Store/
 cocitations/
