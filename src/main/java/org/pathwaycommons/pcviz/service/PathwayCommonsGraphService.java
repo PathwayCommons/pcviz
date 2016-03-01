@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.pattern.miner.*;
+import org.biopax.paxtools.pattern.util.Blacklist;
 import org.pathwaycommons.pcviz.cocitation.CocitationManager;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
@@ -47,6 +48,7 @@ public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
 
     private CPathClient client;
+    private Blacklist blacklist;
 
     private Integer minNumberOfCoCitationsForEdges = 0;
     private Integer minNumberOfCoCitationsForNodes = 0;
@@ -75,7 +77,14 @@ public class PathwayCommonsGraphService {
 
     public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
-        client = CPathClient.newInstance(pathwayCommonsUrl);
+        this.client = CPathClient.newInstance(pathwayCommonsUrl);
+        try {
+            this.blacklist = new Blacklist(new URL(client.getActualEndPointURL()
+                    + "downloads/blacklist.txt").openStream());
+        } catch (IOException e) {
+            log.warn("Failed to load and create Blacklist from: "
+                    + client.getActualEndPointURL() + "downloads/blacklist.txt");
+        }
     }
 
     private GeneNameService geneNameService;
@@ -207,6 +216,7 @@ public class PathwayCommonsGraphService {
 				SIFEnum.CONTROLS_EXPRESSION_OF,
                 SIFEnum.CATALYSIS_PRECEDES
             );
+            searcher.setBlacklist(blacklist);
 
             for (SIFInteraction sif : searcher.searchSIF(model))
             {
