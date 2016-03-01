@@ -1,7 +1,7 @@
 /*
  * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
  *
- * This file is part of PCViz.
+ * This file is part of the Pathway Commons' PCViz.
  *
  * PCViz is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,16 +19,18 @@
 
 package org.pathwaycommons.pcviz.controller;
 
+import cpath.service.GraphType;
 import org.pathwaycommons.pcviz.service.PathwayCommonsGraphService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 
+import java.beans.PropertyEditorSupport;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -47,33 +49,49 @@ public class NetworkController
         this.pathwayCommonsGraphService = pathwayCommonsGraphService;
     }
 
-    @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
-	public ResponseEntity<String> getEntityInJson(@PathVariable String type, @PathVariable String genes)
-	{
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "application/json; charset=utf-8");
+    /**
+     * This configures the web request parameters binding, i.e.,
+     * conversion to the corresponding java types; for example,
+     * "neighborhood" is recognized as {@link GraphType#NEIGHBORHOOD}.
+     *  Depending on the editor, illegal query parameters may result
+     *  in an error or just NULL value.
+     *
+     * @param binder
+     */
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(GraphType.class, new GraphTypeEditor());
+    }
 
-        type = type.toLowerCase().trim();
-        PathwayCommonsGraphService.NETWORK_TYPE nType = PathwayCommonsGraphService.NETWORK_TYPE.NEIGHBOORHOOD;
-        if(type.equals("pathsbetween")) {
-            nType = PathwayCommonsGraphService.NETWORK_TYPE.PATHSBETWEEN;
-        } // TODO: Should we support commonstream and pathsfromto, too?
+    @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
+    public ResponseEntity<String> getEntityInJson(@PathVariable GraphType type, @PathVariable String genes)
+    {
+        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
+            // TODO: support commonstream and pathsfromto?
+            return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
+        }
+
+        // otherwise, do the job -
 
         HashSet<String> geneSet = new HashSet<String>();
-        geneSet.addAll(Arrays.asList(genes.split(",")));
+        geneSet.addAll(Arrays.asList(genes.split("\\s*,\\s*")));
 
-	String networkJson = "";
-	try {
-        	networkJson = getPathwayCommonsGraphService().createNetwork(nType, geneSet);
-	} catch(Exception e) {
-		e.printStackTrace();
-	}
+        String networkJson = "";
+        try {
+            networkJson = getPathwayCommonsGraphService().createNetwork(type, geneSet);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
-		return new ResponseEntity<String>(
-			networkJson,
-			headers,
-			HttpStatus.OK
-		);
-	}
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(networkJson);
+    }
 
+    final class GraphTypeEditor extends PropertyEditorSupport {
+        @Override
+        public void setAsText(String arg0) {
+            GraphType value = null;
+            value = GraphType.valueOf(arg0.trim().toUpperCase());
+            setValue(value);
+        }
+    }
 }

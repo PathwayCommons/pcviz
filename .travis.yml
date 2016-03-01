@@ -1,14 +1,4 @@
 sudo: false
 language: java
-
-# whitelist
-branches:
-  only:
-    - master
-# JDK
-jdk:
-  - openjdk7
-  - oraclejdk7
-
-# copy the properties file for tests (TODO: better keep it in src/test/resources permanently and refer from the testContext)
-script: cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties && mvn clean install
+# not required anymore:
+# script: cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties && mvn clean install

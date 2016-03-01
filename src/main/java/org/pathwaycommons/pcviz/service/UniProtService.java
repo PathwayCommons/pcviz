@@ -63,7 +63,7 @@ public class UniProtService {
             ;
             return desc;
         } catch(Exception e) {
-            log.error("Could not load uniprot description for " + uniprotId + ". Exception: ", e);
+            log.error("Could not load uniprot description for " + uniprotId, e);
         }
 
         return null;

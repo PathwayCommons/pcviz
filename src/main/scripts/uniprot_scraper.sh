@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #TODO sanitize args
-
 # args:
 #   $1 : input hgnc file
 #   $2 : intermediate file (to output uniprot ids)

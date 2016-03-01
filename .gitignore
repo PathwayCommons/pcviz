@@ -1,8 +1,12 @@
 target/
 .idea/
+.extract/
+*.iml
 .DS_Store/
 cocitations/
-pcviz.properties
-*.iml
+uniprot/
+tmp/
 data/
-
+precalculated/
+portal/
+pcviz.properties

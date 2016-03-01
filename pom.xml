@@ -6,16 +6,17 @@
 	<groupId>org.mskcc.cbio.pcviz</groupId>
 	<artifactId>pcviz</artifactId>
 	<packaging>war</packaging>
-	<version>2.0-SNAPSHOT</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<name>Pathway Commons Visualizer</name>
-	<url>http://cbio.mskcc.org/pcviz</url>
+	<url>https://github.com/PathwayCommons/pcviz</url>
 
 	<properties>
 		<java.version>1.7</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.7</slf4j.version>
-		<spring.version>3.2.16.RELEASE</spring.version>
+		<spring.version>4.2.4.RELEASE</spring.version>
 		<paxtools.version>5.0.0-SNAPSHOT</paxtools.version>
+		<cpath-client.version>6.1.0-SNAPSHOT</cpath-client.version>
 	</properties>
 
 	<build>
@@ -31,58 +32,105 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<!--<plugin>-->
+				<!--<groupId>org.apache.tomcat.maven</groupId>-->
+				<!--<artifactId>tomcat7-maven-plugin</artifactId>-->
+				<!--<version>2.1</version>-->
+				<!--<configuration>-->
+					<!--<url>http://localhost:8080/manager</url>-->
+					<!--<server>localhost</server>-->
+					<!--<systemProperties>-->
+						<!--<JAVA_OPTS>-Xms256m -Xmx8g -XX:MaxPermSize=256m</JAVA_OPTS>-->
+					<!--</systemProperties>-->
+				<!--</configuration>-->
+			<!--</plugin>-->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
-				<version>1.1</version>
+				<!-- Can run the exec-jar as: java -Xms256m -Xmx3g -DCPATH2_HOME=$CPATH2_HOME
+					-Djava.io.tmpdir=$CPATH2_HOME/tmp -jar target/cpath-web-service-<VERSION>-exec-war.jar -->
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.1</version>
+				<!-- this is for making an executable jar with the tomcat built-in -->
+				<executions>
+					<execution>
+						<id>create-exec-war</id>
+						<goals>
+							<goal>exec-war-only</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<path>/</path>
+							<enableNaming>false</enableNaming>
+							<attachArtifactClassifier>exec-war</attachArtifactClassifier>
+							<attachArtifactClassifierType>jar</attachArtifactClassifierType>
+							<!-- An HTTP access log pattern ('combined', modified just to get actual client IP)
+							to match the Logstash 2.1x built-in %{COMBINEDAPACHELOG} Grok pattern -->
+							<accessLogValveFormat>%{X-Forwarded-For}i %l %u %t "%r" %s %b "%{Referer}i" "%{User-Agent}i"</accessLogValveFormat>
+							<finalName>pcviz.jar</finalName>
+						</configuration>
+					</execution>
+				</executions>
+				<!-- this is for tomcat:run -->
 				<configuration>
 					<url>http://localhost:8080/manager</url>
 					<server>localhost</server>
+					<systemProperties>
+						<JAVA_OPTS>-Xms256m -Xmx8g -XX:MaxPermSize=256m</JAVA_OPTS>
+					</systemProperties>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.tomcat</groupId>
+						<artifactId>tomcat-catalina</artifactId>
+						<version>8.0.24</version>
+						<scope>runtime</scope>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
 
 	<repositories>
+		<!--<repository>-->
+			<!--<id>biopax.releases</id>-->
+			<!--<name>BioPAX Repository at Sourceforge</name>-->
+			<!--<url>http://biopax.sourceforge.net/m2repo/releases/</url>-->
+		<!--</repository>-->
+		<repository>
+			<id>biopax.snapshots</id>
+			<name>BioPAX Repository at Sourceforge</name>
+			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
 		<repository>
 			<id>ossrh</id>
 			<name>OSSRH Repository</name>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</repository>
-		<repository>
-			<id>causality.repo</id>
-			<name>Repository of BioPAX Causality Framework</name>
-			<url>http://cbio.mskcc.org/~ozgun/m2repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.7</version>
-			<scope>test</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.biopax.paxtools</groupId>
 			<artifactId>paxtools-core</artifactId>
 			<version>${paxtools.version}</version>
 		</dependency>
-
         <dependency>
             <groupId>org.cbio</groupId>
             <artifactId>causality</artifactId>
             <version>1.0.1-SNAPSHOT</version>
         </dependency>
-
         <dependency>
 			<groupId>org.biopax.paxtools</groupId>
 			<artifactId>pattern</artifactId>
-			<version>[1,]</version>
+			<version>${paxtools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>pathwaycommons.cpath</groupId>
+			<artifactId>cpath-client</artifactId>
+			<version>${cpath-client.version}</version>
 		</dependency>
 
 		<dependency>
@@ -106,14 +154,19 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 
-
 		<!-- Spring 3 dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
@@ -152,5 +205,17 @@
             <version>2.2</version>
         </dependency>
 
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

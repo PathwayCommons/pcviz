@@ -19,12 +19,14 @@
 
 package org.pathwaycommons.pcviz.service;
 
+import cpath.client.CPathClient;
+import cpath.service.GraphType;
 import flexjson.JSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.pattern.miner.*;
+import org.biopax.paxtools.pattern.util.Blacklist;
 import org.pathwaycommons.pcviz.cocitation.CocitationManager;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
@@ -44,6 +46,9 @@ import java.util.*;
 
 public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
+
+    private CPathClient client;
+    private Blacklist blacklist;
 
     private Integer minNumberOfCoCitationsForEdges = 0;
     private Integer minNumberOfCoCitationsForNodes = 0;
@@ -72,6 +77,14 @@ public class PathwayCommonsGraphService {
 
     public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
+        this.client = CPathClient.newInstance(pathwayCommonsUrl);
+        try {
+            this.blacklist = new Blacklist(new URL(client.getActualEndPointURL()
+                    + "downloads/blacklist.txt").openStream());
+        } catch (IOException e) {
+            log.warn("Failed to load and create Blacklist from: "
+                    + client.getActualEndPointURL() + "downloads/blacklist.txt");
+        }
     }
 
     private GeneNameService geneNameService;
@@ -167,18 +180,16 @@ public class PathwayCommonsGraphService {
     }
 
     @Cacheable("networkCache")
-    public String createNetwork(NETWORK_TYPE type, Collection<String> genes) {
+    public String createNetwork(GraphType type, Collection<String> genes) {
         String networkJson;
         JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
         CytoscapeJsGraph graph = new CytoscapeJsGraph();
-
         HashSet<String> nodeNames = new HashSet<String>();
 
         /* Short-cut start! */
         if(genes.size() == 1) { // If it is a singleton
             String gene = genes.iterator().next();
             String uniprotId = geneNameService.getUniprotId(gene);
-
             String filePath = getPrecalculatedFolder() + "/" + uniprotId + ".json";
             File file = new File(filePath);
             if(file.exists()) {
@@ -192,25 +203,20 @@ public class PathwayCommonsGraphService {
         }
         /* Short-cut end */
 
-        // TODO: Use cpath2 client for this
-        String biopaxUrl = getPathwayCommonsUrl() + "/graph?";
-        for (String gene : genes)
-            biopaxUrl += "source=" + gene + "&";
-        biopaxUrl += "kind=" + type.toString();
+        // Execute a graph query using the cpath2 client
+        try {
+            Model model = client.createGraphQuery().kind(type).sources(genes).result();
+            if(model != null)
+                log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
 
-        SimpleIOHandler ioHandler = new SimpleIOHandler();
-        try
-        {
-            URL url = new URL(biopaxUrl);
-            URLConnection urlConnection = url.openConnection();
-            Model model = ioHandler.convertFromOWL(urlConnection.getInputStream());
+            // generate SIF
 
-            // the Pattern framework generates SIF
             SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
                 SIFEnum.CONTROLS_STATE_CHANGE_OF,
 				SIFEnum.CONTROLS_EXPRESSION_OF,
                 SIFEnum.CATALYSIS_PRECEDES
             );
+            searcher.setBlacklist(blacklist);
 
             for (SIFInteraction sif : searcher.searchSIF(model))
             {
@@ -239,9 +245,9 @@ public class PathwayCommonsGraphService {
                 graph.getEdges().add(edge);
             }
         }
-        catch (Exception e)
-        {
-            log.error("Failed to load/convert the network: " + e.getMessage());
+        catch (Exception e) {
+            log.debug("There was a problem loading the network: " + e.getMessage());
+            //add the query genes (to be displayed as disconnected nodes...)
             for (String gene : genes)
                 nodeNames.add(gene);
         } finally {
@@ -323,26 +329,6 @@ public class PathwayCommonsGraphService {
             cnt += i;
         }
         return cnt;
-    }
-
-    public enum NETWORK_TYPE {
-        NEIGHBOORHOOD("neighborhood"),
-        PATHSBETWEEN("pathsbetween");
-
-        private final String name;
-
-        NETWORK_TYPE(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
     }
 
 }
