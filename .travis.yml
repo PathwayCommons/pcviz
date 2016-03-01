@@ -2,3 +2,7 @@ sudo: false
 language: java
 # not required anymore:
 # script: cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties && mvn clean install
+# whitelist
+branches:
+  only:
+    - master
