@@ -13,7 +13,7 @@ Clone the repository and in the main directory, use the following command to cop
 The property `hgnc.location` should point to a valid HGNC output that contains the official gene symbols and their synonyms.
 This file can be downloaded as follows:
 
-	wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit" 
+	wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit"
 
 Make sure all other properties reflect the options you wanted to set and then use the following command to start the application within a test Tomcat instance:
 
@@ -25,6 +25,23 @@ If you would like to use your own Tomcat installation for the installation, then
 
 	mvn clean install
 	cp -f target/target/pcviz-VERSION.war /path/to/tomcat/webapps/pcviz.war
+
+# Populating cache using UniProt IDs
+To serve networks better, PCViz can utilize cached network data.
+The data folder for the cache files is set within the properties file using the
+
+To prepare those caches, you need to
+
+1. Clean up your files from `precalculted.folder`
+2. Deploy a dummy PCViz with empty caches
+3. Edit `uniprot_scraper.js` to point to the non-cached version of PCViz (if it is different than the production one)
+4. Make sure `phantomjs` is installed and run `uniprot_scraper.sh` with these arguments: `bash uniprot_scraper.sh /path/to/hgnc.txt /tmp/uniprotids.txt /path/to/cache/folder /path/to/log.txt`
+6. Optionally remove all PNGs from the output directory (as we don't make use of them for now)
+7. Move all JSONs in the folder over to your `precalculated.folder`
+8. Restart/re-deploy PCViz with this cache folder populated
+
+It is a good idea to clean up other cache folders (such as portal and co-citations) once in a while, but it is not required unless the formatting changes for those files/services. 
+Only the pre-calculated network cache requires pre-processing.
 
 # License
 This program is free software: you can redistribute it and/or modify

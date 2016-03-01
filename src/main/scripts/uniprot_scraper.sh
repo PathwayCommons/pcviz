@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #TODO sanitize args
 
 # args:
@@ -10,10 +12,15 @@
 phantomjs extract_uniprot.js $1 $2
 
 tempFile="$2";
+
 # process the temp file and scrape for each uniprot id
-while read -r uniprot
+numOfIds=`wc -l ${tempFile} | awk '{ print $1 }'`
+i=1
+while [ $i -le $numOfIds ]
 do
-    phantomjs uniprot_scraper.js $uniprot $3 >> $4;
-done < "$tempFile"
+    uniprotId=`head -n $i ${tempFile}| tail -1`
+    phantomjs uniprot_scraper.js $uniprotId $3 >> $4
+    let i=$i+1
+done
 
 rm $2;
