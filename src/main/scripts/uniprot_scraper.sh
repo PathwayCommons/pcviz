@@ -7,21 +7,27 @@
 #   $3 : output directory
 #   $4 : logfile name
 
+echo "creating a list of UniProt IDs..."
 # extract uniprot ids into a temp file
 phantomjs extract_uniprot.js $1 $2
 
 wait
-
+echo "for each ID, querying pcviz/PC2 for its nearest undirected neighborhood network:"
 tempFile="$2";
 
 # process the temp file and scrape for each uniprot id
 numOfIds=`wc -l ${tempFile} | awk '{ print $1 }'`
+echo "there are $numOfIds to process;"
+
 i=1
 while [ $i -le $numOfIds ]
 do
     uniprotId=`head -n $i ${tempFile}| tail -1`
     phantomjs uniprot_scraper.js $uniprotId $3 >> $4
+    echo "processed: $i"
     let i=$i+1
 done
 
 rm $2;
+echo "all done!"
+
