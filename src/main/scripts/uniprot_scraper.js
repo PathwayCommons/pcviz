@@ -96,7 +96,6 @@ function fetchNhood(page, queryString, outputDir)
 	page.open('http://localhost:8080/#neighborhood/' + queryString, function() {
 		var maxRetry = 50;
 		var retry = 0;
-
 		interval = setInterval(function() {
 			retry += page.evaluate(function() {
 				if (window.cy)
@@ -119,7 +118,7 @@ function fetchNhood(page, queryString, outputDir)
 				clearInterval(interval);
 				page.close();
 			}
-		}, 200);
+		}, 500);
 	});
 }
 

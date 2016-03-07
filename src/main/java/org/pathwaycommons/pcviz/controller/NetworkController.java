@@ -72,7 +72,6 @@ public class NetworkController
         }
 
         // otherwise, do the job -
-
         HashSet<String> geneSet = new HashSet<String>();
         geneSet.addAll(Arrays.asList(genes.split("\\s*,\\s*")));
 

@@ -59,8 +59,7 @@
             (new FooterView({})).render();
             var genes = ["MDM2", "RB1", "BRCA1", "SMAD3"];
             var randomGene = genes[Math.floor(Math.random()*genes.length)];
-            var networkType = "neighborhood";
-            (new HomeView({ model: { terms: randomGene, networkType: networkType }})).render();
+            (new HomeView({ model: { terms: this.cleanInput(randomGene), networkType: "neighborhood" }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
             this.trackClicks();
@@ -70,10 +69,7 @@
             (new ContainerView({ model: true })).render();
             (new HeaderView({})).render();
             (new FooterView({})).render();
-            (new HomeView({ model: {
-                terms: this.cleanInput(terms),
-                networkType: type
-            }})).render();
+            (new HomeView({ model: {terms: this.cleanInput(terms), networkType: type }})).render();
             (new SettingsView({ model: { networkType: type } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
             this.trackClicks();

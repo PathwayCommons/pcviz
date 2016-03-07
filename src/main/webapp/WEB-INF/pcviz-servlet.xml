@@ -11,10 +11,6 @@
     <!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
     <context:component-scan base-package="org.pathwaycommons.pcviz.controller"/>
 
-    <!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource
-    (css, js, images) requests to the container's default Servlet -->
-    <mvc:default-servlet-handler/>
-
     <!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views.
     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet 
     container: this will happen - here with all other types of exceptions. -->
@@ -28,6 +24,12 @@
             </props>
         </property>
     </bean>
+
+    <mvc:resources mapping="/css/**" location="/css/"/>
+    <mvc:resources mapping="/js/**" location="/js/"/>
+    <mvc:resources mapping="/images/**" location="/images/"/>
+    <mvc:resources mapping="/fonts/**" location="/fonts/"/>
+    <mvc:resources mapping="/sass/**" location="/sass/"/>
 
     <!-- this should normally go last-->
     <mvc:annotation-driven/>
