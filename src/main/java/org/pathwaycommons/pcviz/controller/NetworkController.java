@@ -78,7 +78,7 @@ public class NetworkController
 
         String networkJson = "";
         try {
-            networkJson = getPathwayCommonsGraphService().createNetwork(type, geneSet);
+            networkJson = pathwayCommonsGraphService.createNetwork(type, geneSet);
         } catch(Exception e) {
             e.printStackTrace();
         }

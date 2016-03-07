@@ -189,8 +189,8 @@ public class PathwayCommonsGraphService {
         /* Short-cut start! */
         if(genes.size() == 1) { // If it is a singleton
             String gene = genes.iterator().next();
-            String uniprotId = geneNameService.getUniprotId(gene);
-            String filePath = getPrecalculatedFolder() + "/" + uniprotId + ".json";
+            final String uniprotId = geneNameService.getUniprotId(gene);
+            String filePath = getPrecalculatedFolder() + File.separator + uniprotId + ".json";
             File file = new File(filePath);
             if(file.exists()) {
                 log.debug("Found cache for " + gene + ": " + uniprotId + ".json");
@@ -202,7 +202,9 @@ public class PathwayCommonsGraphService {
             }
         }
         /* Short-cut end */
-
+        // add the query genes (to be displayed as disconnected nodes if there will be any problem getting the network)
+        for (String gene : genes)
+            nodeNames.add(gene);
         // Execute a graph query using the cpath2 client
         try {
             Model model = client.createGraphQuery().kind(type).sources(genes).result();
@@ -237,7 +239,8 @@ public class PathwayCommonsGraphService {
                 edge.setProperty(PropertyKey.TARGET, targetName);
                 edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
                 edge.setProperty(PropertyKey.TYPE, sifType.getTag());
-                edge.setProperty(PropertyKey.DATASOURCE, sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
+                edge.setProperty(PropertyKey.DATASOURCE,
+                    sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
 				edge.setProperty(PropertyKey.PUBMED,
 					sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
 
@@ -247,9 +250,6 @@ public class PathwayCommonsGraphService {
         }
         catch (Exception e) {
             log.debug("There was a problem loading the network: " + e.getMessage());
-            //add the query genes (to be displayed as disconnected nodes...)
-            for (String gene : genes)
-                nodeNames.add(gene);
         } finally {
             for (String nodeName : nodeNames)
             {

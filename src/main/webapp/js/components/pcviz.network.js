@@ -215,7 +215,7 @@ var NetworkView = Backbone.View.extend({
 				        $(self.tooSlowMessage).hide();
 
                         var layoutOptions = pcVizLayoutOptions;
-                        if(data.nodes[0].position != undefined) {
+                        if(data.nodes.length > 0 && data.nodes[0].position != undefined) {
                             layoutOptions = { name: "preset" };
                         } else if(data.nodes.length == 1) { // If a singleton
                             layoutOptions = { name: "random", fit: false };
