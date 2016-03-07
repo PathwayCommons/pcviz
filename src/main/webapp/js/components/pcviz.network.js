@@ -287,11 +287,8 @@ var NetworkView = Backbone.View.extend({
 
 				                var edgeTypes = [
 				                    "catalysis-precedes",
-				                    "controls-degradation-of",
 				                    "controls-state-change-of",
 				                    "controls-expression-of",
-				                    "in-complex-with",
-				                    "interacts-with"
 				                ];
 
 				                _.each(edgeTypes, function(type)

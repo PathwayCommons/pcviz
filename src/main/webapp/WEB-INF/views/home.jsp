@@ -21,10 +21,6 @@
   ~ You should have received a copy of the GNU Lesser General Public License
   ~ along with PCViz. If not, see <http://www.gnu.org/licenses/>.
   --%>
-
-<%--<spring:eval var="pc2Url" expression="@pcvizProps.getProperty('pathwaycommons.url')" />--%>
-<%--<spring:eval var="pcvizUrl" expression="@pcvizProps.getProperty('pcviz.url')" />--%>
-
 <%
     WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
     Properties pcvizProps = (Properties) context.getBean("pcvizProps");
@@ -305,14 +301,6 @@
                                       <span class="itx-type-on-off label controls-expression-of" data-itx-type="controls-expression-of">controls expression <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-controls-degradation-of">
-                                  <td>
-                                      <span id="controls-degradation-of-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label controls-degradation-of" data-itx-type="controls-degradation-of">controls degradation <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
                               <tr id="row-catalysis-precedes">
                                   <td>
                                       <span id="catalysis-precedes-count">0</span>
@@ -321,23 +309,6 @@
                                       <span class="itx-type-on-off label catalysis-precedes" data-itx-type="catalysis-precedes">consecutive catalysis <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <tr id="row-in-complex-with">
-                                  <td>
-                                      <span id="in-complex-with-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label in-complex-with" data-itx-type="in-complex-with">in same complex <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
-                              <tr id="row-interacts-with">
-                                  <td>
-                                      <span id="interacts-with-count">0</span>
-                                  </td>
-                                  <td>
-                                      <span class="itx-type-on-off label interacts-with" data-itx-type="in-complex-with">interacts with <span class="fui-cross-16"></span></span>
-                                  </td>
-                              </tr>
-
                           </table>
                       </div>
 
@@ -515,7 +486,7 @@
               <h3>Cancer Context</h3>
               <h4>Alteration Frequency <small>({{altered}}%)</small></h4>
               <div class="progress">
-                  <div class="bar bar-danger" style="width: ${altered}%;"></div>
+                  <div class="bar bar-danger" style="width: {{altered}}%;"></div>
               </div>
 
               <a href="http://www.cbioportal.org/public-portal/cross_cancer.do?tab_index=tab_visualize&clinical_param_selection=null&cancer_study_id=all&genetic_profile_ids_PROFILE_MUTATION_EXTENDED=gbm_tcga_mutations&genetic_profile_ids_PROFILE_COPY_NUMBER_ALTERATION=gbm_tcga_gistic&Z_SCORE_THRESHOLD=2.0&RPPA_SCORE_THRESHOLD=1.0&case_set_id=gbm_tcga_cnaseq&case_ids=&gene_list={{geneSymbol}}&gene_set_choice=user-defined-list&Action=Submit" target="_blank" class="btn btn-inverse btn-block cbioportal">
