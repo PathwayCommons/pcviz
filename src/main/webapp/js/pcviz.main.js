@@ -59,7 +59,7 @@
             (new FooterView({})).render();
             var genes = ["MDM2", "RB1", "BRCA1", "SMAD3"];
             var randomGene = genes[Math.floor(Math.random()*genes.length)];
-            (new HomeView({ model: { terms: this.cleanInput(randomGene), networkType: "neighborhood" }})).render();
+            (new HomeView({ model: { terms: randomGene, networkType: "neighborhood" }})).render();
             (new SettingsView({ model: { networkType: "neighborhood" } })).render();
             (new NetworkView({ el: "#main-network-view" })).render();
             this.trackClicks();

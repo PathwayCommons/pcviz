@@ -11,25 +11,27 @@
     <!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
     <context:component-scan base-package="org.pathwaycommons.pcviz.controller"/>
 
-    <!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views.
-    The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet 
-    container: this will happen - here with all other types of exceptions. -->
-    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
-        <property name="exceptionMappings">
-            <props>
-                <prop key=".DataAccessException">dataAccessFailure</prop>
-                <prop key=".NoSuchRequestHandlingMethodException">resourceNotFound</prop>
-                <prop key=".TypeMismatchException">resourceNotFound</prop>
-                <prop key=".MissingServletRequestParameterException">resourceNotFound</prop>
-            </props>
-        </property>
+    <!--TODO: provide a nice error/exception view -->
+    <!--<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"-->
+          <!--p:defaultErrorView="exception" p:defaultStatusCode="500" p:exceptionAttribute="error"/>-->
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
     </bean>
 
-    <mvc:resources mapping="/css/**" location="/css/"/>
-    <mvc:resources mapping="/js/**" location="/js/"/>
-    <mvc:resources mapping="/images/**" location="/images/"/>
-    <mvc:resources mapping="/fonts/**" location="/fonts/"/>
-    <mvc:resources mapping="/sass/**" location="/sass/"/>
+    <mvc:view-controller path="/" view-name="home" />
+
+    <!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource
+    (css, js, images) requests to the container's default Servlet -->
+    <mvc:default-servlet-handler />
+    <!--<mvc:resources mapping="/css/**" location="/css/"/>-->
+    <!--<mvc:resources mapping="/js/**" location="/js/"/>-->
+    <!--<mvc:resources mapping="/images/**" location="/images/"/>-->
+    <!--<mvc:resources mapping="/fonts/**" location="/fonts/"/>-->
+    <!--<mvc:resources mapping="/sass/**" location="/sass/"/>-->
 
     <!-- this should normally go last-->
     <mvc:annotation-driven/>

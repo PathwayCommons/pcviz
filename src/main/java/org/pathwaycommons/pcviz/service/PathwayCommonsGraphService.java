@@ -48,7 +48,7 @@ public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
 
     private CPathClient client;
-    private Blacklist blacklist;
+    private final SIFSearcher searcher;
 
     private Integer minNumberOfCoCitationsForEdges = 0;
     private Integer minNumberOfCoCitationsForNodes = 0;
@@ -79,8 +79,9 @@ public class PathwayCommonsGraphService {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
         this.client = CPathClient.newInstance(pathwayCommonsUrl);
         try {
-            this.blacklist = new Blacklist(new URL(client.getActualEndPointURL()
+            final Blacklist blacklist = new Blacklist(new URL(client.getActualEndPointURL()
                     + "downloads/blacklist.txt").openStream());
+            searcher.setBlacklist(blacklist);
         } catch (IOException e) {
             log.warn("Failed to load and create Blacklist from: "
                     + client.getActualEndPointURL() + "downloads/blacklist.txt");
@@ -143,12 +144,12 @@ public class PathwayCommonsGraphService {
         this.cocitMan = cocitMan;
     }
 
-    public PathwayCommonsGraphService(String pathwayCommonsUrl, CocitationManager cocitMan) {
-        this.pathwayCommonsUrl = pathwayCommonsUrl;
-        this.cocitMan = cocitMan;
-    }
-
     public PathwayCommonsGraphService() {
+        searcher = new SIFSearcher(new CommonIDFetcher(),
+                SIFEnum.CONTROLS_STATE_CHANGE_OF,
+                SIFEnum.CONTROLS_EXPRESSION_OF,
+                SIFEnum.CATALYSIS_PRECEDES
+        );
     }
 
     @Cacheable("metadataCache")
@@ -202,24 +203,18 @@ public class PathwayCommonsGraphService {
             }
         }
         /* Short-cut end */
+
         // add the query genes (to be displayed as disconnected nodes if there will be any problem getting the network)
         for (String gene : genes)
             nodeNames.add(gene);
+
         // Execute a graph query using the cpath2 client
         try {
-            Model model = client.createGraphQuery().kind(type).sources(genes).result();
+            final Model model = client.createGraphQuery().kind(type).sources(genes).result();
             if(model != null)
                 log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
 
-            // generate SIF
-
-            SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
-                SIFEnum.CONTROLS_STATE_CHANGE_OF,
-				SIFEnum.CONTROLS_EXPRESSION_OF,
-                SIFEnum.CATALYSIS_PRECEDES
-            );
-            searcher.setBlacklist(blacklist);
-
+            // convert the model to SIF and process the interactions
             for (SIFInteraction sif : searcher.searchSIF(model))
             {
                 String srcName = sif.sourceID;

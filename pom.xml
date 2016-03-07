@@ -32,21 +32,8 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
-			<!--<plugin>-->
-				<!--<groupId>org.apache.tomcat.maven</groupId>-->
-				<!--<artifactId>tomcat7-maven-plugin</artifactId>-->
-				<!--<version>2.1</version>-->
-				<!--<configuration>-->
-					<!--<url>http://localhost:8080/manager</url>-->
-					<!--<server>localhost</server>-->
-					<!--<systemProperties>-->
-						<!--<JAVA_OPTS>-Xms256m -Xmx8g -XX:MaxPermSize=256m</JAVA_OPTS>-->
-					<!--</systemProperties>-->
-				<!--</configuration>-->
-			<!--</plugin>-->
 			<plugin>
-				<!-- Can run the exec-jar as: java -Xms256m -Xmx3g -DCPATH2_HOME=$CPATH2_HOME
-					-Djava.io.tmpdir=$CPATH2_HOME/tmp -jar target/cpath-web-service-<VERSION>-exec-war.jar -->
+				<!-- Can run the exec-jar as: java -Xmx8g -jar target/pcviz.jar -httpPort=8080 -->
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.1</version>
@@ -70,7 +57,7 @@
 						</configuration>
 					</execution>
 				</executions>
-				<!-- this is for tomcat:run -->
+				<!-- this is to debug run as: tomcat:run -->
 				<configuration>
 					<url>http://localhost:8080/manager</url>
 					<server>localhost</server>
@@ -82,7 +69,7 @@
 					<dependency>
 						<groupId>org.apache.tomcat</groupId>
 						<artifactId>tomcat-catalina</artifactId>
-						<version>8.0.24</version>
+						<version>7.0.37</version>
 						<scope>runtime</scope>
 					</dependency>
 				</dependencies>
