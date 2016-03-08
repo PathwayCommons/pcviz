@@ -20,6 +20,7 @@
 package org.pathwaycommons.pcviz.service;
 
 import cpath.client.CPathClient;
+import cpath.client.util.CPathException;
 import cpath.service.GraphType;
 import flexjson.JSONSerializer;
 import org.apache.commons.logging.Log;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -50,7 +52,6 @@ import java.util.*;
 public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
 
-    private CPathClient client;
     private Blacklist blacklist;
 
     private GeneNameService geneNameService;
@@ -63,6 +64,7 @@ public class PathwayCommonsGraphService {
     @Value("${cocitation.min.node:0}")
     private Integer minNumberOfCoCitationsForNodes;
 
+    @Value("${pathwaycommons.url:http://www.pathwaycommons.org/pc2/}")
     private String pathwayCommonsUrl;
 
     @Value("${precalculated.folder}")
@@ -92,17 +94,8 @@ public class PathwayCommonsGraphService {
         return pathwayCommonsUrl;
     }
 
-    @Value("${pathwaycommons.url:http://www.pathwaycommons.org/pc2/}")
     public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
-        this.client = CPathClient.newInstance(pathwayCommonsUrl);
-        try {
-            blacklist = new Blacklist(new URL(client.getActualEndPointURL()
-                    + "downloads/blacklist.txt").openStream());
-        } catch (IOException e) {
-            log.warn("Failed to load and create Blacklist from: "
-                    + client.getActualEndPointURL() + "downloads/blacklist.txt");
-        }
     }
 
     public GeneNameService getGeneNameService() {
@@ -151,6 +144,15 @@ public class PathwayCommonsGraphService {
         cocitationMap = new HashMap<String, Map<String, Integer>>();
     }
 
+
+    @PostConstruct
+    void init() {
+        try {
+            blacklist = new Blacklist(new URL(pathwayCommonsUrl + "downloads/blacklist.txt").openStream());
+        } catch (IOException e) {
+            log.warn("Failed to load and create Blacklist from: " + pathwayCommonsUrl + "downloads/blacklist.txt");
+        }
+    }
 
     @Cacheable("metadataCache")
     public String getMetadata(String datatype) {
@@ -210,7 +212,13 @@ public class PathwayCommonsGraphService {
 
         // Execute a graph query using the cpath2 client
         try {
-            final Model model = client.createGraphQuery().kind(type).sources(genes).result();
+            final CPathClient client = CPathClient.newInstance(pathwayCommonsUrl);
+            Model model = null;
+            try {
+                model = client.createGraphQuery().kind(type).sources(genes).result();
+            } catch (CPathException ex) {
+                log.info("No BioPAX " + type.toString().toLowerCase() +" returned from PC2 for " + genes + "; " + ex);
+            }
             if(model != null)
                 log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
 
