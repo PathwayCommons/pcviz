@@ -17,10 +17,13 @@
  * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.pathwaycommons.pcviz.cocitation;
+package org.pathwaycommons.pcviz.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.HashMap;
@@ -29,43 +32,63 @@ import java.util.Map;
 /**
  * @author Ozgun Babur
  */
+@Service
 public class CocitationManager
 {
-	/**
-	 * For logging.
-	 */
 	private static final Log log = LogFactory.getLog(CocitationManager.class);
 
-	/**
+	/*
 	 * Directory for co-citation files. todo use more fancy resource management
 	 */
 	private String resourceDir;
 
-	/**
+	/*
 	 * Life of cached co-citation data in milliseconds.
 	 */
 	private long shelfLife;
 
-    /**
+    /*
      * For crawling the iHop web site and caching the results
      */
     private IHOPSpider ihopSpider;
 
+
+
 	/**
-	 * Constructor with cache life (in days).
-	 * @param cacheLife life in days
+	 * Default Constructor.
 	 */
-	public CocitationManager(int cacheLife, String resourceDir)
-	{
-		setShelfLife(cacheLife);
-        setResourceDir(resourceDir);
+	public CocitationManager() {
+	}
+
+	public String getResourceDir() {
+		return resourceDir;
+	}
+
+	@Value("${cocitation.cache.folder}")
+	public void setResourceDir(String resourceDir) {
+		this.resourceDir = resourceDir;
+		createResourceDir();
+	}
+
+	public IHOPSpider getIhopSpider() {
+		return ihopSpider;
+	}
+
+	@Autowired
+	public void setIhopSpider(IHOPSpider ihopSpider) {
+		this.ihopSpider = ihopSpider;
+	}
+
+	public long getShelfLife() {
+		return shelfLife;
 	}
 
 	/**
-	 * Sets the shelf life of cached co-citations.
+	 * Sets the shelf life of cached co-citations using the pcviz properties.
 	 * @param days shelf life in days
 	 */
-	public void setShelfLife(long days)
+	@Value("${cocitation.shelflife:30}")
+	public void setShelfLife(Long days)
 	{
 		// convert to milliseconds
 		this.shelfLife = days * 1000 * 60 * 60 * 24;
@@ -255,25 +278,4 @@ public class CocitationManager
 			}
 		}
 	}
-
-    public String getResourceDir() {
-        return resourceDir;
-    }
-
-    public void setResourceDir(String resourceDir) {
-        this.resourceDir = resourceDir;
-        createResourceDir();
-    }
-
-    public long getShelfLife() {
-        return shelfLife;
-    }
-
-    public IHOPSpider getIhopSpider() {
-        return ihopSpider;
-    }
-
-    public void setIhopSpider(IHOPSpider ihopSpider) {
-        this.ihopSpider = ihopSpider;
-    }
 }

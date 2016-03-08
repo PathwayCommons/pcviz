@@ -27,12 +27,14 @@ import org.apache.commons.logging.LogFactory;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.pattern.miner.*;
 import org.biopax.paxtools.pattern.util.Blacklist;
-import org.pathwaycommons.pcviz.cocitation.CocitationManager;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,14 +46,31 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+@Service
 public class PathwayCommonsGraphService {
     private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
 
     private CPathClient client;
-    private final SIFSearcher searcher;
+    private Blacklist blacklist;
 
-    private Integer minNumberOfCoCitationsForEdges = 0;
-    private Integer minNumberOfCoCitationsForNodes = 0;
+    private GeneNameService geneNameService;
+    private CocitationManager cocitMan;
+    private UniProtService uniProtService;
+
+    @Value("${cocitation.min.edge:0}")
+    private Integer minNumberOfCoCitationsForEdges; // if the prop. isn't set, the default value=0
+
+    @Value("${cocitation.min.node:0}")
+    private Integer minNumberOfCoCitationsForNodes;
+
+    private String pathwayCommonsUrl;
+
+    @Value("${precalculated.folder}")
+    private String precalculatedFolder;
+
+    // Cache for co-citations.
+    private final Map<String, Map<String, Integer>> cocitationMap;
+
 
     public Integer getMinNumberOfCoCitationsForEdges() {
         return minNumberOfCoCitationsForEdges;
@@ -69,36 +88,31 @@ public class PathwayCommonsGraphService {
         this.minNumberOfCoCitationsForNodes = minNumberOfCoCitationsForNodes;
     }
 
-    private String pathwayCommonsUrl;
-
     public String getPathwayCommonsUrl() {
         return pathwayCommonsUrl;
     }
 
+    @Value("${pathwaycommons.url:http://www.pathwaycommons.org/pc2/}")
     public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
         this.pathwayCommonsUrl = pathwayCommonsUrl;
         this.client = CPathClient.newInstance(pathwayCommonsUrl);
         try {
-            final Blacklist blacklist = new Blacklist(new URL(client.getActualEndPointURL()
+            blacklist = new Blacklist(new URL(client.getActualEndPointURL()
                     + "downloads/blacklist.txt").openStream());
-            searcher.setBlacklist(blacklist);
         } catch (IOException e) {
             log.warn("Failed to load and create Blacklist from: "
                     + client.getActualEndPointURL() + "downloads/blacklist.txt");
         }
     }
 
-    private GeneNameService geneNameService;
-
     public GeneNameService getGeneNameService() {
         return geneNameService;
     }
 
+    @Autowired
     public void setGeneNameService(GeneNameService geneNameService) {
         this.geneNameService = geneNameService;
     }
-
-    private String precalculatedFolder;
 
     public String getPrecalculatedFolder() {
         return precalculatedFolder;
@@ -109,48 +123,34 @@ public class PathwayCommonsGraphService {
     }
 
     /**
-     * Cache for co-citations.
-     */
-    private static Map<String, Map<String, Integer>> cocitationMap = new HashMap<String, Map<String, Integer>>();
-
-    /**
      * Accessor for new co-citations.
      */
-    private CocitationManager cocitMan;
-
-    private UniProtService uniProtService;
-
     public UniProtService getUniProtService() {
         return uniProtService;
     }
 
+    @Autowired
     public void setUniProtService(UniProtService uniProtService) {
         this.uniProtService = uniProtService;
-    }
-
-    public static Map<String, Map<String, Integer>> getCocitationMap() {
-        return cocitationMap;
-    }
-
-    public static void setCocitationMap(Map<String, Map<String, Integer>> cocitationMap) {
-        PathwayCommonsGraphService.cocitationMap = cocitationMap;
     }
 
     public CocitationManager getCocitMan() {
         return cocitMan;
     }
 
+    @Autowired
     public void setCocitMan(CocitationManager cocitMan) {
         this.cocitMan = cocitMan;
     }
 
+
+    /**
+     * Default Constructor.
+     */
     public PathwayCommonsGraphService() {
-        searcher = new SIFSearcher(new CommonIDFetcher(),
-                SIFEnum.CONTROLS_STATE_CHANGE_OF,
-                SIFEnum.CONTROLS_EXPRESSION_OF,
-                SIFEnum.CATALYSIS_PRECEDES
-        );
+        cocitationMap = new HashMap<String, Map<String, Integer>>();
     }
+
 
     @Cacheable("metadataCache")
     public String getMetadata(String datatype) {
@@ -215,6 +215,13 @@ public class PathwayCommonsGraphService {
                 log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
 
             // convert the model to SIF and process the interactions
+            final SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
+                    SIFEnum.CONTROLS_STATE_CHANGE_OF,
+                    SIFEnum.CONTROLS_EXPRESSION_OF,
+                    SIFEnum.CATALYSIS_PRECEDES
+            );
+            searcher.setBlacklist(blacklist);
+
             for (SIFInteraction sif : searcher.searchSIF(model))
             {
                 String srcName = sif.sourceID;

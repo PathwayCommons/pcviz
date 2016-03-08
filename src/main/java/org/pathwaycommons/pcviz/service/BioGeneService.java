@@ -19,7 +19,9 @@
 
 package org.pathwaycommons.pcviz.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,15 +29,34 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+@Service
 public class BioGeneService {
+
+    @Value("${biogene.url:http://cbio.mskcc.org/biogene/}")
     public String bioGeneUrl;
+
+    @Value("${biogene.format:json}")
     public String bioGeneFormat;
 
+    /**
+     * Default Constructor.
+     */
     public BioGeneService() {
     }
 
-    public BioGeneService(String bioGeneUrl, String bioGeneFormat) {
+    public String getBioGeneUrl() {
+        return bioGeneUrl;
+    }
+
+    public void setBioGeneUrl(String bioGeneUrl) {
         this.bioGeneUrl = bioGeneUrl;
+    }
+
+    public String getBioGeneFormat() {
+        return bioGeneFormat;
+    }
+
+    public void setBioGeneFormat(String bioGeneFormat) {
         this.bioGeneFormat = bioGeneFormat;
     }
 
@@ -79,19 +100,4 @@ public class BioGeneService {
         return sb.toString();
     }
 
-    public String getBioGeneUrl() {
-        return bioGeneUrl;
-    }
-
-    public void setBioGeneUrl(String bioGeneUrl) {
-        this.bioGeneUrl = bioGeneUrl;
-    }
-
-    public String getBioGeneFormat() {
-        return bioGeneFormat;
-    }
-
-    public void setBioGeneFormat(String bioGeneFormat) {
-        this.bioGeneFormat = bioGeneFormat;
-    }
 }

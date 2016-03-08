@@ -19,22 +19,21 @@
 
 package org.pathwaycommons.pcviz.service;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:spring/testContext.xml")
 public class GeneNameServiceTest {
-    protected ClassPathXmlApplicationContext context;
-    protected GeneNameService geneNameService;
 
-    @Before
-    public void initialize() {
-        context = new ClassPathXmlApplicationContext("classpath:/spring/testContext.xml");
-        geneNameService = (GeneNameService) context.getBean("geneNameService");
-    }
+    @Autowired
+    protected GeneNameService geneNameService;
 
     @Test
     public void testValidation() {

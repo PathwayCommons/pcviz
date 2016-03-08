@@ -1,7 +1,10 @@
-package org.pathwaycommons.pcviz.cocitation;
+package org.pathwaycommons.pcviz.service;
 
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Map;
 
@@ -10,16 +13,20 @@ import static org.junit.Assert.*;
 /**
  * @author Ozgun Babur
  */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:spring/testContext.xml")
 public class CocitationManagerTest
 {
-    protected ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:/spring/testContext.xml");
+
+	@Autowired
+	CocitationManager man;
 
     /**
 	 * Beware! This test first clears the co-citation cache.
 	 */
 	@Test
 	public void testManager() throws InterruptedException {
-		CocitationManager man = (CocitationManager) context.getBean("cocitationManager1");
 		man.clearCache();
 
 		String gene = "FOXA1";
@@ -32,8 +39,8 @@ public class CocitationManagerTest
 
 		assertTrue(man.cacheExists(gene));
 
-		// a manager with a cache that has no shelf life
-        man = (CocitationManager) context.getBean("cocitationManager0");
+		//set shelf life to 0
+		man.setShelfLife(0L);
 
 		// re-getting citations should download and stamp again
 		long stamp1 = man.getCacheTimestamp(gene);

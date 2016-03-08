@@ -2,16 +2,27 @@ package org.pathwaycommons.pcviz.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
+@Service
 public class UniProtService {
     private static Log log = LogFactory.getLog(UniProtService.class);
 
-    private String uniProtBaseURL = "http://www.uniprot.org/";
+    //auto-set the value from pcviz.properties (placeholder) or use the default
+    @Value("${uniprot.base.url:http://www.uniprot.org/}")
+    private String uniProtBaseURL;
+
+    /**
+     * Default Constructor.
+     */
+    public UniProtService() {
+    }
 
     public String getUniProtBaseURL() {
         return uniProtBaseURL;

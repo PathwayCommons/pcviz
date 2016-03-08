@@ -23,19 +23,33 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pathwaycommons.pcviz.model.AutoCompleteResult;
 import org.pathwaycommons.pcviz.model.GeneValidation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
 
+@Service
 public class GeneNameService {
     private static Log log = LogFactory.getLog(GeneNameService.class);
 
+    @Value("${hgnc.location}")
     private Resource geneResource;
+
     private HashMap<String, HashSet<String>> geneMaps = null;
     private ArrayList<String> geneMapKeysSorted = null;
-    private Integer autoCompleteLimit = Integer.MAX_VALUE;
-    private HashMap<String, String> symbolToUniprot = new HashMap<String, String>();
+
+    private Integer autoCompleteLimit;
+
+    private final HashMap<String, String> symbolToUniprot;
+
+    /**
+     * Default Constructor.
+     */
+    public GeneNameService() {
+        symbolToUniprot = new HashMap<String, String>();
+    }
 
     public Resource getGeneResource() {
         return geneResource;
@@ -49,6 +63,7 @@ public class GeneNameService {
         return autoCompleteLimit;
     }
 
+    @Value("${autoCompleteResult.limit:10}")
     public void setAutoCompleteLimit(Integer autoCompleteLimit) {
         this.autoCompleteLimit = autoCompleteLimit;
     }

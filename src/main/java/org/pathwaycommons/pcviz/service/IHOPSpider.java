@@ -17,10 +17,12 @@
  * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.pathwaycommons.pcviz.cocitation;
+package org.pathwaycommons.pcviz.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
@@ -35,25 +37,30 @@ import java.util.Map;
  *
  * @author Ozgun Babur
  */
+@Service
 public class IHOPSpider
 {
-	/**
-	 * For logging.
-	 */
 	private static final Log log = LogFactory.getLog(IHOPSpider.class);
 
     /**
      * Base URL to the iHop web pages
      */
+	@Value("${ihop.url:http://www.ihop-net.org/UniPub/iHOP/}")
     private String iHopURL;
 
     /**
-     * Initializes the class and sets the required url property
-     * @param iHopURL iHop base URL
+     * Default Constructor.
      */
-    public IHOPSpider(String iHopURL) {
-        this.iHopURL = iHopURL;
+    public IHOPSpider() {
     }
+
+	public String getiHopURL() {
+		return iHopURL;
+	}
+
+	public void setiHopURL(String iHopURL) {
+		this.iHopURL = iHopURL;
+	}
 
     /**
 	 * Gets the co-citation data from the iHOP server.
@@ -252,11 +259,4 @@ public class IHOPSpider
 		return null;
 	}
 
-    public String getiHopURL() {
-        return iHopURL;
-    }
-
-    public void setiHopURL(String iHopURL) {
-        this.iHopURL = iHopURL;
-    }
 }

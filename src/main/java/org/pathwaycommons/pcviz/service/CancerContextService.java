@@ -26,17 +26,18 @@ import org.cbio.causality.model.AlterationPack;
 import org.pathwaycommons.pcviz.model.CancerStudyDetails;
 import org.pathwaycommons.pcviz.model.PropertyKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@Service
 public class CancerContextService {
-    @Autowired
-    private CBioPortalAccessor cBioPortalAccessor;
 
-    private String portalUrl;
+    private CBioPortalAccessor cBioPortalAccessor;
 
     private String dataCacheFolder;
 
@@ -48,18 +49,17 @@ public class CancerContextService {
         this.dataCacheFolder = dataCacheFolder;
     }
 
-    public String getPortalUrl() {
-        return portalUrl;
-    }
-
-    public void setPortalUrl(String portalUrl) {
-        this.portalUrl = portalUrl;
-    }
-
     public CBioPortalAccessor getcBioPortalAccessor() {
         return cBioPortalAccessor;
     }
 
+    /**
+     * Default Constructor.
+     */
+    public CancerContextService() {
+    }
+
+    @Autowired
     public void setcBioPortalAccessor(CBioPortalAccessor cBioPortalAccessor) {
         this.cBioPortalAccessor = cBioPortalAccessor;
     }
