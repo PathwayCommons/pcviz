@@ -60,65 +60,46 @@ function scrape(uniprotId, outDir)
 function fetchNhood(page, queryString, outputDir)
 {
 	console.log("fetchNHood(): " + queryString);
-
-	var same = 0;
-	var prevMsg = "";
-	var interval = null;
-
-	page.onConsoleMessage = function(msg) {
-		// TODO this is a really bad way of checking layout end
-		if (msg.split("__")[0] == "NODE_POSITION")
-		{
-			// checking if node position changed within the interval
-			if (msg == prevMsg)
+	page.open('http://localhost:8080/#neighborhood/' + queryString, function() {
+		var repeat = 100;
+		var same = 0;
+		var prev = "";
+		var interval = setInterval(function() {
+			var pos = page.evaluate(function() {
+				if (window.cy)
+				{
+					return JSON.stringify(window.cy.elements("node").position());
+				} else
+				{
+					return "";
+				}
+			});
+			//if(pos) {console.log(pos);} //last node pos. message
+			if(prev && pos == prev)
 			{
 				same++;
-			}
-			else
+			} else
 			{
-				prevMsg = msg;
 				same = 0;
+				prev = pos;
 			}
-
-			// if no change for more than 3 successive intervals,
-			// assuming that layout is finished...
+			// if no change for at least 4 successive messages, assuming that layout is finished...
+			// TODO: find a better way to tell if layout is done...
 			if (same > 3)
 			{
 				clearInterval(interval);
 				saveGraph(page, queryString, outputDir);
 				page.close();
+				console.log("saved " + queryString);
 			}
-		}
 
-		console.log(msg);
-	};
-
-	page.open('http://localhost:8080/#neighborhood/' + queryString, function() {
-		var maxRetry = 50;
-		var retry = 0;
-		interval = setInterval(function() {
-			retry += page.evaluate(function() {
-				if (window.cy)
-				{
-					// TODO see if there is way to check the layout is finished!
-					console.log("NODE_POSITION__" + JSON.stringify(window.cy.elements("node").position()));
-					// proper evaluation
-					return 0;
-				}
-				else
-				{
-					// window.cy is not initialized, retry++
-					return 1;
-				}
-			});
-
-			if (retry > maxRetry)
+			if (--repeat < 0)
 			{
-				console.log("[timeout] skipping query " + queryString);
 				clearInterval(interval);
 				page.close();
+				console.log("[timeout]");
 			}
-		}, 500);
+		}, 300);
 	});
 }
 

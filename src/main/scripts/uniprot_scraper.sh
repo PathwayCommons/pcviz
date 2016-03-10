@@ -12,6 +12,8 @@ if ! [ -e "$2" ]; then
     # extract uniprot ids into a temp file
     phantomjs extract_uniprot.js $1 $2
     wait
+else
+    echo "using previously generated ID list: $2"
 fi
 
 echo "for each ID, querying pcviz/PC2 for its nearest undirected neighborhood network:"
@@ -35,5 +37,5 @@ do
     let i=$i+1
 done
 
-rm $2;
+# rm $2;
 echo "all done!"
