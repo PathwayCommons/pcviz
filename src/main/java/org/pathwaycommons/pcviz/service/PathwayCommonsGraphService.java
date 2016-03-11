@@ -259,29 +259,29 @@ public class PathwayCommonsGraphService {
             }
         }
         catch (Exception e) {
-            log.debug("There was a problem loading the network: " + e.getMessage());
-        } finally {
-            for (String nodeName : nodeNames)
-            {
-                int totalCocitations = getTotalCocitations(nodeName);
-                if(totalCocitations < getMinNumberOfCoCitationsForNodes())
-                    continue;
+            log.error("There was a problem loading the network: " + e);
+        }
 
-                CytoscapeJsNode node = new CytoscapeJsNode();
-                node.setProperty(PropertyKey.ID, nodeName);
-                boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
-                node.setProperty(PropertyKey.ISVALID, isValid);
-                node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
-                boolean isSeed = genes.contains(nodeName);
-                node.setProperty(PropertyKey.ISSEED, isSeed);
-                node.setProperty(PropertyKey.RANK, 0);
-                node.setProperty(PropertyKey.ALTERED, 0);
-                String uniprotId = geneNameService.getUniprotId(nodeName);
-                node.setProperty(PropertyKey.UNIPROT, uniprotId);
-                String description = uniProtService.getDescription(uniprotId);
-                node.setProperty(PropertyKey.UNIPROTDESC, description);
-                graph.getNodes().add(node);
-            }
+        for (String nodeName : nodeNames)
+        {
+            int totalCocitations = getTotalCocitations(nodeName);
+            if(totalCocitations < getMinNumberOfCoCitationsForNodes())
+                continue;
+
+            CytoscapeJsNode node = new CytoscapeJsNode();
+            node.setProperty(PropertyKey.ID, nodeName);
+            boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
+            node.setProperty(PropertyKey.ISVALID, isValid);
+            node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
+            boolean isSeed = genes.contains(nodeName);
+            node.setProperty(PropertyKey.ISSEED, isSeed);
+            node.setProperty(PropertyKey.RANK, 0);
+            node.setProperty(PropertyKey.ALTERED, 0);
+            String uniprotId = geneNameService.getUniprotId(nodeName);
+            node.setProperty(PropertyKey.UNIPROT, uniprotId);
+            String description = uniProtService.getDescription(uniprotId);
+            node.setProperty(PropertyKey.UNIPROTDESC, description);
+            graph.getNodes().add(node);
         }
 
         networkJson = jsonSerializer.deepSerialize(graph);

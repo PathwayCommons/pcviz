@@ -61,7 +61,7 @@ function fetchNhood(page, queryString, outputDir)
 {
 	console.log("fetchNHood(): " + queryString);
 	page.open('http://localhost:8080/#neighborhood/' + queryString, function() {
-		var repeat = 100;
+		var repeat = 30;
 		var same = 0;
 		var prev = "";
 		var interval = setInterval(function() {
@@ -74,7 +74,7 @@ function fetchNhood(page, queryString, outputDir)
 					return "";
 				}
 			});
-			//if(pos) {console.log(pos);} //last node pos. message
+			if(pos) {console.log(pos);} //last node pos. message
 			if(prev && pos == prev)
 			{
 				same++;
@@ -83,9 +83,9 @@ function fetchNhood(page, queryString, outputDir)
 				same = 0;
 				prev = pos;
 			}
-			// if no change for at least 4 successive messages, assuming that layout is finished...
+			// if no change for at least 3 successive messages, assuming that layout is finished...
 			// TODO: find a better way to tell if layout is done...
-			if (same > 3)
+			if (same > 2)
 			{
 				clearInterval(interval);
 				saveGraph(page, queryString, outputDir);
@@ -99,7 +99,7 @@ function fetchNhood(page, queryString, outputDir)
 				page.close();
 				console.log("[timeout]");
 			}
-		}, 300);
+		}, 1000);
 	});
 }
 
