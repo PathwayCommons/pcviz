@@ -46,7 +46,7 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<path>/</path>
+							<path>/pcviz</path>
 							<enableNaming>false</enableNaming>
 							<attachArtifactClassifier>exec-war</attachArtifactClassifier>
 							<attachArtifactClassifierType>jar</attachArtifactClassifierType>
@@ -61,6 +61,7 @@
 				<configuration>
 					<url>http://localhost:8080/manager</url>
 					<server>localhost</server>
+					<path>/pcviz</path>
 					<systemProperties>
 						<JAVA_OPTS>-Xms256m -Xmx8g -XX:MaxPermSize=256m</JAVA_OPTS>
 					</systemProperties>

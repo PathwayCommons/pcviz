@@ -60,8 +60,8 @@ function scrape(uniprotId, outDir)
 function fetchNhood(page, queryString, outputDir)
 {
 	console.log("fetchNHood(): " + queryString);
-	page.open('http://localhost:8080/#neighborhood/' + queryString, function() {
-		var repeat = 30;
+	page.open('http://localhost:8080/pcviz/#neighborhood/' + queryString, function() {
+		var repeat = 300;
 		var same = 0;
 		var prev = "";
 		var interval = setInterval(function() {
