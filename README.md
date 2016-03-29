@@ -19,13 +19,11 @@ Make sure all other properties reflect the options you wanted to set and then us
 ```
 	mvn clean install tomcat:run
 ```
-and point your browser to [http://localhost:8080/pcviz/](http://localhost:8080/pcviz/).
-
-Or, the following command starts the stand-alone pcviz.jar application (Tomcat is there embedded):
+or, the following command starts the stand-alone pcviz.jar application (Tomcat is there embedded):
 ```
 	java -Xmx16g -jar target/pcviz.jar -httpPort=8080
 ```
-and point your browser to [http://localhost:8080/](http://localhost:8080/).
+and then point your browser to [http://localhost:8080/pcviz/](http://localhost:8080/pcviz/).
 
 If you would like to use your own Tomcat installation for the installation, then you can also deploy the file as follows:
 ```
