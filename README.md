@@ -17,7 +17,7 @@ This file can be downloaded as follows:
 ```
 Make sure all other properties reflect the options you wanted to set and then use the following command to start the application within a test Tomcat instance:
 ```
-	mvn clean install tomcat:run
+	mvn clean install tomcat7:run
 ```
 or, the following command starts the stand-alone pcviz.jar application (Tomcat is there embedded):
 ```
