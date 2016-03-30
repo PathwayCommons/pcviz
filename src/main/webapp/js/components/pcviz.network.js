@@ -21,11 +21,14 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
             "content": "data(id)",
-            "shape": "data(shape)",
             "border-width": 3,
             "background-color": "mapData(altered, 0, 1, #DDDDDD, red)",
             "border-color": "#555",
             "font-size": "15"
+        })
+        .selector("[shape]")
+        .css({
+          "shape": "data(shape)",
         })
         .selector("[?isseed]")
         .css({

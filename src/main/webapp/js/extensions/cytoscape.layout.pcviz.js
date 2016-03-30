@@ -34,7 +34,7 @@
     };
 
     function PCVizLayout( options ){
-        this.options = $$.util.extend({}, defaults, options);
+        this.options = $.extend({}, defaults, options);
     }
 
     PCVizLayout.prototype.run = function(){

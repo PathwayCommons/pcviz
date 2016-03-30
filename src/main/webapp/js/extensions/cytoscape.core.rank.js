@@ -29,7 +29,7 @@
 
     function RankNodes(options) {
         var cy = this;
-        options = $$.util.extend(true, {}, defaults, options);
+        options = $.extend(true, {}, defaults, options);
 
         // We will pool everything for performance issues
         var pooledData = {};
