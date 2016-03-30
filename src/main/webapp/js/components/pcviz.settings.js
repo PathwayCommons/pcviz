@@ -40,14 +40,7 @@ var SettingsView = Backbone.View.extend({
             var edges = cy.$("edge[type='" + type + "']");
 
             if(!$(this).hasClass("itx-removed")) {
-                edges.animate({
-                    css: { 'opacity' : .0 }
-                }, {
-                    duration: 250,
-                    complete: function() {
-                        this.hide();
-                    }
-                });
+                edges.hide();
 
                 $(this).find("span")
                     .removeClass("fui-cross-16")
@@ -62,13 +55,7 @@ var SettingsView = Backbone.View.extend({
                 })).render();
 
             } else {
-                edges
-                    .show()
-                    .animate({
-                        css: { 'opacity' : 1.0 }
-                    }, {
-                        duration: 250
-                    });
+                edges.show();
 
                 $(this).find("span")
                     .removeClass("fui-plus-16")
@@ -139,6 +126,29 @@ var NodesSliderView = Backbone.View.extend({
             var minVal = model.min;
             var maxVal = model.max;
 
+            var update = _.throttle( function(event, ui) {
+                $("#slider-help-row").fadeOut();
+
+                selfSlider.slider("disable");
+                (new FilteringNodesView()).render();
+
+                var val = ui.value;
+
+
+                // Then hide the low importance ones
+                var eles = cy.elements();
+                var hiddenNodes = cy.$("node[rank>=" + val + "][!isseed]");
+                var shownNodes = cy.nodes().not( hiddenNodes );
+                var shown = shownNodes.add( shownNodes.connectedEdges() );
+                var hidden = cy.elements().not( shown );
+
+                eles.show();
+                hidden.hide();
+
+                (new NumberOfNodesView({ model: { numberOfNodes: val }})).render();
+                selfSlider.slider("enable");
+            }, 1000/30 );
+
             // TODO: Get all these dynamic range values from the Ranker itself
             $(this).slider({
                 min: minVal,
@@ -147,65 +157,11 @@ var NodesSliderView = Backbone.View.extend({
                 orientation: "horizontal",
                 range: "min",
 
-                slide: function(event, ui) {
-                    (new NumberOfNodesView({ model: { numberOfNodes: ui.value }})).render();
-                },
-                change: function(event, ui) {
-                    $("#slider-help-row").fadeOut();
-
-                    selfSlider.slider("disable");
-                    (new FilteringNodesView()).render();
-
-                    var val = ui.value;
-
-                    // First stop all animations and clear the queue
-                    cy.$("node").stop(true, true);
-
-                    var allNodesLength = cy.nodes().length;
-
-                    var processedNodes = 0;
-
-                    // Then hide the low importance ones
-                    var eles = cy.$("node[rank>=" + val + "][!isseed]");
-                    var visibleNodesLength = allNodesLength - eles.length;
-                    eles
-                        .animate(
-                        {
-                            css: {
-                                'opacity': .0
-                            }
-                        }, {
-                            duration: 700,
-                            complete: function() {
-                                this.hide();
-                                if(++processedNodes == allNodesLength) {
-                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
-                                    selfSlider.slider("enable");
-                                }
-                            }
-                        }
-                    );
-
-                    // Finally show high importance ones
-                    var eles2 = cy.$("node[rank<" + val + "]");
-                    eles2
-                        .show()
-                        .animate(
-                        {
-                            css: {
-                                'opacity': 1.0
-                            }
-                        }, {
-                            duration: 700,
-                            complete: function() {
-                                if(++processedNodes == allNodesLength) {
-                                    (new NumberOfNodesView({ model: { numberOfNodes: visibleNodesLength }})).render();
-                                    selfSlider.slider("enable");
-                                }
-                            }
-                        }
-                    );
-                }
+                // slide: function(event, ui) {
+                //     (new NumberOfNodesView({ model: { numberOfNodes: ui.value }})).render();
+                // },
+                slide: update,
+                change: update
             });
 
             $("#decrease-button").click(function(e) {

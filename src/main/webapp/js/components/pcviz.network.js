@@ -21,11 +21,15 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
             "content": "data(id)",
-            "border-width": 3,
-            "background-color": "mapData(altered, 0, 1, #DDDDDD, red)",
-            "border-color": "#555",
+            // "border-width": 3,
+            "background-color": "mapData(altered, 0, 1, #888888, red)",
+            // "border-color": "#555",
             "font-size": "15"
         })
+		.selector("edge")
+			.css({
+				"curve-style": "haystack"
+			})
         .selector("[shape]")
         .css({
           "shape": "data(shape)",
@@ -102,12 +106,38 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         }); // end of pcVizStyleSheet
 var edgeLengthArray = new Array(); // a map from edgeID to number
 var defaultEdgeLength = 10; // we will hop 0.15 of this amount each time, the larger the biger the radiuses
-var pcVizLayoutOptions = {
-    name: 'cose'
 
-    // put more options here if you want to config the layout...
-    // http://js.cytoscape.org/#layouts/cose
-}; // end of pcVizLayoutOptions
+
+function getPcVizLayoutOptions( data ){
+	var numNodes = data.nodes.length;
+	var levelWidth = numNodes / 35;
+
+	// circles
+	// var pcVizLayoutOptions = {
+	// 	name: 'concentric',
+    //
+	// 	concentric: function( node ){
+	// 		return node.data('isseed') ? levelWidth : -node.data('rank');
+	// 	},
+    //
+	// 	levelWidth: function(nodes){ // the variation of concentric values in each level
+	// 		return levelWidth;
+	// 	}
+    //
+	// }; // end of pcVizLayoutOptions
+
+	// forces layout
+	var pcVizLayoutOptions = {
+		name: 'cose',
+		animate: true
+
+		// put more options here if you want to config the layout...
+		// http://js.cytoscape.org/#layouts/cose
+	}; // end of pcVizLayoutOptions
+
+	return pcVizLayoutOptions;
+}
+
 
 var NetworkView = Backbone.View.extend({
 	// div id for the initial display before the actual network loaded
@@ -206,19 +236,20 @@ var NetworkView = Backbone.View.extend({
 				        controlsContainer.show();
 				        $(self.tooSlowMessage).hide();
 
-                        var layoutOptions = pcVizLayoutOptions;
-                        if(data.nodes.length > 0 && data.nodes[0].position != undefined) {
-                            layoutOptions = { name: "preset" };
-                        } else if(data.nodes.length == 1) { // If a singleton
-                            layoutOptions = { name: "random", fit: false };
-                        }
+                        var layoutOptions = getPcVizLayoutOptions( data );
+                        // if(data.nodes.length > 0 && data.nodes[0].position != undefined) {
+                        //     layoutOptions = { name: "preset" };
+                        // } else if(data.nodes.length == 1) { // If a singleton
+                        //     layoutOptions = { name: "random", fit: false };
+                        // }
 
 				        var cyOptions = {
+							container: container,
 				            elements: data,
 				            style: self.cyStyle,
 				            showOverlay: false,
                             layout: layoutOptions,
-                            minZoom: 0.125,
+                            minZoom: 0.01,
 				            maxZoom: 16,
 
 				            ready: function()
@@ -229,7 +260,13 @@ var NetworkView = Backbone.View.extend({
 				                cy.boxSelectionEnabled(false);
 
 				                // add pan zoom control panel
-				                container.cytoscapePanzoom();
+				                cy.panzoom({
+									// icon class names
+									sliderHandleIcon: 'icon-minus',
+									zoomInIcon: 'icon-plus',
+									zoomOutIcon: 'icon-minus',
+									resetIcon: 'icon-resize-full'
+								});
 
 				                // we are gonna use 'tap' to handle events for multiple devices
 				                // add click listener on nodes
@@ -265,11 +302,13 @@ var NetworkView = Backbone.View.extend({
                                 calcEdgeDistribution(data, numberOfNodes);
 				                // make the canvas is size propotoinal to the square root of the number of nodes
 				                // so the zoom level should change accordingly
-				                var w = cy.container().clientWidth;
-				                var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
-				                // 0.9 is multiplied to get rid of the overlap as before
-				                var zoomLevel = 0.9 * (w / width);
-                                cy.zoom(zoomLevel);
+				                // var w = cy.container().clientWidth;
+
+								// why?????
+                                // var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
+                                // // 0.9 is multiplied to get rid of the overlap as before
+                                // var zoomLevel = 0.9 * (w / width);
+                                // cy.zoom(zoomLevel);
 
 				                // Run the ranker on this graph
 				                cy.rankNodes();
@@ -305,7 +344,16 @@ var NetworkView = Backbone.View.extend({
 				            } // end of ready: function()
 				        }; // end of cyOptions
 
-						  container.cy(cyOptions);
+						var startTime = Date.now();
+						// console.log('Initting...');
+
+						cy = cytoscape(cyOptions);
+
+						cy.ready(function(){
+							var endTime = Date.now();
+
+							// console.log('Init took %s ms', endTime - startTime);
+						});
 
 				        (new NotyView({
 			        		template: "#noty-network-loaded-template",
@@ -437,19 +485,19 @@ var EmbedNetworkView = Backbone.View.extend({
                         container.html("");
                         container.show();
 
-                        var layoutOptions = pcVizLayoutOptions;
-                        if(data.nodes[0].position != undefined) {
-                            layoutOptions = { name: "preset" };
-                        } else if(data.nodes.length == 1) { // If a singleton
-                            layoutOptions = { name: "random", fit: false };
-                        }
+                        var layoutOptions = getPcVizLayoutOptions( data );
+                        // if(data.nodes[0].position != undefined) {
+                        //     layoutOptions = { name: "preset" };
+                        // } else if(data.nodes.length == 1) { // If a singleton
+                        //     layoutOptions = { name: "random", fit: false };
+                        // }
 
                         var cyOptions = {
                             elements: data,
                             style: self.cyStyle,
                             showOverlay: false,
                             layout: layoutOptions,
-                            minZoom: 0.25,
+                            minZoom: 0.01,
                             maxZoom: 16,
 
                             ready: function()
@@ -460,7 +508,13 @@ var EmbedNetworkView = Backbone.View.extend({
                                 cy.boxSelectionEnabled(false);
 
                                 // add pan zoom control panel
-                                container.cytoscapePanzoom();
+								cy.panzoom({
+									// icon class names
+									sliderHandleIcon: 'icon-minus',
+									zoomInIcon: 'icon-plus',
+									zoomOutIcon: 'icon-minus',
+									resetIcon: 'icon-resize-full'
+								});
 
                                 var createAndPostClickMessage = function(where, info) {
                                     var message = {
@@ -553,6 +607,8 @@ var EmbedNetworkView = Backbone.View.extend({
  */
 function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a cytoscape.js core plugin
 {
+	return; // TODO probably not used; don't need the expense (not using arbor)
+
 	// method for sorting numeric array
 	var c = function compareNumbers(a, b)
 	{

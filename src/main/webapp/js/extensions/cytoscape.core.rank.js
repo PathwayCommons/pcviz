@@ -30,50 +30,39 @@
     function RankNodes(options) {
         var cy = this;
         options = $.extend(true, {}, defaults, options);
+        var eles = cy.elements();
+        var identity = function(x){ return x; };
+        var nodes = eles.map( identity );
 
-        // We will pool everything for performance issues
-        var pooledData = {};
+        cy.startBatch();
 
-        // First set defaults
-        cy.$("node").each(function(i, ele) {
-            var nodeData = {};
-            nodeData[options.attrName] = options.defaultScore;
-            pooledData[ele.id()] = nodeData;
-        });
+        eles.bfs("node[?isseed]", function(i, depth) {
+                var node = this;
 
-        // Then update the visited nodes
-        cy.elements().bfs("node[?isseed]", function(i, depth) {
-                var nodeData = {};
-                nodeData[options.attrName] = Math.max(options.minScore, options.maxScore-depth);
-                pooledData[this.id()] = nodeData;
+                node.data( options.attrName, Math.max(options.minScore, options.maxScore-depth) );
             },
             false
         );
 
-        var nodes = [];
-        cy.nodes().each(function(i, ele) {
-            nodes.push(ele.id());
-        });
-
         nodes.sort(function(a, b) {
-            var diff = pooledData[b][options.attrName] - pooledData[a][options.attrName]
+            var diff = b.data(options.attrName) - b.data(options.attrName);
 
             if(diff == 0) {
-                diff = cy.$("#" + b).data("altered") - cy.$("#" + a).data("altered");
+                diff = b.data("altered") - a.data("altered");
 
                 if(diff == 0) {
-                    diff = cy.$("#" + b).data("cited") - cy.$("#" + a).data("cited");
+                    diff = b.data("cited") - a.data("cited");
                 }
             }
             return diff;
         });
 
-        for(var i=0; i < nodes.length; i++) {
-            pooledData[nodes[i]][options.attrName2] = i;
+        for( var i = 0; i < nodes.length; i++ ) {
+            nodes[i].data(options.attrName2, i);
         }
 
-        // update'em all
-        cy.batchData(pooledData);
+
+        cy.endBatch();
 
         return this;
     }

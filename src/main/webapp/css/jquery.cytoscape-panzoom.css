@@ -1,24 +1,4 @@
-
-/* jquery.cytoscape-panzoom.css */
-
-/**
- * This file is part of cytoscape.js 2.0.1.
- * 
- * Cytoscape.js is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- * 
- * Cytoscape.js is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along with
- * cytoscape.js. If not, see <http://www.gnu.org/licenses/>.
- */
- 
-.ui-cytoscape-panzoom {
+.cy-panzoom {
 	position: absolute;
 	font-size: 12px;
 	color: #fff;
@@ -27,9 +7,10 @@
 	color: #666;
 	font-size: 11px;
 	z-index: 99999;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-zoom-button {
+.cy-panzoom-zoom-button {
 	cursor: pointer;
 	padding: 3px;
 	text-align: center;
@@ -43,79 +24,88 @@
 	margin-left: -1px;
 	margin-top: -1px;
 	z-index: 1;
-	box-shadow: 0 1px 4px rgba(0, 0, 0,  0.5);
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-zoom-button:active,
-.ui-cytoscape-panzoom-slider-handle:active,
-.ui-cytoscape-panzoom-slider-handle.active {
+.cy-panzoom-zoom-button:active,
+.cy-panzoom-slider-handle:active,
+.cy-panzoom-slider-handle.active {
 	background: #ddd;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-pan-button {
+.cy-panzoom-pan-button {
 	position: absolute;
 	z-index: 1;
 	height: 16px;
 	width: 16px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-reset {
+.cy-panzoom-reset {
 	top: 55px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-zoom-in {
+.cy-panzoom-zoom-in {
 	top: 80px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-zoom-out {
+.cy-panzoom-zoom-out {
 	top: 197px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-pan-up {
+.cy-panzoom-pan-up {
 	top: 0;
 	left: 50%;
 	margin-left: -5px;
-	width: 0; 
-	height: 0; 
+	width: 0;
+	height: 0;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
 	border-bottom: 5px solid #666;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-pan-down {
+.cy-panzoom-pan-down {
 	bottom: 0;
 	left: 50%;
 	margin-left: -5px;
-	width: 0; 
-	height: 0; 
+	width: 0;
+	height: 0;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
 	border-top: 5px solid #666;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-pan-left {
+.cy-panzoom-pan-left {
 	top: 50%;
 	left: 0;
 	margin-top: -5px;
-	width: 0; 
-	height: 0; 
+	width: 0;
+	height: 0;
 	border-top: 5px solid transparent;
-	border-bottom: 5px solid transparent; 
-	border-right: 5px solid #666; 
+	border-bottom: 5px solid transparent;
+	border-right: 5px solid #666;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-pan-right {
+.cy-panzoom-pan-right {
 	top: 50%;
 	right: 0;
 	margin-top: -5px;
-	width: 0; 
-	height: 0; 
+	width: 0;
+	height: 0;
 	border-top: 5px solid transparent;
 	border-bottom: 5px solid transparent;
 	border-left: 5px solid #666;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-pan-indicator {
+.cy-panzoom-pan-indicator {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -129,29 +119,31 @@
 	display: none;
 	z-index: 999;
 	opacity: 0.6;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-slider {
+.cy-panzoom-slider {
 	position: absolute;
 	top: 97px;
 	left: 17px;
 	height: 100px;
 	width: 15px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-slider-background {
+.cy-panzoom-slider-background {
 	position: absolute;
 	top: 0;
 	width: 2px;
 	height: 100px;
 	left: 5px;
 	background: #fff;
-	box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25);
 	border-left: 1px solid #999;
 	border-right: 1px solid #999;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-slider-handle {
+.cy-panzoom-slider-handle {
 	position: absolute;
 	width: 16px;
 	height: 8px;
@@ -159,17 +151,19 @@
 	border: 1px solid #999;
 	border-radius: 2px;
 	margin-left: -2px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0,  0.5);
 	z-index: 999;
 	line-height: 8px;
+	cursor: default;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-slider-handle .icon {
+.cy-panzoom-slider-handle .icon {
 	margin: 0 4px;
 	line-height: 10px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-no-zoom-tick {
+.cy-panzoom-no-zoom-tick {
 	position: absolute;
 	background: #666;
 	border: 1px solid #fff;
@@ -180,9 +174,10 @@
 	left: 3px;
 	z-index: 1;
 	margin-top: 3px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-panner {
+.cy-panzoom-panner {
 	position: absolute;
 	left: 5px;
 	top: 5px;
@@ -190,12 +185,12 @@
 	width: 40px;
 	background: #fff;
 	border: 1px solid #999;
-	box-shadow: 0 1px 4px rgba(0, 0, 0,  0.5);
 	border-radius: 40px;
 	margin-left: -1px;
+	box-sizing: content-box;
 }
 
-.ui-cytoscape-panzoom-panner-handle {
+.cy-panzoom-panner-handle {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -204,7 +199,22 @@
 	width: 40px;
 	position: absolute;
 	z-index: 999;
+	box-sizing: content-box;
 }
 
+.cy-panzoom-zoom-only .cy-panzoom-slider,
+.cy-panzoom-zoom-only .cy-panzoom-panner {
+	display: none;
+}
 
+.cy-panzoom-zoom-only .cy-panzoom-reset {
+	top: 20px;
+}
 
+.cy-panzoom-zoom-only .cy-panzoom-zoom-in {
+	top: 45px;
+}
+
+.cy-panzoom-zoom-only .cy-panzoom-zoom-out {
+	top: 70px;
+}
