@@ -100,21 +100,10 @@ var pcVizStyleSheet = cytoscape.stylesheet()
 var edgeLengthArray = new Array(); // a map from edgeID to number
 var defaultEdgeLength = 10; // we will hop 0.15 of this amount each time, the larger the biger the radiuses
 var pcVizLayoutOptions = {
-    name: 'pcvizarbor',
-    liveUpdate: true,
-    nodeMass: function(e) { return e.isseed ? 2.5 : 0.2; },
-    edgeLength: function(e) { 
-	return edgeLengthArray[e.id];
-    },
-    repulsion: 1800,
-    stiffness: 75,
-    gravity: true,
-    maxIterations: 75,
-    displayStepSize: 5,
-    stableEnergy: function(energy) {
-        return (energy.max <= 2) || (energy.mean <= 0.5);
-    },
-    precision: 0
+    name: 'cose'
+
+    // put more options here if you want to config the layout...
+    // http://js.cytoscape.org/#layouts/cose
 }; // end of pcVizLayoutOptions
 
 var NetworkView = Backbone.View.extend({
@@ -131,7 +120,7 @@ var NetworkView = Backbone.View.extend({
 	// cytoscape web visual style object
 	cyStyle: pcVizStyleSheet,
 
-	render: function() 
+	render: function()
 	{
 		// reference to the NetworkView instance itself, this is required since
 		// 'this' doesn't refer to the actual instance for callback functions
@@ -149,7 +138,7 @@ var NetworkView = Backbone.View.extend({
 		// get gene names from the input field
 		var names = $(self.tagsInputField).val().toUpperCase();
 
-		if(names.length < 1) 
+		if(names.length < 1)
 		{
 		    networkLoading.hide();
 		    container.html("");
@@ -170,11 +159,11 @@ var NetworkView = Backbone.View.extend({
 		// This will run the validation on the side track
 		var geneValidations = new GeneValidations({ genes: names });
 		geneValidations.fetch({
-			success: function() 
+			success: function()
 			{
 				var geneValidationsView = new GeneValidationsView({ model: geneValidations });
 				geneValidationsView.render();
-				if(!geneValidationsView.isAllValid()) 
+				if(!geneValidationsView.isAllValid())
 				{
 					(new NotyView({
 						template: "#noty-invalid-symbols-template",
@@ -182,10 +171,10 @@ var NetworkView = Backbone.View.extend({
 						model: {}
 					})).render();
 				}
-			
+
 				var networkType = $("#query-type").val();
 
-				if(networkType == "pathsbetween" && names.split(",").length < 2) 
+				if(networkType == "pathsbetween" && names.split(",").length < 2)
 				{
 				    (new NotyView({
 				        template: "#noty-invalid-pathsbetween-template",
@@ -194,7 +183,7 @@ var NetworkView = Backbone.View.extend({
 				    })).render();
 				}
 
-				window.setTimeout(function() 
+				window.setTimeout(function()
 				{
 				    $(self.tooSlowMessage).slideDown();
 				}, 10000);
@@ -205,7 +194,7 @@ var NetworkView = Backbone.View.extend({
 
 				// TODO: change graph type dynamically! (nhood)
 				$.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
-				    function(data) 
+				    function(data)
 				    {
 				        networkLoading.hide();
 				        container.html("");
@@ -305,7 +294,7 @@ var NetworkView = Backbone.View.extend({
 						});
 
 						(new NodesSliderView({
-							model: 
+							model:
 							{
 						                min: cy.nodes("[?isseed]").length,
 						                max: numberOfNodes
@@ -318,7 +307,7 @@ var NetworkView = Backbone.View.extend({
 
 				        (new NotyView({
 			        		template: "#noty-network-loaded-template",
-			        		model: 
+			        		model:
 						{
 						        nodes: data.nodes.length,
 						        edges: data.edges ? data.edges.length : 0,
@@ -326,9 +315,9 @@ var NetworkView = Backbone.View.extend({
 						        timeout: 4000
 						 }
 				        })).render();
-				} // end of function(data) 
+				} // end of function(data)
 			); // end of $.getJSON
-		} // end of success: function() 
+		} // end of success: function()
         }); // end of geneValidations.fetch({
 
         return this;
@@ -339,7 +328,7 @@ var NetworkView = Backbone.View.extend({
     * @param evt
     * @param node
     */
-    updateNodeDetails: function(evt, node) 
+    updateNodeDetails: function(evt, node)
     {
  	var self = this;
 	var container = $(self.detailsContent);
@@ -352,14 +341,14 @@ var NetworkView = Backbone.View.extend({
 	container.show();
 
 	// request json data from BioGene service
-	$.getJSON("biogene/human/" + node.id(), function(queryResult) 
+	$.getJSON("biogene/human/" + node.id(), function(queryResult)
 	{
 		container.empty();
 
 		if (queryResult.returnCode != "SUCCESS")
 		{
 			container.append(
-            		_.template($("#biogene-retrieve-error-template").html(), 
+            		_.template($("#biogene-retrieve-error-template").html(),
 				{
 	                		returnCode: queryResult.returnCode
             			})
@@ -419,7 +408,7 @@ var EmbedNetworkView = Backbone.View.extend({
     // cytoscape web visual style object
     cyStyle: pcVizStyleSheet,
 
-    render: function() 
+    render: function()
     {
         var self = this;
 
@@ -548,14 +537,14 @@ var EmbedNetworkView = Backbone.View.extend({
 
 /**
  * distribution of citation of edges is calculated here
- * 
+ *
  * edges connected to seed nodes:
  * for each seed node
  * get the distribution of all edges connected to that seed node
  * place the 8 largest cited edges on the first radius (smallest edge length)
- * then the next 2^4 will go on the second radius, 
+ * then the next 2^4 will go on the second radius,
  * next 2^5 on the third... so on
- * 
+ *
  * for edges not connected to seed nodes
  * their length should be proportional to the radius size of the seed-edges
  * (edges connected to seed nodes)
@@ -583,18 +572,18 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 	{
 		if(nodes[i].data.isseed)
 		{
-			// calculate the citation distribution 
+			// calculate the citation distribution
 			citedDis = new Array();
 			var nID = nodes[i].data.id;
 			for (var j = 0 ; j < edges.length; j++)
 			{
-				if (edges[j].data.target == nID || 
+				if (edges[j].data.target == nID ||
 				    edges[j].data.source == nID)
 				{
 					citedDis.push(parseInt(edges[j].data.cited, 10));
 				}
 			}
-			// sort it 
+			// sort it
 			citedDis.sort(c);
 			// now based on this distribution calculate the hops
 			// hop: radius from the seed node
@@ -616,7 +605,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 					edgeLengthArray[e.id] = length;
 					// mark this edge as processed
 					nonSeedEdges[e.id] = false;
-					
+
 					// here hop statistics are updated to later calculate non-seed edge length
 					// accordingly, hopAverage holds sums, not average till here, I will update it later
 					// if this hop level is new, define it
@@ -628,10 +617,10 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 					// otherwise just add it up
 					else
 					{
-						hopAverage[hop - 1] += e.cited; 
-						hopCount[hop - 1] += 1; 
+						hopAverage[hop - 1] += e.cited;
+						hopCount[hop - 1] += 1;
 					}
-					
+
 				}
 			}
 		}
@@ -643,7 +632,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 	{
 		hopAverage[i] /= hopCount[i];
 	}
-	
+
 	var maxHop = hopAverage.length;
 	// so the edge length should be proportional to radiuses of seed nodes
 	for (var i = 0; i < edges.length; i++)
@@ -653,7 +642,7 @@ function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a c
 			var e = edges[i].data;
 			var hop = 0;
 			// hop till average hop is reached
-			while ( hop < maxHop && 
+			while ( hop < maxHop &&
 				e.cited < hopAverage[hop])
 			{
 				hop++;
