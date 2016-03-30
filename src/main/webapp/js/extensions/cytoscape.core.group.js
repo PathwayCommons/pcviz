@@ -50,7 +50,7 @@
 			{
 				if (!grouped.contains(node))
 				{
-					var data = $$.util.extend(true, {}, node.data);
+					var data = $.extend(true, {}, node.data);
 					graph.nodes.push({"data": data});
 				}
 			});
@@ -63,7 +63,7 @@
 
 				group.forEach(function(node)
 				{
-					var data = $$.util.extend(true, {}, node.data);
+					var data = $.extend(true, {}, node.data);
 					data.parent = groupID;
 					graph.nodes.push({"data": data});
 				});

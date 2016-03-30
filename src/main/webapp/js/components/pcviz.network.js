@@ -264,7 +264,6 @@ var NetworkView = Backbone.View.extend({
                                 // update the edgeLengthArray according to citation distribution
                                 calcEdgeDistribution(data, numberOfNodes);
 				                // make the canvas is size propotoinal to the square root of the number of nodes
-				                // see extensions.cytoscape.layout.pcvix.arbor.js
 				                // so the zoom level should change accordingly
 				                var w = cy.container().clientWidth;
 				                var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));

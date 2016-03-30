@@ -778,7 +778,6 @@
   <script src="js/jquery.ui.touch-punch.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/jquery.placeholder.js"></script>
-  <script src="js/arbor.js"></script>
   <script src="js/cytoscape.min.js"></script>
   <script src="js/jquery.cytoscape-panzoom.min.js"></script>
   <script src="js/application.js"></script>
@@ -809,7 +808,6 @@
   <script src="js/components/pcviz.edgeinfo.js"></script>
   <script src="js/components/pcviz.cancer.js"></script>
   <script src="js/extensions/cytoscape.layout.pcviz.js"></script>
-  <script src="js/extensions/cytoscape.layout.pcviz.arbor.js"></script>
   <script src="js/extensions/cytoscape.core.rank.js"></script>
 
   </body>
