@@ -70,6 +70,9 @@ public class PathwayCommonsGraphService {
     @Value("${precalculated.folder}")
     private String precalculatedFolder;
 
+    @Value("${blacklist.location}")
+    private String blacklistLocation;
+
     // Cache for co-citations.
     private final Map<String, Map<String, Integer>> cocitationMap;
 
@@ -148,9 +151,10 @@ public class PathwayCommonsGraphService {
     @PostConstruct
     void init() {
         try {
-            blacklist = new Blacklist(new URL(pathwayCommonsUrl + "downloads/blacklist.txt").openStream());
+            blacklist = new Blacklist(new URL(blacklistLocation).openStream());
         } catch (IOException e) {
-            log.warn("Failed to load and create Blacklist from: " + pathwayCommonsUrl + "downloads/blacklist.txt");
+            log.warn("Cannot initialize Blacklist from " + blacklistLocation + " (won't use any)");
+            blacklist = null;
         }
     }
 

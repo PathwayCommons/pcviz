@@ -219,7 +219,7 @@ var NetworkView = Backbone.View.extend({
 				window.setTimeout(function()
 				{
 				    $(self.tooSlowMessage).slideDown();
-				}, 10000);
+				}, 15000);
 
 
                 // log this event on google analytics

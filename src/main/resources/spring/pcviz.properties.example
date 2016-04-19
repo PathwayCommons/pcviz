@@ -32,3 +32,6 @@ pcviz.url=http://www.pathwaycommons.org/pcviz/
 
 # UniProt Base URL for extracting descriptions
 uniprot.base.url=http://www.uniprot.org/
+
+# PC2 data version specific blacklist of ubiquitous small molecules (used by SIF converter)
+blacklist.location=file:/tmp/blacklist.txt
