@@ -215,55 +215,56 @@ public class PathwayCommonsGraphService {
             nodeNames.add(gene);
 
         // Execute a graph query using the cpath2 client
+        final CPathClient client = CPathClient.newInstance(pathwayCommonsUrl);
+
+        Model model = null;
         try {
-            final CPathClient client = CPathClient.newInstance(pathwayCommonsUrl);
-            Model model = null;
-            try {
-                model = client.createGraphQuery().kind(type).sources(genes).result();
-            } catch (CPathException ex) {
-                log.info("No BioPAX " + type.toString().toLowerCase() +" returned from PC2 for " + genes + "; " + ex);
-            }
-            if(model != null)
-                log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
-
-            // convert the model to SIF and process the interactions
-            final SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
-                    SIFEnum.CONTROLS_STATE_CHANGE_OF,
-                    SIFEnum.CONTROLS_EXPRESSION_OF,
-                    SIFEnum.CATALYSIS_PRECEDES
-            );
-            searcher.setBlacklist(blacklist);
-
-            for (SIFInteraction sif : searcher.searchSIF(model))
-            {
-                String srcName = sif.sourceID;
-                String targetName = sif.targetID;
-
-                int cocitations = getCocitations(srcName, targetName);
-                if(cocitations < getMinNumberOfCoCitationsForEdges())
-                    continue;
-
-                nodeNames.add(srcName);
-                nodeNames.add(targetName);
-                SIFType sifType = sif.type;
-
-                CytoscapeJsEdge edge = new CytoscapeJsEdge();
-                edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
-                edge.setProperty(PropertyKey.SOURCE, srcName);
-                edge.setProperty(PropertyKey.TARGET, targetName);
-                edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
-                edge.setProperty(PropertyKey.TYPE, sifType.getTag());
-                edge.setProperty(PropertyKey.DATASOURCE,
-                    sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
-				edge.setProperty(PropertyKey.PUBMED,
-					sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
-
-                edge.setProperty(PropertyKey.CITED, cocitations);
-                graph.getEdges().add(edge);
-            }
+            model = client.createGraphQuery().kind(type).sources(genes).result();
+        } catch (CPathException ex) {
+            log.info("No BioPAX " + type.toString().toLowerCase() + " returned from PC2 for " + genes + "; " + ex);
         }
-        catch (Exception e) {
-            log.error("There was a problem loading the network: ", e);
+
+        if (model != null) {
+            log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
+            try {
+                // convert the model to SIF and process the interactions
+                final SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
+                        SIFEnum.CONTROLS_STATE_CHANGE_OF,
+                        SIFEnum.CONTROLS_EXPRESSION_OF,
+                        SIFEnum.CATALYSIS_PRECEDES
+                );
+                searcher.setBlacklist(blacklist);
+
+                for (SIFInteraction sif : searcher.searchSIF(model)) {
+                    String srcName = sif.sourceID;
+                    String targetName = sif.targetID;
+
+                    int cocitations = getCocitations(srcName, targetName);
+                    if (cocitations < getMinNumberOfCoCitationsForEdges())
+                        continue;
+
+                    nodeNames.add(srcName);
+                    nodeNames.add(targetName);
+                    SIFType sifType = sif.type;
+
+                    CytoscapeJsEdge edge = new CytoscapeJsEdge();
+                    edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
+                    edge.setProperty(PropertyKey.SOURCE, srcName);
+                    edge.setProperty(PropertyKey.TARGET, targetName);
+                    edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
+                    edge.setProperty(PropertyKey.TYPE, sifType.getTag());
+                    edge.setProperty(PropertyKey.DATASOURCE,
+                            sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
+                    edge.setProperty(PropertyKey.PUBMED,
+                            sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
+
+                    edge.setProperty(PropertyKey.CITED, cocitations);
+                    graph.getEdges().add(edge);
+                }
+            }
+            catch(Exception e){
+                log.error("Failed converting the network to SIF, etc.: ", e);
+            }
         }
 
         for (String nodeName : nodeNames)
