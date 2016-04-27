@@ -41,12 +41,13 @@ public class CancerContextService {
 
     private String dataCacheFolder;
 
-    public String getDataCacheFolder() {
-        return dataCacheFolder;
-    }
-
+    @Value("${cbioportal.cache.folder}")
     public void setDataCacheFolder(String dataCacheFolder) {
         this.dataCacheFolder = dataCacheFolder;
+    }
+
+    public String getDataCacheFolder() {
+        return dataCacheFolder;
     }
 
     public CBioPortalAccessor getcBioPortalAccessor() {

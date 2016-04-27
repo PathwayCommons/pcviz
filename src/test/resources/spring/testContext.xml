@@ -10,6 +10,7 @@
                         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <util:properties id="pcvizProps" location="classpath:spring/test.properties" />
+
     <context:property-placeholder  properties-ref="pcvizProps" />
 
     <context:component-scan base-package="org.pathwaycommons.pcviz.service"/>
