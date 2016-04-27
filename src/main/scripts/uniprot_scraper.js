@@ -61,7 +61,7 @@ function fetchNhood(page, queryString, outputDir)
 {
 	console.log("fetchNHood(): " + queryString);
 	page.open('http://localhost:8080/pcviz/#neighborhood/' + queryString, function() {
-		var repeat = 3000;
+		var repeat = 2000;
 		var same = 0;
 		var prev = "";
 		var interval = setInterval(function() {
@@ -99,7 +99,7 @@ function fetchNhood(page, queryString, outputDir)
 				page.close();
 				console.log("[timeout]");
 			}
-		}, 200);
+		}, 500);
 	});
 }
 
