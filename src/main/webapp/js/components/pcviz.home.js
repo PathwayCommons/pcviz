@@ -129,6 +129,8 @@ var HomeView = Backbone.View.extend({
             e.preventDefault();
             $("#download-network").trigger('click');
 
+            //TODO: convert current cy graph to SIF and return instead of expensive PC2 query
+
             var t = terms.split(",");
             var url = $(this).data("pcurl") + "graph?";
             for(var i=0; i < t.length; i++) {
