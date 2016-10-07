@@ -214,15 +214,14 @@
                   </div>
 
                   <div class="row hide" id="extra-download-options">
-                      <div class="span6 offset1">
+                      <div class="span9 offset1">
                           <div class="share download-options">
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
-                                  <a class="btn" id="download-sif"
-                                     data-pcurl="<%=pc2Url%>"
-                                     href="#">Network (SIF)</a>
-                                  <a class="btn" id="download-biopax"
-                                     data-pcurl="<%=pc2Url%>"
+                                  <a class="btn" id="download-sif-quick" href="#">Network (SIF)</a>
+                                  <a class="btn" id="download-sif" data-pcurl="<%=pc2Url%>"
+                                     href="#">Larger Network (SIF)</a>
+                                  <a class="btn" id="download-biopax" data-pcurl="<%=pc2Url%>"
                                      href="#">Network (BioPAX)</a>
                               </div>
                           </div>
@@ -792,6 +791,7 @@
   <script src="js/store.js"></script>
   <script src="js/jquery.scrollTo-1.4.3.1-min.js"></script>
   <script src="js/js_cols.min.js"></script>
+  <script src="js/FileSaver.min.js"></script>
 
   <!--[if lt IE 8]>
   <script src="js/icon-font-ie7.js"></script>

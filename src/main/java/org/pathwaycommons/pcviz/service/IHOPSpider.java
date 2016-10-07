@@ -70,29 +70,28 @@ public class IHOPSpider
 	public Map<String, Integer> parseCocitations(String symbol)
 	{
 		// Find internal ID
-		String url = getGeneSearchURL(symbol);
-		BufferedReader reader = getReader(url);
-		try
-		{
-			String ID = getInternalID(reader, symbol);
-			reader.close();
+		BufferedReader reader = getReader(getGeneSearchURL(symbol));
+		try {
+			String ID = null;
 
-			if (ID == null)
-			{
-				log.debug("Cannot find internal ID of " + symbol + ".");
+			if(reader != null) {
+				ID = getInternalID(reader, symbol);
+				reader.close();
+			}
+
+			if (ID == null) {
+				log.debug("Cannot find internal ID of " + symbol);
 				return null;
 			}
 
-			url = getGenePageURL(ID);
-			reader = getReader(url);
-
+			reader = getReader(getGenePageURL(ID));
             Map<String, Integer> map = parseCocitations(reader);
             reader.close();
+
             return map;
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
-			log.warn("Cannot parse co-citations for " + symbol + ".", e);
+			log.warn("Cannot parse co-citations for " + symbol, e);
             return null;
 		}
 	}
@@ -104,7 +103,7 @@ public class IHOPSpider
 	 */
 	private String getGeneSearchURL(String symbol)
 	{
-		return  getiHopURL() + "/?field=synonym&ncbi_tax_id=9606&search=" + symbol;
+		return  getiHopURL() + "?field=synonym&ncbi_tax_id=9606&search=" + symbol;
 	}
 
 	/**
@@ -133,7 +132,7 @@ public class IHOPSpider
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			log.error(e.toString());
 			return null;
 		}
 	}
@@ -146,6 +145,11 @@ public class IHOPSpider
 	 */
 	private String getInternalID(BufferedReader reader, String symbol) throws IOException
 	{
+		if(reader == null) {
+			log.info("Cannot find internal ID of " + symbol);
+			return null;
+		}
+
 		List<String> ids = new ArrayList<String>();
 
 		for(String line = reader.readLine(); line != null; line = reader.readLine())

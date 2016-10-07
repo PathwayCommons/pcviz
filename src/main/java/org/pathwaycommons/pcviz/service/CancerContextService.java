@@ -20,6 +20,8 @@
 package org.pathwaycommons.pcviz.service;
 
 import flexjson.JSONSerializer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cbio.causality.data.portal.*;
 import org.cbio.causality.model.Alteration;
 import org.cbio.causality.model.AlterationPack;
@@ -30,12 +32,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Service
 public class CancerContextService {
+
+    private static final Log log = LogFactory.getLog(CancerContextService.class);
 
     private CBioPortalAccessor cBioPortalAccessor;
 
@@ -83,13 +88,14 @@ public class CancerContextService {
 
         // Now use the biggest case set as default
         CaseList caseListById = portal.getCaseListById(study + "_all");
-        cancerStudyDetails.setNumberOfCases(caseListById.getCases().length);
-
-        // Now find out if there is profiles
-        for (GeneticProfile geneticProfile : portal.getGeneticProfilesForCurrentStudy()) {
-            if(isCNA(geneticProfile)) cancerStudyDetails.setHasCNA(true);
-            if(isExtendedMutation(geneticProfile)) cancerStudyDetails.setHasMutation(true);
-            if(isZscores(geneticProfile)) cancerStudyDetails.setHasExpression(true);
+        if(cancerStudyById != null) {
+            cancerStudyDetails.setNumberOfCases(caseListById.getCases().length); //TODO: it throws NPE sometimes
+            // Now find out if there is profiles
+            for (GeneticProfile geneticProfile : portal.getGeneticProfilesForCurrentStudy()) {
+                if (isCNA(geneticProfile)) cancerStudyDetails.setHasCNA(true);
+                if (isExtendedMutation(geneticProfile)) cancerStudyDetails.setHasMutation(true);
+                if (isZscores(geneticProfile)) cancerStudyDetails.setHasExpression(true);
+            }
         }
 
         JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
@@ -139,13 +145,17 @@ public class CancerContextService {
         portal.setCurrentGeneticProfiles(geneticProfiles);
 
         for (String gene : genes.split(",")) {
-            AlterationPack alterations = portal.getAlterations(gene);
-            if(alterations != null) {
-                alterations.complete(Alteration.ANY);
-                double altered = alterations.calcAlteredRatio(Alteration.ANY);
-                HashMap<String, Double> dataMap = new HashMap<String, Double>();
-                dataMap.put(PropertyKey.ALTERED.toString(), altered);
-                context.put(gene.toUpperCase(), dataMap);
+            try {
+                AlterationPack alterations = portal.getAlterations(gene);
+                if (alterations != null) {
+                    alterations.complete(Alteration.ANY);
+                    double altered = alterations.calcAlteredRatio(Alteration.ANY);
+                    HashMap<String, Double> dataMap = new HashMap<String, Double>();
+                    dataMap.put(PropertyKey.ALTERED.toString(), altered);
+                    context.put(gene.toUpperCase(), dataMap);
+                }
+            } catch (Exception e) {
+                log.error("Cannot get alterations from cBio portal for: " + gene + ". " + e);
             }
         }
 

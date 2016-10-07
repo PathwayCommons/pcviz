@@ -129,8 +129,6 @@ var HomeView = Backbone.View.extend({
             e.preventDefault();
             $("#download-network").trigger('click');
 
-            //TODO: convert current cy graph to SIF and return instead of expensive PC2 query
-
             var t = terms.split(",");
             var url = $(this).data("pcurl") + "graph?";
             for(var i=0; i < t.length; i++) {
@@ -139,6 +137,22 @@ var HomeView = Backbone.View.extend({
             url += "kind=" + kind + "&format=BINARY_SIF";
 
             window.open(url, "_blank");
+        });
+
+        $("#download-sif-quick").click(function(e) {
+            e.preventDefault();
+            $("#download-network").trigger('click');
+            //convert cy graph to SIF and return instead of doing expensive PC2 query
+            var sif = [];
+            cy.edges().forEach(function( ele ){
+                sif.push(ele.source().id() + '\t' + ele.data('type') + '\t' + ele.target().id());
+            });
+            var sifTxt = sif.join('\n');
+            // console.log(sifTxt);
+            var blob = new Blob([sifTxt], {
+                type: "text/plain;charset=utf-8;"
+            });
+            saveAs(blob, 'network.sif.txt');
         });
 
         $("#download-biopax").click(function(e) {
