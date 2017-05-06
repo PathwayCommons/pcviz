@@ -19,7 +19,7 @@
 
 package org.pathwaycommons.pcviz.controller;
 
-import org.pathwaycommons.pcviz.service.PathwayCommonsGraphService;
+import org.pathwaycommons.pcviz.service.PathwayCommonsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,8 +28,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.io.IOException;
 
 /**
  *
@@ -40,14 +38,14 @@ import java.io.IOException;
 public class MetaDataController
 {
 	@Autowired
-	private PathwayCommonsGraphService pathwayCommonsGraphService;
+	private PathwayCommonsService pathwayCommonsService;
 
-	public PathwayCommonsGraphService getPathwayCommonsGraphService() {
-		return pathwayCommonsGraphService;
+	public PathwayCommonsService getPathwayCommonsService() {
+		return pathwayCommonsService;
 	}
 
-	public void setPathwayCommonsGraphService(PathwayCommonsGraphService pathwayCommonsGraphService) {
-		this.pathwayCommonsGraphService = pathwayCommonsGraphService;
+	public void setPathwayCommonsService(PathwayCommonsService pathwayCommonsService) {
+		this.pathwayCommonsService = pathwayCommonsService;
 	}
 
 	@RequestMapping(value = "{datatype}",
@@ -58,7 +56,7 @@ public class MetaDataController
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json; charset=utf-8");
 
-		String data = pathwayCommonsGraphService.getMetadata(datatype);
+		String data = pathwayCommonsService.getMetadata(datatype);
 		return new ResponseEntity<String>(data, headers, HttpStatus.OK);
 	}
 }

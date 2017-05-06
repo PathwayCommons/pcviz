@@ -20,7 +20,7 @@
 package org.pathwaycommons.pcviz.controller;
 
 import cpath.service.GraphType;
-import org.pathwaycommons.pcviz.service.PathwayCommonsGraphService;
+import org.pathwaycommons.pcviz.service.PathwayCommonsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +37,14 @@ import java.util.HashSet;
 public class NetworkController
 {
     @Autowired
-    private PathwayCommonsGraphService pathwayCommonsGraphService;
+    private PathwayCommonsService pathwayCommonsService;
 
-    public PathwayCommonsGraphService getPathwayCommonsGraphService() {
-        return pathwayCommonsGraphService;
+    public PathwayCommonsService getPathwayCommonsService() {
+        return pathwayCommonsService;
     }
 
-    public void setPathwayCommonsGraphService(PathwayCommonsGraphService pathwayCommonsGraphService) {
-        this.pathwayCommonsGraphService = pathwayCommonsGraphService;
+    public void setPathwayCommonsService(PathwayCommonsService pathwayCommonsService) {
+        this.pathwayCommonsService = pathwayCommonsService;
     }
 
     /**
@@ -75,7 +75,7 @@ public class NetworkController
 
         String networkJson = "";
         try {
-            networkJson = pathwayCommonsGraphService.createNetwork(type, geneSet);
+            networkJson = pathwayCommonsService.createNetwork(type, geneSet);
         } catch(Exception e) {
             e.printStackTrace();
         }

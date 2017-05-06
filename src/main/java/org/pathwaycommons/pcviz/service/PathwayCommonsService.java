@@ -49,8 +49,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Service
-public class PathwayCommonsGraphService {
-    private static final Log log = LogFactory.getLog(PathwayCommonsGraphService.class);
+public class PathwayCommonsService {
+    private static final Log log = LogFactory.getLog(PathwayCommonsService.class);
 
     private Blacklist blacklist;
 
@@ -143,7 +143,7 @@ public class PathwayCommonsGraphService {
     /**
      * Default Constructor.
      */
-    public PathwayCommonsGraphService() {
+    public PathwayCommonsService() {
         cocitationMap = new HashMap<String, Map<String, Integer>>();
     }
 
@@ -170,7 +170,6 @@ public class PathwayCommonsGraphService {
                 builder.append(scanner.nextLine() + "\n");
             }
             scanner.close();
-
             return builder.toString();
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -256,8 +255,8 @@ public class PathwayCommonsGraphService {
                     edge.setProperty(PropertyKey.DATASOURCE,
                             sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
                     edge.setProperty(PropertyKey.PUBMED,
-                            sif.getPubmedIDs() == null ? Collections.emptyList() : sif.getPubmedIDs());
-
+                            sif.getPublicationIDs(true) == null ? Collections.emptyList()
+                                    : sif.getPublicationIDs(true));
                     edge.setProperty(PropertyKey.CITED, cocitations);
                     graph.getEdges().add(edge);
                 }
