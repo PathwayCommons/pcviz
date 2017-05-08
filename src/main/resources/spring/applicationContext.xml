@@ -19,7 +19,7 @@
     <!-- auto-create and initialize service beans -->
     <context:component-scan base-package="org.pathwaycommons.pcviz.service"/>
 
-    <bean class="org.cbio.causality.data.portal.CBioPortalAccessor" id="cBioPortalAccessor"/>
+    <bean class="org.pathwaycommons.pcviz.cbioportal.CBioPortalAccessor" id="cBioPortalAccessor"/>
 
     <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
         <property name="configLocation" value="/WEB-INF/ehcache.xml"/>

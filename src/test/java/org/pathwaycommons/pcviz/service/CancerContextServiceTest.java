@@ -23,8 +23,6 @@ public class CancerContextServiceTest {
 
         HashMap<String, HashMap<String, Double>> map = cancerContextService
             .loadContext("paac_jhu_2014", "mutation", "MDC1,MIMAT0000456");
-        // - used to fail due to NullPointerException
-
         assertFalse(map.isEmpty());
     }
 

@@ -22,11 +22,9 @@ package org.pathwaycommons.pcviz.service;
 import flexjson.JSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cbio.causality.data.portal.*;
-import org.cbio.causality.model.Alteration;
-import org.cbio.causality.model.AlterationPack;
 import org.pathwaycommons.pcviz.model.CancerStudyDetails;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.pathwaycommons.pcviz.cbioportal.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,10 +38,15 @@ import java.util.HashMap;
 public class CancerContextService {
 
     private static final Log log = LogFactory.getLog(CancerContextService.class);
-
     private CBioPortalAccessor cBioPortalAccessor;
-
     private String dataCacheFolder;
+
+    /**
+     * Default Constructor.
+     */
+    public CancerContextService() {
+    }
+
 
     @Value("${cbioportal.cache.folder}")
     public void setDataCacheFolder(String dataCacheFolder) {
@@ -56,12 +59,6 @@ public class CancerContextService {
 
     public CBioPortalAccessor getcBioPortalAccessor() {
         return cBioPortalAccessor;
-    }
-
-    /**
-     * Default Constructor.
-     */
-    public CancerContextService() {
     }
 
     @Autowired

@@ -3,11 +3,11 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.mskcc.cbio.pcviz</groupId>
+	<groupId>pathwaycommons</groupId>
 	<artifactId>pcviz</artifactId>
 	<packaging>war</packaging>
 	<version>2.2.0-SNAPSHOT</version>
-	<name>Pathway Commons Visualizer</name>
+	<name>Pathway Commons Network Visualizer</name>
 	<url>https://github.com/PathwayCommons/pcviz</url>
 
 	<properties>
@@ -80,14 +80,6 @@
 
 	<repositories>
 		<repository>
-			<id>biopax.snapshots</id>
-			<name>BioPAX Repository at Sourceforge</name>
-			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-		<repository>
 			<id>ossrh</id>
 			<name>OSSRH Repository</name>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
@@ -100,20 +92,25 @@
 			<artifactId>paxtools-core</artifactId>
 			<version>${paxtools.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.cbio</groupId>
-            <artifactId>causality</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
+		<dependency>
 			<groupId>org.biopax.paxtools</groupId>
 			<artifactId>pattern</artifactId>
+			<version>${paxtools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.biopax.paxtools</groupId>
+			<artifactId>paxtools-query</artifactId>
 			<version>${paxtools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>pathwaycommons.cpath</groupId>
 			<artifactId>cpath-client</artifactId>
 			<version>${cpath-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
 		</dependency>
 
 		<dependency>
