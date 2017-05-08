@@ -80,6 +80,14 @@
 
 	<repositories>
 		<repository>
+			<id>biopax.snapshots</id>
+			<name>BioPAX Repository at Sourceforge</name>
+			<url>http://biopax.sourceforge.net/m2repo/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+		<repository>
 			<id>ossrh</id>
 			<name>OSSRH Repository</name>
 			<url>https://oss.sonatype.org/content/groups/public/</url>

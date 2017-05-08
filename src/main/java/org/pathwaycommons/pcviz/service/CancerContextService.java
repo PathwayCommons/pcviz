@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +88,8 @@ public class CancerContextService {
         // Now use the biggest case set as default
         CaseList caseListById = portal.getCaseListById(study + "_all");
         if(cancerStudyById != null) {
-            cancerStudyDetails.setNumberOfCases(caseListById.getCases().length); //TODO: it throws NPE sometimes
+            if(caseListById.getCases()!=null)
+                cancerStudyDetails.setNumberOfCases(caseListById.getCases().length);
             // Now find out if there is profiles
             for (GeneticProfile geneticProfile : portal.getGeneticProfilesForCurrentStudy()) {
                 if (isCNA(geneticProfile)) cancerStudyDetails.setHasCNA(true);
