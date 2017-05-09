@@ -1,8 +1,11 @@
-sudo: false
 language: java
-# not required anymore:
-# script: cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties && mvn clean install
-# whitelist
+jdk:
+  - oraclejdk8
+sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
 branches:
   only:
     - master
