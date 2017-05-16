@@ -15,7 +15,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.7</slf4j.version>
 		<spring.version>4.3.7.RELEASE</spring.version>
-		<paxtools.version>5.0.1-SNAPSHOT</paxtools.version>
+		<paxtools.version>5.1.0-SNAPSHOT</paxtools.version>
 		<cpath-client.version>7.0.0-SNAPSHOT</cpath-client.version>
 	</properties>
 
