@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
+//TODO: too slow; instead of uniprot.org, can call PC2 traverse to get the FUNCTION:... comment of a ProteinReference
+// e.g.: http://www.pathwaycommons.org/pc2/traverse.json?path=EntityReference/comment&uri=http://identifiers.org/uniprot/P12643
+
 @Service
 public class UniProtService {
     private static Log log = LogFactory.getLog(UniProtService.class);
