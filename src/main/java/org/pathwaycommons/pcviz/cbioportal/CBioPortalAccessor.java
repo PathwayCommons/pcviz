@@ -2,37 +2,78 @@ package org.pathwaycommons.pcviz.cbioportal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pathwaycommons.pcviz.service.GeneNameService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 /**
  * @author Arman Aksoy
  * @author Ozgun Babur
+ * @author Igor Rodchenkov (merged together the accessor and manager, refactored)
  */
+@Service
 public class CBioPortalAccessor extends AlterationProviderAdaptor
 {
 	private static Log log = LogFactory.getLog(CBioPortalAccessor.class);
 
-	protected CBioPortalManager man = new CBioPortalManager();
-	protected CNVerifier cnVerifier;
-
+	protected final static String COMMAND = "cmd=";
 	protected final static String DELIMITER = "\t";
+	protected final static String NOT_FOUND_FILENAME = "NOTFOUND";
 
-	private List<CancerStudy> cancerStudies = new ArrayList<CancerStudy>();
-	private CancerStudy currentCancerStudy = null;
+	private final List<CancerStudy> cancerStudies;
+	private final Map<String, CancerStudy> cancerStudiesById;
+	private final Map<String, GeneticProfile> geneticProfilesById;
+	private final Map<String, CaseList> caseListsById;
+	private final Map<CancerStudy, List<GeneticProfile>> geneticProfilesCache;
+	private final Map<CancerStudy, List<CaseList>> caseListCache;
+	private final Set<CaseList> validatedCaseLists;
 
-	private Map<String, CancerStudy> cancerStudiesById = null;
-	private Map<String, GeneticProfile> geneticProfilesById = null;
-	private Map<String, CaseList> caseListsById = null;
-
-	private Map<CancerStudy, List<GeneticProfile>> geneticProfilesCache
-		= new HashMap<CancerStudy, List<GeneticProfile>>();
-	private Map<CancerStudy, List<CaseList>> caseListCache = new HashMap<CancerStudy, List<CaseList>>();
-	private CaseList currentCaseList = null;
-	private List<GeneticProfile> currentGeneticProfiles = new ArrayList<GeneticProfile>();
+	private List<GeneticProfile> currentGeneticProfiles;
+	private GeneNameService geneNameService;
 	private CBioPortalOptions options;
+	private String cacheDir;
+	private Map<String, Set<String>> notFoundMap;
 
+	static String portalURL = "http://www.cbioportal.org/public-portal/webservice.do?";
+
+	protected CNVerifier cnVerifier;
+	private CancerStudy currentCancerStudy;
+	private CaseList currentCaseList;
+
+	@Value("${cbioportal.cache.folder}")
+	public void setCacheDir(String cacheDir)
+	{
+		this.cacheDir = cacheDir;
+	}
+
+	@Autowired
+	public void setGeneNameService(GeneNameService geneNameService) {
+		this.geneNameService = geneNameService;
+	}
+
+	public CBioPortalAccessor() throws IOException
+	{
+		cancerStudies = new ArrayList<CancerStudy>();
+		geneticProfilesCache = new HashMap<CancerStudy, List<GeneticProfile>>();
+		caseListCache = new HashMap<CancerStudy, List<CaseList>>();
+		currentGeneticProfiles = new ArrayList<GeneticProfile>();
+		memory = new HashMap<String, AlterationPack>();
+		validatedCaseLists = new HashSet<CaseList>();
+		cancerStudiesById = new HashMap<String, CancerStudy>();
+		caseListsById = new HashMap<String, CaseList>();
+		geneticProfilesById = new HashMap<String, GeneticProfile>();
+
+		setOptions(new CBioPortalOptions());
+		initializeStudies();
+
+		assert !cancerStudies.isEmpty();
+	}
 
 	public CBioPortalAccessor(PortalDataset dataset) throws IOException
 	{
@@ -85,19 +126,9 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		setCurrentGeneticProfiles(profiles);
 	}
 
-	public CBioPortalAccessor() throws IOException
-	{
-		memory = new HashMap<String, AlterationPack>();
-		setOptions(new CBioPortalOptions());
-		initializeStudies();
-		assert !cancerStudies.isEmpty();
-	}
-
 	private void initializeStudies() throws IOException
 	{
-		cancerStudiesById = new HashMap<String, CancerStudy>();
-
-		for (CancerStudy study : man.getCancerStudies())
+		for (CancerStudy study : getAllCancerStudies())
 		{
 			cancerStudies.add(study);
 			cancerStudiesById.put(study.getStudyId(), study);
@@ -164,12 +195,12 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 	{
 		assert symbol != null && !symbol.isEmpty();
 
-		String s = EntrezGene.getSymbol(symbol);
+		String s = geneNameService.getSymbol(symbol);
 		if (s != null) symbol = s;
 
 		Map<String, Change> changesMap = new HashMap<String, Change>();
 
-		String[] data = man.getDataForGene(symbol, geneticProfile, caseList);
+		String[] data = getDataForGene(symbol, geneticProfile, caseList);
 		if (data == null) return null;
 
 		if (data.length != caseList.getCases().length)
@@ -372,7 +403,8 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		memorize(symbol, alterationPack);
 //		alterationPack.complete();
 
-		if (cnVerifier != null) cnVerifier.verify(alterationPack);
+		if (cnVerifier != null)
+			cnVerifier.verify(alterationPack);
 
 		if (alterationPack.getSize() != currentCaseList.getCases().length)
 		{
@@ -386,7 +418,6 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 
 	public List<CaseList> getCaseListsForCurrentStudy() throws IOException
 	{
-		caseListsById = new HashMap<String, CaseList>();
 		List<CaseList> caseLists = caseListCache.get(getCurrentCancerStudy());
 		if (caseLists != null)
 		{
@@ -395,7 +426,7 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 			return caseLists;
 		}
 
-		caseLists = man.getCaseListsForStudy(getCurrentCancerStudy());
+		caseLists = getCaseListsForStudy(getCurrentCancerStudy());
 		for (CaseList caseList : caseLists)
 		{
 			caseListsById.put(caseList.getId(), caseList);
@@ -444,7 +475,6 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 
 	public List<GeneticProfile> getGeneticProfilesForCurrentStudy() throws IOException
 	{
-		geneticProfilesById = new HashMap<String, GeneticProfile>();
 		List<GeneticProfile> geneticProfiles = geneticProfilesCache.get(getCurrentCancerStudy());
 		if (geneticProfiles != null)
 		{
@@ -453,7 +483,7 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 			return geneticProfiles;
 		}
 
-		geneticProfiles = man.getGeneticProfilesForStudy(getCurrentCancerStudy());
+		geneticProfiles = getGeneticProfilesForStudy(getCurrentCancerStudy());
 		for (GeneticProfile geneticProfile : geneticProfiles)
 		{
 			geneticProfilesById.put(geneticProfile.getId(), geneticProfile);
@@ -487,12 +517,6 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		return currentCaseList;
 	}
 
-	public void setCurrentGeneticProfiles(List<GeneticProfile> geneticProfiles)
-	{
-		currentGeneticProfiles = geneticProfiles;
-		memory.clear();
-	}
-
 	public List<GeneticProfile> getCurrentGeneticProfiles()
 	{
 		return currentGeneticProfiles;
@@ -510,8 +534,10 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 	protected String getGeneSymbol(Node node)
 	{
 		String egid = getEntrezGeneID(node);
-		if (egid != null) return EntrezGene.getSymbol(egid);
-		return null;
+		if (egid != null)
+			return geneNameService.getSymbol(egid);
+		else
+			return null;
 	}
 
 	public void clearAlterationCache()
@@ -519,8 +545,348 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		memory.clear();
 	}
 
-	public static void setCacheDir(String cacheDir)
-	{
-		CBioPortalManager.setCacheDir(cacheDir);
+	public void setCurrentGeneticProfiles(List<GeneticProfile> currentGeneticProfiles) {
+		this.currentGeneticProfiles = currentGeneticProfiles;
+		memory.clear();
 	}
+
+
+	// merged from used to be CBioPortalManager
+	protected String[] downloadDataForGene(String symbol, GeneticProfile geneticProfile, CaseList caseList)
+			throws IOException
+	{
+		String geneid = geneNameService.getID(symbol);
+		String url = "getProfileData&case_set_id=" + caseList.getId() + "&"
+				+ "genetic_profile_id=" + geneticProfile.getId() + "&"
+				+ "gene_list=" + geneid;
+
+		List<String[]> results = queryAndParseURL(url, false);
+
+		if (results.size() < 2)
+		{
+			log.warn("Cannot get data for " + symbol);
+			return null;
+		}
+
+		String firstCase = caseList.getCases()[0];
+		int startIndex = 0;
+		while (!firstCase.equals(results.get(0)[startIndex])) startIndex++;
+
+		// DEBUG CODE
+		String[] cases = results.get(0);
+		for (int i = 0; i < caseList.getCases().length; i++)
+		{
+			assert cases[i+startIndex].equals(caseList.getCases()[i]);
+		}
+		// END OF DEBUG CODE
+
+
+		String[] data = results.get(1);
+
+		assert data.length > 2;
+
+		String[] result = new String[data.length - startIndex];
+		System.arraycopy(data, startIndex, result, 0, result.length);
+		return result;
+	}
+
+	public List<CaseList> getCaseListsForStudy(CancerStudy study) throws IOException
+	{
+		List<CaseList> caseLists = new ArrayList<CaseList>();
+
+		String url = "getCaseLists&cancer_study_id=" + study.getStudyId();
+		for (String[] results : queryAndParseURL(url))
+		{
+			assert results.length == 5;
+			String[] cases = results[4].split(" ");
+			assert cases.length > 0;
+
+			int startIndex = 0;
+			while (cases[startIndex].equals("Hybridization") || cases[startIndex].equals("REF") ||
+					cases[startIndex].equals("Composite.Element.REF")) startIndex++;
+
+			if (startIndex > 0)
+			{
+				cases = Arrays.asList(cases).subList(startIndex, cases.length)
+						.toArray(new String[cases.length - startIndex]);
+			}
+
+			CaseList caseList = new CaseList(results[0], results[1], cases);
+			caseLists.add(caseList);
+		}
+
+		return caseLists;
+	}
+
+	private List<String[]> queryAndParseURL(String urlPostFix) throws IOException
+	{
+		return queryAndParseURL(urlPostFix, true);
+	}
+
+	private List<String[]> queryAndParseURL(String urlPostFix, boolean skipHeader) throws IOException
+	{
+		List<String[]> list = new ArrayList<String[]>();
+
+		String urlStr = portalURL + COMMAND + urlPostFix;
+		URL url = new URL(urlStr);
+		URLConnection urlConnection = url.openConnection();
+		Scanner scanner = new Scanner(urlConnection.getInputStream());
+
+		int lineNum = 0;
+		while (scanner.hasNextLine())
+		{
+			String line = scanner.nextLine();
+			lineNum++;
+
+			if (line.startsWith("#") || line.length() == 0 || (skipHeader && lineNum == 1))
+				continue;
+
+			list.add(line.split(DELIMITER));
+		}
+
+		return list;
+	}
+
+	public List<GeneticProfile> getGeneticProfilesForStudy(CancerStudy study) throws IOException
+	{
+		List<GeneticProfile> geneticProfiles = new ArrayList<GeneticProfile>();
+
+		String url = "getGeneticProfiles" + "&cancer_study_id=" + study.getStudyId();
+		for (String[] results : queryAndParseURL(url))
+		{
+			assert results.length == 6;
+			GeneticProfile geneticProfile = new GeneticProfile(results[0], results[1], results[2], results[4]);
+			geneticProfiles.add(geneticProfile);
+		}
+
+		assert !geneticProfiles.isEmpty();
+		return geneticProfiles;
+	}
+
+	public List<CancerStudy> getAllCancerStudies() throws IOException
+	{
+		List<CancerStudy> studies = new ArrayList<CancerStudy>();
+		String urlStr = "getCancerStudies";
+		for (String[] result : queryAndParseURL(urlStr))
+		{
+			assert result.length == 3;
+			CancerStudy cancerStudy = new CancerStudy(result[0], result[1], result[2]);
+			studies.add(cancerStudy);
+		}
+		return studies;
+	}
+
+	public void cacheData(String[] data, String symbol, GeneticProfile geneticProfile,
+						  CaseList caseList)
+	{
+		String dir = cacheDir + File.separator + geneticProfile.getId() + File.separator +
+				caseList.getId() + File.separator;
+
+		File f = new File(dir);
+		if (!f.exists()) f.mkdirs();
+
+		String casefile = dir + "cases.txt";
+		if (!(new File(casefile).exists()))
+		{
+			try
+			{
+				BufferedWriter writer = new BufferedWriter(new FileWriter(casefile));
+				StringBuilder sb = new StringBuilder();
+				for (String aCase : caseList.getCases())
+				{
+					sb.append(aCase).append("\t");
+				}
+				writer.write(sb.toString().trim());
+				writer.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		String url = dir  + symbol;
+		try
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(url));
+
+			for (int i = 0; i < data.length; i++)
+			{
+				writer.write(data[i]);
+				if (i < data.length - 1) writer.write(DELIMITER);
+			}
+
+			writer.close();
+		}
+		catch (IOException e)
+		{
+			log.error("Cannot cache data for " + symbol, e);
+		}
+	}
+
+	public String[] readDataInCache(String symbol, GeneticProfile geneticProfile, CaseList caseList)
+	{
+		String url = cacheDir + File.separator + geneticProfile.getId() + File.separator +
+				caseList.getId() + File.separator + symbol;
+
+		if (new File(url).exists())
+		{
+			try
+			{
+				if (!validatedCaseLists.contains(caseList))
+					checkCaseListValidity(geneticProfile, caseList);
+
+				BufferedReader reader = new BufferedReader(new FileReader(url));
+				String line = reader.readLine();
+				reader.close();
+				return line.split(DELIMITER);
+			}
+			catch (IOException e)
+			{
+				log.error("Cannot read an existing file", e);
+			}
+		}
+		return null;
+	}
+
+	private void checkCaseListValidity(GeneticProfile geneticProfile, CaseList caseList) throws IOException
+	{
+		String file = cacheDir + File.separator + geneticProfile.getId() + File.separator +
+				caseList.getId() + File.separator + "cases.txt";
+
+		if (new File(file).exists())
+		{
+			Scanner sc = new Scanner(new File(file));
+			String[] token = sc.nextLine().split("\t");
+
+			String[] cases = caseList.getCases();
+
+			if (cases.length != token.length)
+			{
+				System.err.println("CaseList in a different length! Previous: " + token.length +
+						", new: " + cases.length);
+			}
+			else
+			{
+				for (int i = 0; i < cases.length; i++)
+				{
+					if (!cases[i].equals(token[i])) System.err.println(
+							"Caselist mismatch at pos " + i + "! prev: " + token[i] + ", new:" +
+									cases[i]);
+				}
+			}
+		}
+
+		validatedCaseLists.add(caseList);
+	}
+
+	protected void readNotFoundInCache(GeneticProfile geneticProfile, CaseList caseList)
+	{
+		if (notFoundMap == null)
+		{
+			notFoundMap = new HashMap<String, Set<String>>();
+		}
+
+		String key = geneticProfile.getId() + caseList.getId();
+		notFoundMap.put(key, new HashSet<String>());
+
+		String url = cacheDir + File.separator + geneticProfile.getId() + File.separator +
+				caseList.getId() + File.separator + NOT_FOUND_FILENAME;
+
+		if (new File(url).exists())
+		{
+			try
+			{
+				BufferedReader reader = new BufferedReader(new FileReader(url));
+				for (String line = reader.readLine(); line != null; line = reader.readLine())
+				{
+					if (!line.isEmpty()) notFoundMap.get(key).add(line);
+				}
+				reader.close();
+			}
+			catch (IOException e)
+			{
+				log.error("Cannot read an existing not-found file", e);
+			}
+		}
+	}
+
+	protected void addToNotFound(String symbol, GeneticProfile geneticProfile, CaseList caseList)
+	{
+		String key = geneticProfile.getId() + caseList.getId();
+		notFoundMap.get(key).add(symbol);
+
+		String url = cacheDir + File.separator + geneticProfile.getId() + File.separator +
+				caseList.getId() + File.separator + NOT_FOUND_FILENAME;
+
+		if (new File(url).exists())
+		{
+			try
+			{
+				BufferedWriter writer = new BufferedWriter(new FileWriter(url, true));
+				writer.write("\n" + symbol);
+				writer.close();
+			}
+			catch (IOException e)
+			{
+				log.error("Cannot append to not-found file", e);
+			}
+		}
+		else
+		{
+			try
+			{
+				BufferedWriter writer = new BufferedWriter(new FileWriter(url));
+				writer.write(symbol);
+				writer.close();
+			}
+			catch (IOException e)
+			{
+				log.error("Cannot create not-found file", e);
+			}
+		}
+	}
+
+	protected boolean isNotFound(String symbol, GeneticProfile geneticProfile, CaseList caseList)
+	{
+		String key = geneticProfile.getId() + caseList.getId();
+		if (notFoundMap == null || !notFoundMap.containsKey(key))
+		{
+			readNotFoundInCache(geneticProfile, caseList);
+		}
+		return notFoundMap.get(key).contains(symbol);
+	}
+
+	public String[] getDataForGene(String symbol, GeneticProfile geneticProfile, CaseList caseList)
+	{
+		assert symbol != null && !symbol.isEmpty();
+
+		try
+		{
+			if (isNotFound(symbol, geneticProfile, caseList))
+				return null;
+
+			String[] data = readDataInCache(symbol, geneticProfile, caseList);
+			if(data != null)
+				return data;
+
+			data = downloadDataForGene(symbol, geneticProfile, caseList);
+
+			if (data != null)
+			{
+				cacheData(data, symbol, geneticProfile, caseList);
+			}
+			else
+			{
+				addToNotFound(symbol, geneticProfile, caseList);
+			}
+			return data;
+		}
+		catch (IOException e)
+		{
+			log.error("Cannot access to the data of " + symbol, e);
+			return null;
+		}
+	}
+
 }

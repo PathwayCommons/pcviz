@@ -1,5 +1,6 @@
 package org.pathwaycommons.pcviz.cbioportal;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,28 +17,19 @@ public class ExpDataManager
 	private CaseList caseList;
 
 	private Map<String, double[]> cache;
-	private CBioPortalManager cman;
+	private CBioPortalAccessor cman;
 	private Set<String> notFound;
 
 	private boolean takeLog = false;
 
-	/**
-	 * This constructor can be used if the accessor have only one profile, or the first one is the
-	 * desired profile.
-	 */
-	public ExpDataManager(CBioPortalAccessor acc)
-	{
-		this(acc.getCurrentGeneticProfiles().get(0), acc.getCurrentCaseList());
-	}
 
-	public ExpDataManager(GeneticProfile profile, CaseList caseList)
+	public ExpDataManager(GeneticProfile profile, CaseList caseList) throws IOException
 	{
 		this.profile = profile;
 		this.caseList = caseList;
-
-		cache = new HashMap<String, double[]>();
-		cman = new CBioPortalManager();
-		notFound = new HashSet<String>();
+		this.cache = new HashMap<String, double[]>();
+		this.cman = new CBioPortalAccessor();
+		this.notFound = new HashSet<String>();
 	}
 
 	public CaseList getCaseList()

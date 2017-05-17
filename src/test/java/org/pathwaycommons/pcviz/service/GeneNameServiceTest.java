@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class GeneNameServiceTest {
 
     @Autowired
-    protected GeneNameService geneNameService;
+    GeneNameService geneNameService;
 
     @Test
     public void testValidation() {

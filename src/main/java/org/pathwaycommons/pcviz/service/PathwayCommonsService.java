@@ -283,8 +283,10 @@ public class PathwayCommonsService {
             node.setProperty(PropertyKey.ALTERED, 0);
             String uniprotId = geneNameService.getUniprotId(nodeName);
             node.setProperty(PropertyKey.UNIPROT, uniprotId);
-            String description = uniProtService.getDescription(uniprotId);
-            node.setProperty(PropertyKey.UNIPROTDESC, description);
+//            if(uniprotId != null) {
+//                String description = uniProtService.getDescription(uniprotId);
+//                node.setProperty(PropertyKey.UNIPROTDESC, description);
+//            }
             graph.getNodes().add(node);
         }
 

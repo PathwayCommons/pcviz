@@ -6,29 +6,28 @@
 #*****
 # args:
 #   $1 : input hgnc file
-#   $2 : intermediate file (to output uniprot ids)
-#   $3 : output directory
-#   $4 : logfile name
+#   $2 : output directory
+#   $3 : logfile name
 
-if ! [ -e "$2" ]; then
+TMPFILE="/tmp/pcviz_uniprot_ids.txt"
+
+if ! [ -e "$TMPFILE" ]; then
     echo "creating a list of UniProt IDs..."
-    # extract uniprot ids into a temp file
-    phantomjs extract_uniprot.js "$1" "$2"
+    # extract UniProt accession numbers to the file
+    phantomjs extract_uniprot.js "$1" "$TMPFILE"
     wait
 else
-    echo "using previously generated ID list: $2"
+    echo "using previously generated ID list: $TMPFILE"
 fi
 
 echo "for each ID, querying pcviz/PC2 for its nearest undirected neighborhood network:"
-tempFile="$2";
 
 # process the temp file and scrape for each (not previously processed) uniprot accession number
-numOfIds=`wc -l ${tempFile} | awk '{ print $1 }'`
+numOfIds=$(wc -l ${TMPFILE} | awk '{ print $1 }')
 echo "there are $numOfIds to process;"
 i=1
-while [ $i -le $numOfIds ]
-do
-    uniprotId=`head -n $i ${tempFile}| tail -1`
+while [ $i -le $numOfIds ] ; do
+    uniprotId=$(head -n $i ${TMPFILE}| tail -1)
 
     if [ -e "$3/$uniprotId.json" ]; then
       echo "skip existing $uniprotId"
@@ -41,5 +40,4 @@ do
     let i=$i+1
 done
 
-# rm $2;
 echo "all done!"

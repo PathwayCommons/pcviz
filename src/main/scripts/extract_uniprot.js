@@ -35,8 +35,7 @@ function extractAll(inFile, outFile)
 	{
 		uniprotId = getNextUniprotId(inputStream, buffer);
 
-		if (uniprotId &&
-		    uniprotId.length > 0)
+		if (uniprotId && uniprotId.length > 0)
 		{
 			outputStream.writeLine(uniprotId);
 		}

@@ -19,10 +19,13 @@ precalculated.folder=/tmp/precalculated
 cocitation.min.edge=0
 cocitation.min.node=0
 
-# HGNC util
-#hgnc.location=http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit
+# mapping util
+#http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit
 hgnc.location=file:/tmp/hgnc.txt
 autoCompleteResult.limit=10
+
+#http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit
+ncbigene.location=file:/tmp/ncbigene.txt
 
 # CBioPortal
 cbioportal.cache.folder=/tmp/cocitations/portal

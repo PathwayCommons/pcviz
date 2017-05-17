@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
 
@@ -35,42 +36,29 @@ public class GeneNameService {
     private static Log log = LogFactory.getLog(GeneNameService.class);
 
     @Value("${hgnc.location}")
-    private Resource geneResource;
+    private Resource hgncResource;
 
-    private HashMap<String, HashSet<String>> geneMaps = null;
-    private ArrayList<String> geneMapKeysSorted = null;
-
-    private Integer autoCompleteLimit;
-
-    private final HashMap<String, String> symbolToUniprot;
-
-    /**
-     * Default Constructor.
-     */
-    public GeneNameService() {
-        symbolToUniprot = new HashMap<String, String>();
-    }
-
-    public Resource getGeneResource() {
-        return geneResource;
-    }
-
-    public void setGeneResource(Resource geneResource) {
-        this.geneResource = geneResource;
-    }
-
-    public Integer getAutoCompleteLimit() {
-        return autoCompleteLimit;
-    }
+    @Value("${ncbigene.location}")
+    private Resource ncbigeneResource;
 
     @Value("${autoCompleteResult.limit:10}")
-    public void setAutoCompleteLimit(Integer autoCompleteLimit) {
-        this.autoCompleteLimit = autoCompleteLimit;
+    private Integer autoCompleteLimit;
+
+    private final Map<String, String> sym2id;
+    private final Map<String, String> id2sym;
+    private final HashMap<String, HashSet<String>> geneMaps;
+    private final ArrayList<String> geneMapKeysSorted;
+    private final HashMap<String, String> symbolToUniprot;
+
+    public GeneNameService() {
+        symbolToUniprot = new HashMap<String, String>();
+        sym2id = new HashMap<String, String>();
+        id2sym = new HashMap<String, String>();
+        geneMaps = new HashMap<String, HashSet<String>>();
+        geneMapKeysSorted = new ArrayList<String>();
     }
 
     public GeneValidation validate(String name) {
-        initializeNameMap();
-
         GeneValidation geneValidation = new GeneValidation();
         geneValidation.setQuery(name);
         HashSet<String> names = geneMaps.get(name.toUpperCase());
@@ -79,17 +67,13 @@ public class GeneNameService {
         return geneValidation;
     }
 
+    @PostConstruct
     private void initializeNameMap() {
-        if(geneMaps != null) return;
-
         try {
-            geneMaps = new HashMap<String, HashSet<String>>();
-            geneMapKeysSorted = new ArrayList<String>();
-            Scanner scanner = new Scanner(getGeneResource().getInputStream());
+            Scanner scanner = new Scanner(hgncResource.getInputStream());
             // Skip the first (header) line
             scanner.nextLine();
-
-            while(scanner.hasNext()) {
+            while (scanner.hasNext()) {
                 String line = scanner.nextLine();
                 String[] tokens = line.split("\t", -1);
                 assert tokens.length == 3;
@@ -100,26 +84,54 @@ public class GeneNameService {
                 String[] secondaryNames = tokens[1].split(", ");
                 for (String secondaryName : secondaryNames) {
                     secondaryName = secondaryName.trim().toUpperCase();
-                    if(!secondaryName.isEmpty()) {
+                    if (!secondaryName.isEmpty()) {
                         addToMap(secondaryName, primaryName);
                     }
                 }
 
-	            String[] uniprotIds = tokens[2].split(", ");
-	            for (String uniprotId : uniprotIds) {
-		            uniprotId = uniprotId.trim().toUpperCase();
-		            if(!uniprotId.isEmpty()) {
-			            addToMap(uniprotId, primaryName);
+                String[] uniprotIds = tokens[2].split(", ");
+                for (String uniprotId : uniprotIds) {
+                    uniprotId = uniprotId.trim().toUpperCase();
+                    if (!uniprotId.isEmpty()) {
+                        addToMap(uniprotId, primaryName);
                         symbolToUniprot.put(primaryName, uniprotId);
-		            }
-	            }
+                    }
+                }
             }
+            scanner.close();
 
             Collections.sort(geneMapKeysSorted);
+
         } catch (IOException e) {
             log.error("Could not initialize the gene map: " + e.getLocalizedMessage());
         }
 
+        try {
+            Scanner scanner = new Scanner(ncbigeneResource.getInputStream());
+            // Skip the first (header) line
+            scanner.nextLine();
+
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+                String[] token = line.split("\t");
+                if (token.length < 2)
+                    continue;
+
+                String sym = token[0];
+                if (sym == null) {
+                    continue;
+                }
+                String id = token[1];
+                if (sym.length() > 0 && id.length() > 0) sym2id.put(sym, id);
+            }
+            scanner.close();
+
+            for (String key : sym2id.keySet()) {
+                id2sym.put(sym2id.get(key), key);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Initialization failed", e);
+        }
     }
 
     private void addToMap(String secondaryName, String primaryName) {
@@ -129,7 +141,6 @@ public class GeneNameService {
             geneMaps.put(secondaryName, strings);
             geneMapKeysSorted.add(secondaryName);
         }
-
         strings.add(primaryName);
     }
 
@@ -156,7 +167,7 @@ public class GeneNameService {
                     autoCompleteResults.add(autoCompleteResult);
                 }
 
-                if(autoCompleteResults.size() >= getAutoCompleteLimit())
+                if(autoCompleteResults.size() >= autoCompleteLimit)
                     break;
             }
 
@@ -165,7 +176,32 @@ public class GeneNameService {
         return autoCompleteResults;
     }
 
+    /**
+     * Gets UniProt Accession, given gene symbol.
+     * @param symbol gene symbol
+     * @return UniProt AC
+     */
     public String getUniprotId(String symbol) {
         return this.symbolToUniprot.get(symbol);
+    }
+
+    /**
+     * Gets NCBI Gene ID, given gene symbol.
+     * @param symbol gene symbol
+     * @return gene ID
+     */
+    public String getID(String symbol)
+    {
+        return sym2id.get(symbol);
+    }
+
+    /**
+     * Gets gene symbol, given NCBI Gene ID.
+     * @param id gene id
+     * @return gene symbol
+     */
+    public String getSymbol(String id)
+    {
+        return id2sym.get(id);
     }
 }

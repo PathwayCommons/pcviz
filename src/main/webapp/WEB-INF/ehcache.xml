@@ -30,7 +30,7 @@
            diskPersistent="false"
            diskExpiryThreadIntervalSeconds="604800"
            memoryStoreEvictionPolicy="LRU"
-           maxElementsInMemory="1000"
+           maxElementsInMemory="5000"
             />
 
 <cache name="cancerContextStudiesCache"
@@ -85,8 +85,7 @@
        diskPersistent="false"
        diskExpiryThreadIntervalSeconds="604800"
        memoryStoreEvictionPolicy="LRU"
-       maxElementsInMemory="1000"
+       maxElementsInMemory="5000"
         />
-
 
 </ehcache>

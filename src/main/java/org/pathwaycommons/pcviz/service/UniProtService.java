@@ -21,24 +21,19 @@ public class UniProtService {
     @Value("${uniprot.base.url:http://www.uniprot.org/}")
     private String uniProtBaseURL;
 
-    /**
-     * Default Constructor.
-     */
     public UniProtService() {
     }
 
-    public String getUniProtBaseURL() {
-        return uniProtBaseURL;
-    }
-
-    public void setUniProtBaseURL(String uniProtBaseURL) {
-        this.uniProtBaseURL = uniProtBaseURL;
-    }
-
+    /**
+     * TODO: use a pre-calculated id-description map/datafile instead of the web service!
+     *
+     * @param uniprotId UniProt accession number
+     * @return protein/gene function
+     */
     @Cacheable("uniprotCache")
     public String getDescription(String uniprotId) {
         if(uniprotId == null || uniprotId.isEmpty()) {
-            log.warn("NULL or empty UniProt accession number.");
+            log.error("NULL or empty UniProt accession number.");
             return null;
         }
 
