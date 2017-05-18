@@ -1,33 +1,15 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.service;
 
 import cpath.client.CPathClient;
 import cpath.client.util.CPathException;
+import cpath.query.CPathGraphQuery;
 import cpath.service.GraphType;
+import cpath.service.OutputFormat;
 import flexjson.JSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.biopax.paxtools.model.Model;
-import org.biopax.paxtools.pattern.miner.*;
-import org.biopax.paxtools.pattern.util.Blacklist;
+import org.biopax.paxtools.pattern.miner.SIFEnum;
+import org.biopax.paxtools.pattern.miner.SIFType;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
 import org.pathwaycommons.pcviz.model.CytoscapeJsGraph;
 import org.pathwaycommons.pcviz.model.CytoscapeJsNode;
@@ -52,73 +34,31 @@ import java.util.*;
 public class PathwayCommonsService {
     private static final Log log = LogFactory.getLog(PathwayCommonsService.class);
 
-    private Blacklist blacklist;
+    // Pathway Commons client
+    private CPathClient client;
+    private CPathGraphQuery graphQuery;
 
     private GeneNameService geneNameService;
     private CocitationManager cocitMan;
 
-    @Value("${cocitation.min.edge:0}")
-    private Integer minNumberOfCoCitationsForEdges; // if the prop. isn't set, the default value=0
+    @Value("${cocitation.min.edge}")
+    private Integer minNumberOfCoCitationsForEdges;
 
-    @Value("${cocitation.min.node:0}")
+    @Value("${cocitation.min.node}")
     private Integer minNumberOfCoCitationsForNodes;
 
-    @Value("${pathwaycommons.url:http://www.pathwaycommons.org/pc2/}")
+    @Value("${pathwaycommons.url}")
     private String pathwayCommonsUrl;
 
-    @Value("${precalculated.folder:data/uniprot}")
+    @Value("${precalculated.folder}")
     private String precalculatedFolder;
-
-    @Value("${blacklist.location:data/blacklist.txt}")
-    private String blacklistLocation;
 
     // Cache for co-citations.
     private final Map<String, Map<String, Integer>> cocitationMap;
 
-
-    public Integer getMinNumberOfCoCitationsForEdges() {
-        return minNumberOfCoCitationsForEdges;
-    }
-
-    public void setMinNumberOfCoCitationsForEdges(Integer minNumberOfCoCitationsForEdges) {
-        this.minNumberOfCoCitationsForEdges = minNumberOfCoCitationsForEdges;
-    }
-
-    public Integer getMinNumberOfCoCitationsForNodes() {
-        return minNumberOfCoCitationsForNodes;
-    }
-
-    public void setMinNumberOfCoCitationsForNodes(Integer minNumberOfCoCitationsForNodes) {
-        this.minNumberOfCoCitationsForNodes = minNumberOfCoCitationsForNodes;
-    }
-
-    public String getPathwayCommonsUrl() {
-        return pathwayCommonsUrl;
-    }
-
-    public void setPathwayCommonsUrl(String pathwayCommonsUrl) {
-        this.pathwayCommonsUrl = pathwayCommonsUrl;
-    }
-
-    public GeneNameService getGeneNameService() {
-        return geneNameService;
-    }
-
     @Autowired
     public void setGeneNameService(GeneNameService geneNameService) {
         this.geneNameService = geneNameService;
-    }
-
-    public String getPrecalculatedFolder() {
-        return precalculatedFolder;
-    }
-
-    public void setPrecalculatedFolder(String precalculatedFolder) {
-        this.precalculatedFolder = precalculatedFolder;
-    }
-
-    public CocitationManager getCocitMan() {
-        return cocitMan;
     }
 
     @Autowired
@@ -127,27 +67,27 @@ public class PathwayCommonsService {
     }
 
 
-    /**
-     * Default Constructor.
-     */
     public PathwayCommonsService() {
         cocitationMap = new HashMap<String, Map<String, Integer>>();
     }
 
-
     @PostConstruct
-    void init() {
-        try {
-            blacklist = new Blacklist(new URL(blacklistLocation).openStream());
-        } catch (IOException e) {
-            log.warn("Cannot initialize Blacklist from " + blacklistLocation + " (won't use any)");
-            blacklist = null;
-        }
+    void init()
+    {
+        client = CPathClient.newInstance(pathwayCommonsUrl);
+        client.setName("PCViz-PC9");
+        graphQuery = client.createGraphQuery().patterns(
+                new String[]{
+                        "CONTROLS_STATE_CHANGE_OF",
+                        "CONTROLS_EXPRESSION_OF",
+                        "CATALYSIS_PRECEDES"
+                }
+        );
     }
 
     @Cacheable("metadataCache")
     public String getMetadata(String datatype) {
-        String urlStr = getPathwayCommonsUrl() + "/metadata/" + datatype;
+        String urlStr = pathwayCommonsUrl + "/metadata/" + datatype;
         try {
             URL url = new URL(urlStr);
             URLConnection urlConnection = url.openConnection();
@@ -173,17 +113,13 @@ public class PathwayCommonsService {
     }
 
     @Cacheable("networkCache")
-    public String createNetwork(GraphType type, Collection<String> genes) {
-        String networkJson;
-        JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
-        CytoscapeJsGraph graph = new CytoscapeJsGraph();
-        HashSet<String> nodeNames = new HashSet<String>();
-
+    public String createNetwork(GraphType type, Collection<String> genes)
+    {
         /* Short-cut start! */
         if(genes.size() == 1) { // If it is a singleton
             String gene = genes.iterator().next();
             final String uniprotId = geneNameService.getUniprotId(gene);
-            String filePath = getPrecalculatedFolder() + File.separator + uniprotId + ".json";
+            String filePath = precalculatedFolder + File.separator + uniprotId + ".json";
             File file = new File(filePath);
             if(file.exists()) {
                 log.debug("Found cache for " + gene + ": " + uniprotId + ".json");
@@ -196,86 +132,94 @@ public class PathwayCommonsService {
         }
         /* Short-cut end */
 
-        // add the query genes (to be displayed as disconnected nodes if there will be any problem getting the network)
-        for (String gene : genes)
-            nodeNames.add(gene);
+        final CytoscapeJsGraph graph = new CytoscapeJsGraph();
+        final HashSet<String> nodeNames = new HashSet<String>();
 
-        // Execute a graph query using the cpath2 client
-        final CPathClient client = CPathClient.newInstance(pathwayCommonsUrl);
+        try
+        {
+            String txt = graphQuery.kind(type).sources(genes).stringResult(OutputFormat.TXT);
+            if (txt != null && !txt.trim().isEmpty()) {
+                Scanner scanner = new Scanner(txt);
+                String line = scanner.nextLine(); // skip title
+                log.debug(line);
+                while (scanner.hasNextLine())
+                {
+                    line = scanner.nextLine();
 
-        Model model = null;
-        try {
-            model = client.createGraphQuery().kind(type).sources(genes).result();
-        } catch (CPathException ex) {
-            log.info("No BioPAX " + type.toString().toLowerCase() + " returned from PC2 for " + genes + "; " + ex);
-        }
+                    if(line.trim().isEmpty())
+                        break; // done - skip the next section (nodes descr.) of PC extended SIF format
 
-        if (model != null) {
-            log.debug("result model has " + model.getObjects().size() + " BioPAX objects.");
-            try {
-                // convert the model to SIF and process the interactions
-                final SIFSearcher searcher = new SIFSearcher(new CommonIDFetcher(),
-                        SIFEnum.CONTROLS_STATE_CHANGE_OF,
-                        SIFEnum.CONTROLS_EXPRESSION_OF,
-                        SIFEnum.CATALYSIS_PRECEDES
-                );
-                searcher.setBlacklist(blacklist);
+                    //split; empty tokens that result from '\t\t' and after the last tab are also included:
+                    String[] sif = line.split("\t",-1);
 
-                for (SIFInteraction sif : searcher.searchSIF(model)) {
-                    String srcName = sif.sourceID;
-                    String targetName = sif.targetID;
+                    String srcName = sif[0];
+                    String targetName = sif[2];
 
-                    int cocitations = getCocitations(srcName, targetName);
-                    if (cocitations < getMinNumberOfCoCitationsForEdges())
+                    int edgeCo = getCocitations(srcName, targetName);
+                    int srcCo = getTotalCocitations(srcName);
+                    int targetCo = getTotalCocitations(targetName);
+                    if (edgeCo < minNumberOfCoCitationsForEdges
+                            || srcCo < minNumberOfCoCitationsForNodes
+                            || targetCo < minNumberOfCoCitationsForNodes)
+                    {
                         continue;
+                    }
 
-                    nodeNames.add(srcName);
-                    nodeNames.add(targetName);
-                    SIFType sifType = sif.type;
+                    SIFType sifType = SIFEnum.typeOf(sif[1]);
+                    String[] datasources = sif[3].split(";");
+                    String[] publications = sif[4].split(";");
 
-                    CytoscapeJsEdge edge = new CytoscapeJsEdge();
-                    edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
-                    edge.setProperty(PropertyKey.SOURCE, srcName);
-                    edge.setProperty(PropertyKey.TARGET, targetName);
-                    edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
-                    edge.setProperty(PropertyKey.TYPE, sifType.getTag());
-                    edge.setProperty(PropertyKey.DATASOURCE,
-                            sif.getDataSources() == null ? Collections.emptyList() : sif.getDataSources());
-                    edge.setProperty(PropertyKey.PUBMED,
-                            sif.getPublicationIDs(true) == null ? Collections.emptyList()
-                                    : sif.getPublicationIDs(true));
-                    edge.setProperty(PropertyKey.CITED, cocitations);
-                    graph.getEdges().add(edge);
+                    if(nodeNames.add(srcName))
+                        createNode(graph, srcName, srcCo, genes);
+                    if(nodeNames.add(targetName))
+                        createNode(graph, targetName, targetCo, genes);;
+
+                    createEdge(graph, srcName, targetName, sifType, edgeCo, datasources, publications);
                 }
             }
-            catch(Exception e){
-                log.error("Failed converting the network to SIF, etc.: ", e);
+        } catch (CPathException e) {
+            log.info("PC query error / no data; " + type.toString().toLowerCase() + ", source: " + genes + "; " + e);
+        }
+
+        if(nodeNames.isEmpty()) {
+            // add the query genes (to be displayed as disconnected nodes)
+            for (String gene : genes) {
+                createNode(graph, gene, getTotalCocitations(gene), genes);
             }
         }
 
-        for (String nodeName : nodeNames)
-        {
-            int totalCocitations = getTotalCocitations(nodeName);
-            if(totalCocitations < getMinNumberOfCoCitationsForNodes())
-                continue;
+        return (new JSONSerializer()).exclude("*.class").deepSerialize(graph);
+    }
 
-            CytoscapeJsNode node = new CytoscapeJsNode();
-            node.setProperty(PropertyKey.ID, nodeName);
-            boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
-            node.setProperty(PropertyKey.ISVALID, isValid);
-            node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
-            boolean isSeed = genes.contains(nodeName);
-            node.setProperty(PropertyKey.ISSEED, isSeed);
-            node.setProperty(PropertyKey.RANK, 0);
-            node.setProperty(PropertyKey.ALTERED, 0);
-            String uniprotId = geneNameService.getUniprotId(nodeName);
-            node.setProperty(PropertyKey.UNIPROT, uniprotId);
-            graph.getNodes().add(node);
-        }
+    private void createNode(CytoscapeJsGraph graph, String nodeName, int totalCocitations, Collection<String> genes)
+    {
+        CytoscapeJsNode node = new CytoscapeJsNode();
+        node.setProperty(PropertyKey.ID, nodeName);
+        boolean isValid = !geneNameService.validate(nodeName).getMatches().isEmpty();
+        node.setProperty(PropertyKey.ISVALID, isValid);
+        node.setProperty(PropertyKey.CITED, isValid ? totalCocitations : 0);
+        boolean isSeed = genes.contains(nodeName);
+        node.setProperty(PropertyKey.ISSEED, isSeed);
+        node.setProperty(PropertyKey.RANK, 0);
+        node.setProperty(PropertyKey.ALTERED, 0);
+        String uniprotId = geneNameService.getUniprotId(nodeName);
+        node.setProperty(PropertyKey.UNIPROT, uniprotId);
+        graph.getNodes().add(node);
+    }
 
-        networkJson = jsonSerializer.deepSerialize(graph);
-        return networkJson;
-
+    private void createEdge(CytoscapeJsGraph graph, String srcName, String targetName, SIFType sifType,
+                            int edgeCo, String[] dataSources, String[] publicationIds)
+    {
+        CytoscapeJsEdge edge = new CytoscapeJsEdge();
+        edge.setProperty(PropertyKey.ID, srcName + "-" + sifType.getTag() + "-" + targetName);
+        edge.setProperty(PropertyKey.SOURCE, srcName);
+        edge.setProperty(PropertyKey.TARGET, targetName);
+        edge.setProperty(PropertyKey.ISDIRECTED, sifType.isDirected());
+        edge.setProperty(PropertyKey.TYPE, sifType.getTag());
+        edge.setProperty(PropertyKey.DATASOURCE, (dataSources==null)?Collections.emptyList():dataSources);
+        edge.setProperty(PropertyKey.PUBMED, (publicationIds==null)?Collections.emptyList():publicationIds);
+        edge.setProperty(PropertyKey.CITED, edgeCo);
+        graph.getEdges().add(edge);
     }
 
     /**

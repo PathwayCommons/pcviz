@@ -1,22 +1,3 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.service;
 
 import org.apache.commons.logging.Log;
@@ -41,17 +22,13 @@ import java.util.Map;
 public class IHOPSpider
 {
 	private static final Log log = LogFactory.getLog(IHOPSpider.class);
+	public static final String DEFAULT_URL = "http://www.ihop-net.org/UniPub/iHOP/";
 
-    /**
-     * Base URL to the iHop web pages
-     */
 	@Value("${ihop.url:http://www.ihop-net.org/UniPub/iHOP/}")
     private String iHopURL;
 
-    /**
-     * Default Constructor.
-     */
     public IHOPSpider() {
+    	iHopURL = DEFAULT_URL; //for using w/o a Spring context
     }
 
 	public String getiHopURL() {
@@ -103,7 +80,7 @@ public class IHOPSpider
 	 */
 	private String getGeneSearchURL(String symbol)
 	{
-		return  getiHopURL() + "?field=synonym&ncbi_tax_id=9606&search=" + symbol;
+		return  iHopURL + "?field=synonym&ncbi_tax_id=9606&search=" + symbol;
 	}
 
 	/**
@@ -113,7 +90,7 @@ public class IHOPSpider
 	 */
 	private String getGenePageURL(String internalID)
 	{
-		return getiHopURL() +"/gs/" + internalID + ".html?list=1&page=1";
+		return iHopURL +"/gs/" + internalID + ".html?list=1&page=1";
 	}
 
 	/**
@@ -262,5 +239,4 @@ public class IHOPSpider
 		}
 		return null;
 	}
-
 }

@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/PathwayCommons/pcviz.svg?branch=pcviz-boot)](https://travis-ci.org/PathwayCommons/pcviz)
 
 # About
-Pathway Commons Network Visualizer, PCViz in short, is a joint project of [Sander Lab - cBio MSKCC](http://cbio.mskcc.org) and [Bader Lab - uToronto](http://baderlab.org). PCViz currently runs at http://www.pathwaycommons.org/pcviz/
+[Pathway Commons](http://www.pathwaycommons.org) Simple Network Visualizer, PCViz in short.
 
 [![PCViz](./pcviz-screenshot.png)](http://www.pathwaycommons.org/pcviz/)
 
@@ -15,6 +15,12 @@ This file can be downloaded as follows:
 ```
 	wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit" 
 ```
+The property `ncbigene.location` should point to a valid NCBI (Entrez) Gene output that contains the official gene symbols and IDs.
+This file can be downloaded as follows:
+```
+	wget -O /tmp/ncbigene.txt "http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit" 
+```
+
 Make sure all other properties reflect the options you wanted to set and then use the following command to start the application within a test Tomcat instance:
 ```
 	mvn clean install tomcat7:run

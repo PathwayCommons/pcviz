@@ -46,7 +46,7 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 	private CancerStudy currentCancerStudy;
 	private CaseList currentCaseList;
 
-	@Value("${cbioportal.cache.folder:data/portal}")
+	@Value("${cbioportal.cache.folder}")
 	public void setCacheDir(String cacheDir)
 	{
 		this.cacheDir = cacheDir;

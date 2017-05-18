@@ -52,6 +52,8 @@ public class CocitationManagerTest
 		man.getCocitations(gene);
 		long stamp2 = man.getCacheTimestamp(gene);
 
-		assertFalse(stamp1 == stamp2);
+//		assertFalse(stamp1 == stamp2);
+		// from now, cache never expires!
+		assertTrue(stamp1 == stamp2);
 	}
 }
