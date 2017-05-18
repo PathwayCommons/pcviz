@@ -20,9 +20,6 @@ public class CancerContextService {
     private static final Log log = LogFactory.getLog(CancerContextService.class);
     private CBioPortalAccessor cBioPortalAccessor;
 
-    public CancerContextService() {
-    }
-
     @Autowired
     public void setcBioPortalAccessor(CBioPortalAccessor cBioPortalAccessor) {
         this.cBioPortalAccessor = cBioPortalAccessor;

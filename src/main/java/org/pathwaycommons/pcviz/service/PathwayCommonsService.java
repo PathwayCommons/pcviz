@@ -56,7 +56,6 @@ public class PathwayCommonsService {
 
     private GeneNameService geneNameService;
     private CocitationManager cocitMan;
-    private UniProtService uniProtService;
 
     @Value("${cocitation.min.edge:0}")
     private Integer minNumberOfCoCitationsForEdges; // if the prop. isn't set, the default value=0
@@ -67,10 +66,10 @@ public class PathwayCommonsService {
     @Value("${pathwaycommons.url:http://www.pathwaycommons.org/pc2/}")
     private String pathwayCommonsUrl;
 
-    @Value("${precalculated.folder}")
+    @Value("${precalculated.folder:data/uniprot}")
     private String precalculatedFolder;
 
-    @Value("${blacklist.location}")
+    @Value("${blacklist.location:data/blacklist.txt}")
     private String blacklistLocation;
 
     // Cache for co-citations.
@@ -116,18 +115,6 @@ public class PathwayCommonsService {
 
     public void setPrecalculatedFolder(String precalculatedFolder) {
         this.precalculatedFolder = precalculatedFolder;
-    }
-
-    /**
-     * Accessor for new co-citations.
-     */
-    public UniProtService getUniProtService() {
-        return uniProtService;
-    }
-
-    @Autowired
-    public void setUniProtService(UniProtService uniProtService) {
-        this.uniProtService = uniProtService;
     }
 
     public CocitationManager getCocitMan() {
@@ -283,10 +270,6 @@ public class PathwayCommonsService {
             node.setProperty(PropertyKey.ALTERED, 0);
             String uniprotId = geneNameService.getUniprotId(nodeName);
             node.setProperty(PropertyKey.UNIPROT, uniprotId);
-//            if(uniprotId != null) {
-//                String description = uniProtService.getDescription(uniprotId);
-//                node.setProperty(PropertyKey.UNIPROTDESC, description);
-//            }
             graph.getNodes().add(node);
         }
 

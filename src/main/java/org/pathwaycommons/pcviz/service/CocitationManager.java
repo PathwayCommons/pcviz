@@ -64,7 +64,7 @@ public class CocitationManager
 		return resourceDir;
 	}
 
-	@Value("${cocitation.cache.folder}")
+	@Value("${cocitation.cache.folder:data/cocitations}")
 	public void setResourceDir(String resourceDir) {
 		this.resourceDir = resourceDir;
 		createResourceDir();

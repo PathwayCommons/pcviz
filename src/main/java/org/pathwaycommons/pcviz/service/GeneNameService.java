@@ -35,10 +35,10 @@ import java.util.*;
 public class GeneNameService {
     private static Log log = LogFactory.getLog(GeneNameService.class);
 
-    @Value("${hgnc.location}")
+    @Value("${hgnc.location:data/hgnc.txt}")
     private Resource hgncResource;
 
-    @Value("${ncbigene.location}")
+    @Value("${ncbigene.location:data/ncbigene.txt}")
     private Resource ncbigeneResource;
 
     @Value("${autoCompleteResult.limit:10}")
