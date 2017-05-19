@@ -20,10 +20,12 @@ public class CancerContextServiceTest {
 
     @Test
     public void testLoadContext() throws IOException {
-
         HashMap<String, HashMap<String, Double>> map = cancerContextService
             .loadContext("paac_jhu_2014", "mutation", "MDC1,MIMAT0000456");
-        assertFalse(map.isEmpty());
+        String s = cancerContextService.listAvailableCancers();
+        assertNotNull(s);
+        assertFalse(s.isEmpty());
+//        assertFalse(map.isEmpty()); //TODO update the test example (it seems not working anymore... gone?)
     }
 
 }

@@ -3,9 +3,6 @@ package org.pathwaycommons.pcviz.cbioportal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pathwaycommons.pcviz.service.GeneNameService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
@@ -17,7 +14,6 @@ import java.util.*;
  * @author Ozgun Babur
  * @author Igor Rodchenkov (merged together the accessor and manager, refactored)
  */
-@Service
 public class CBioPortalAccessor extends AlterationProviderAdaptor
 {
 	private static Log log = LogFactory.getLog(CBioPortalAccessor.class);
@@ -38,26 +34,26 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 	private GeneNameService geneNameService;
 	private CBioPortalOptions options;
 	private String cacheDir;
+
 	private Map<String, Set<String>> notFoundMap;
 
 	static String portalURL = "http://www.cbioportal.org/public-portal/webservice.do?";
 
-	protected CNVerifier cnVerifier;
+//	protected CNVerifier cnVerifier;
+
 	private CancerStudy currentCancerStudy;
 	private CaseList currentCaseList;
 
-	@Value("${cbioportal.cache.folder}")
 	public void setCacheDir(String cacheDir)
 	{
 		this.cacheDir = cacheDir;
 	}
 
-	@Autowired
 	public void setGeneNameService(GeneNameService geneNameService) {
 		this.geneNameService = geneNameService;
 	}
 
-	public CBioPortalAccessor() throws IOException
+	public CBioPortalAccessor()
 	{
 		cancerStudies = new ArrayList<CancerStudy>();
 		geneticProfilesCache = new HashMap<CancerStudy, List<GeneticProfile>>();
@@ -68,11 +64,7 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		cancerStudiesById = new HashMap<String, CancerStudy>();
 		caseListsById = new HashMap<String, CaseList>();
 		geneticProfilesById = new HashMap<String, GeneticProfile>();
-
 		setOptions(new CBioPortalOptions());
-		initializeStudies();
-
-		assert !cancerStudies.isEmpty();
 	}
 
 	public CBioPortalAccessor(PortalDataset dataset) throws IOException
@@ -126,13 +118,14 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		setCurrentGeneticProfiles(profiles);
 	}
 
-	private void initializeStudies() throws IOException
+	public void initializeStudies() throws IOException
 	{
 		for (CancerStudy study : getAllCancerStudies())
 		{
 			cancerStudies.add(study);
 			cancerStudiesById.put(study.getStudyId(), study);
 		}
+		assert !cancerStudies.isEmpty();
 	}
 
 	public void setOptions(CBioPortalOptions cBioPortalOptions)
@@ -403,8 +396,8 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		memorize(symbol, alterationPack);
 //		alterationPack.complete();
 
-		if (cnVerifier != null)
-			cnVerifier.verify(alterationPack);
+//		if (cnVerifier != null)
+//			cnVerifier.verify(alterationPack);
 
 		if (alterationPack.getSize() != currentCaseList.getCases().length)
 		{

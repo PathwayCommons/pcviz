@@ -7,9 +7,11 @@ import org.pathwaycommons.pcviz.model.CancerStudyDetails;
 import org.pathwaycommons.pcviz.model.PropertyKey;
 import org.pathwaycommons.pcviz.cbioportal.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +20,27 @@ import java.util.HashMap;
 public class CancerContextService {
 
     private static final Log log = LogFactory.getLog(CancerContextService.class);
-    private CBioPortalAccessor cBioPortalAccessor;
+
+    private final CBioPortalAccessor cBioPortalAccessor;
+
+    @Value("${cbioportal.cache.folder}")
+    private String cacheDir;
 
     @Autowired
-    public void setcBioPortalAccessor(CBioPortalAccessor cBioPortalAccessor) {
-        this.cBioPortalAccessor = cBioPortalAccessor;
+    public CancerContextService(GeneNameService geneNameService) {
+        cBioPortalAccessor = new CBioPortalAccessor();
+        cBioPortalAccessor.setGeneNameService(geneNameService);
+    }
+
+    @PostConstruct
+    void init() {
+        cBioPortalAccessor.setCacheDir(cacheDir);
+        try {
+            cBioPortalAccessor.initializeStudies();
+        } catch (IOException e) {
+            log.error("Failed to init studies from cBioPOrtal", e);
+//            throw new RuntimeException("Failed to init studies from cBioPOrtal", e);
+        }
     }
 
     @Cacheable("cancerContextStudiesCache")

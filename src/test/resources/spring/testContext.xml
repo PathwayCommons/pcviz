@@ -15,6 +15,6 @@
 
     <context:component-scan base-package="org.pathwaycommons.pcviz.service"/>
 
-    <bean class="org.pathwaycommons.pcviz.cbioportal.CBioPortalAccessor" id="cBioPortalAccessor"/>
+    <!--<bean class="org.pathwaycommons.pcviz.cbioportal.CBioPortalAccessor" id="cBioPortalAccessor"/>-->
 
 </beans>
