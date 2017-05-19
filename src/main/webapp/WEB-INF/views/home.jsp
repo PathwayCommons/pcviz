@@ -338,10 +338,12 @@
                           </tr>
                       </table>
 
+                      <%-- hide this; will chose type automatically based on the number of genes entered--%>
                       <h4 class="demo-panel-title">Query type</h4>
                       <select value="0" class="span3" tabindex="1" id="query-type" name="herolist">
-                          <option selected="selected" value="neighborhood">Neighborhood</option>
-                          <option value="pathsbetween">Paths-between</option>
+                          <option value="neighborhood">neighborhood (one gene)</option>
+                          <option selected="selected" value="pathsbetween">paths-between</option>
+                          <%--<option value="commonstream">common-stream</option>--%>
                       </select>
 
                   </div>
@@ -673,8 +675,12 @@
       Sorry! One or more gene symbols you have entered were not valid.
   </script>
 
-  <script type="text/template" id="noty-invalid-pathsbetween-template">
-      A Paths-between query cannot be run for a single gene. Maybe you want to try <b>neighborhood</b> instead?
+  <script type="text/template" id="noty-invalid-graphtype-template">
+      Maybe you want a single gene <b>NEIGHBORHOOD</b> query instead (check Settings)?
+  </script>
+
+  <script type="text/template" id="noty-invalid-neighborhood-template">
+      A Neighborhood query takes too long and returns too much for multiple genes. Let's do <b>pathsbetween</b> instead.
   </script>
 
   <script type="text/template" id="noty-semivalid-symbols-template">

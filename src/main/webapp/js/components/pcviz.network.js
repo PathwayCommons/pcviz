@@ -207,25 +207,46 @@ var NetworkView = Backbone.View.extend({
 
 				var networkType = $("#query-type").val();
 
-				if(networkType == "pathsbetween" && names.split(",").length < 2)
-				{
-				    (new NotyView({
-				        template: "#noty-invalid-pathsbetween-template",
-				        error: true,
-				        model: {}
-				    })).render();
-				}
+
+				// although, 'pathsbetween' is ok to query with one or more genes,
+				// let's auto-switch to 'neighborhood' in case it's just one gene ID
+				// (it's ok because we pre-compute all gene nearest neighborhoods as parts of pcviz release);
+                // on the other hand, let's also change graph type from neighb. to paths. if there are several genes.
+                if (networkType == "neighborhood" && names.split(",").length > 1)
+                {
+                    (new NotyView({
+                        template: "#noty-invalid-neighborhood-template",
+                        error: true,
+                        model: {}
+                    })).render();
+
+                    $("#query-type").val("pathsbetween");
+                    window.location.hash = "pathsbetween/" + names;
+                    return this;
+                }
+                else if (networkType != "neighborhood" && names.split(",").length < 2)
+                {
+                    (new NotyView({
+                        template: "#noty-invalid-graphtype-template",
+                        error: true,
+                        model: {}
+                    })).render();
+
+                    // TODO: auto-switch to neighborhood? (let user do it, for now)
+                    // $("#query-type").val("neighborhood");
+                    // window.location.hash = "neighborhood/" + names;
+                    // return this;
+                }
 
 				window.setTimeout(function()
 				{
 				    $(self.tooSlowMessage).slideDown();
-				}, 15000);
+				}, 20000);
 
 
                 // log this event on google analytics
                 ga('send', 'event', 'main', networkType, geneValidations.getPrimaryNames());
 
-				// TODO: change graph type dynamically! (nhood)
 				$.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
 				    function(data)
 				    {
@@ -237,11 +258,6 @@ var NetworkView = Backbone.View.extend({
 				        $(self.tooSlowMessage).hide();
 
                         var layoutOptions = getPcVizLayoutOptions( data );
-                        // if(data.nodes.length > 0 && data.nodes[0].position != undefined) {
-                        //     layoutOptions = { name: "preset" };
-                        // } else if(data.nodes.length == 1) { // If a singleton
-                        //     layoutOptions = { name: "random", fit: false };
-                        // }
 
 				        var cyOptions = {
 							container: container,
@@ -351,7 +367,6 @@ var NetworkView = Backbone.View.extend({
 
 						cy.ready(function(){
 							var endTime = Date.now();
-
 							// console.log('Init took %s ms', endTime - startTime);
 						});
 

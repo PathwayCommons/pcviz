@@ -64,8 +64,7 @@ public class NetworkController
     @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
     public ResponseEntity<String> getEntityInJson(@PathVariable GraphType type, @PathVariable String genes)
     {
-        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
-            // TODO: support commonstream and pathsfromto?
+        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN || type == GraphType.COMMONSTREAM)) {
             return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
         }
 

@@ -4,14 +4,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class parses co-citation information in iHOP database.
@@ -24,11 +20,14 @@ public class IHOPSpider
 	private static final Log log = LogFactory.getLog(IHOPSpider.class);
 	public static final String DEFAULT_URL = "http://www.ihop-net.org/UniPub/iHOP/";
 
+	private final RestTemplate restTemplate;
+
 	@Value("${ihop.url:http://www.ihop-net.org/UniPub/iHOP/}")
     private String iHopURL;
 
     public IHOPSpider() {
     	iHopURL = DEFAULT_URL; //for using w/o a Spring context
+		restTemplate = new RestTemplate();
     }
 
 	public String getiHopURL() {
@@ -41,33 +40,25 @@ public class IHOPSpider
 
     /**
 	 * Gets the co-citation data from the iHOP server.
+	 *
 	 * @param symbol symbol of the gene of interest
 	 * @return map from co-cited to counts
 	 */
 	public Map<String, Integer> parseCocitations(String symbol)
 	{
-		// Find internal ID
-		BufferedReader reader = getReader(getGeneSearchURL(symbol));
 		try {
-			String ID = null;
-
-			if(reader != null) {
-				ID = getInternalID(reader, symbol);
-				reader.close();
-			}
-
+			// Find internal ID
+			String result = restTemplate.getForObject(getGeneSearchURL(symbol), String.class);
+			String ID = getInternalID(result, symbol);
 			if (ID == null) {
 				log.debug("Cannot find internal ID of " + symbol);
 				return null;
+			} else {
+				result = restTemplate.getForObject(getGenePageURL(ID), String.class);
+				Map<String, Integer> map = parseCocitationsByID(result);
+				return map;
 			}
-
-			reader = getReader(getGenePageURL(ID));
-            Map<String, Integer> map = parseCocitations(reader);
-            reader.close();
-
-            return map;
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			log.warn("Cannot parse co-citations for " + symbol, e);
             return null;
 		}
@@ -93,44 +84,21 @@ public class IHOPSpider
 		return iHopURL +"/gs/" + internalID + ".html?list=1&page=1";
 	}
 
-	/**
-	 * Gets a BufferedReader for the given URL.
-	 * @param url url of the resource
-	 * @return buffered reader
-	 */
-	private static BufferedReader getReader(String url)
-	{
-		try
-		{
-			URL u = new URL(url);
-			URLConnection con = u.openConnection();
-			InputStream is = con.getInputStream();
-			return new BufferedReader(new InputStreamReader(is));
-		}
-		catch (IOException e)
-		{
-			log.error(e.toString());
-			return null;
-		}
-	}
 
-	/**
-	 * Extracts the internal ID of the molecule.
-	 * @param reader reader of the resource
-	 * @return internal ID
-	 * @throws IOException
-	 */
-	private String getInternalID(BufferedReader reader, String symbol) throws IOException
+	private String getInternalID(String result, String symbol) throws IOException
 	{
-		if(reader == null) {
+		if(result == null) {
 			log.info("Cannot find internal ID of " + symbol);
 			return null;
 		}
 
+		Scanner scanner = new Scanner(result);
+
 		List<String> ids = new ArrayList<String>();
 
-		for(String line = reader.readLine(); line != null; line = reader.readLine())
+		while (scanner.hasNextLine())
 		{
+			String line = scanner.nextLine();
 			if (line.startsWith("<TD nowrap=\"1\""))
 			{
 				int index = line.indexOf("doaction(null, ");
@@ -142,11 +110,11 @@ public class IHOPSpider
 
 			if (line.equals("<B>" + symbol + "</B>"))
 			{
-				line = reader.readLine();
+				line = scanner.nextLine();
 
 				if (!line.equals("</SYMBOL>")) continue;
 
-				line = reader.readLine();
+				line = scanner.nextLine();
 
 				int index = line.indexOf("doaction(null, ");
 
@@ -170,20 +138,23 @@ public class IHOPSpider
 
 		// Cannot find
 		log.debug("Cannot find internal ID of " + symbol);
+
 		return null;
 	}
 
-	/**
+	/*
 	 * Parses the co-citation counts for the given gene page.
+	 *
 	 * @param reader reader for the content
 	 * @return map from the co-cited to their counts
 	 */
-	private Map<String, Integer> parseCocitations(BufferedReader reader) throws IOException
+	private Map<String, Integer> parseCocitationsByID(String result) throws IOException
 	{
 		Map<String, Integer> map = new HashMap<String, Integer>();
-
-		for(String line = reader.readLine(); line != null; line = reader.readLine())
+		Scanner scanner = new Scanner(result);
+		while (scanner.hasNextLine())
 		{
+			String line = scanner.nextLine();
 			if (line.startsWith("           hstore(new Array(\"type\", \"GENE\""))
 			{
 				String symbol = line.substring(line.indexOf("symbol\", \"") + 10, line.indexOf("\", \"name"));
@@ -202,37 +173,31 @@ public class IHOPSpider
 	 */
 	private String getSymbolOfID(String ID)
 	{
-		String url = getGenePageURL(ID);
-		BufferedReader reader = getReader(url);
-		try
-		{
-            String symbol = parseSymbol(reader);
-            reader.close();
-            return symbol;
+		try {
+			String result = restTemplate.getForObject(getGenePageURL(ID), String.class);
+            return parseSymbol(result);
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			log.error("Error while extracting gene symbol.", e);
 			return null;
 		}
 	}
 
-	/**
+	/*
 	 * Gets the gene symbol in the title.
-	 * @param reader reader for the content
-	 * @return gene symbol
 	 */
-	private String parseSymbol(BufferedReader reader) throws IOException
+	private String parseSymbol(String result) throws IOException
 	{
-		for(String line = reader.readLine(); line != null; line = reader.readLine())
+		Scanner scanner = new Scanner(result);
+		while(scanner.hasNextLine())
 		{
+			String line = scanner.nextLine();
 			if (line.startsWith("<title>"))
 			{
 				int start = line.indexOf("[");
 				int end = line.indexOf("]");
-
-				if (start > 0 && end > start)
-				{
+				if (start > 0 && end > start) {
 					return line.substring(start + 1, end).trim();
 				}
 			}

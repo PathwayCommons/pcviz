@@ -22,9 +22,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -48,7 +45,7 @@ public class PathwayCommonsService {
     private Integer minNumberOfCoCitationsForNodes;
 
     @Value("${pathwaycommons.url}")
-    private String pathwayCommonsUrl;
+    private volatile String pathwayCommonsUrl;
 
     @Value("${precalculated.folder}")
     private String precalculatedFolder;
@@ -85,25 +82,14 @@ public class PathwayCommonsService {
         );
     }
 
+    //TODO: pre-load all the metadata and never do it again
     @Cacheable("metadataCache")
     public String getMetadata(String datatype) {
-        String urlStr = pathwayCommonsUrl + "/metadata/" + datatype;
         try {
-            URL url = new URL(urlStr);
-            URLConnection urlConnection = url.openConnection();
-            StringBuilder builder = new StringBuilder();
-            Scanner scanner = new Scanner(urlConnection.getInputStream());
-            while(scanner.hasNextLine()) {
-                builder.append(scanner.nextLine() + "\n");
-            }
-            scanner.close();
-            return builder.toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            return client.get("/metadata/" + datatype, null, String.class);
+        }catch (CPathException e) {
+           log.error("Failed fetching /metadata/" + datatype, e);
+           return null;
         }
     }
 

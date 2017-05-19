@@ -46,24 +46,24 @@ public class GeneNameService {
 
     private final Map<String, String> sym2id;
     private final Map<String, String> id2sym;
-    private final HashMap<String, HashSet<String>> geneMaps;
-    private final ArrayList<String> geneMapKeysSorted;
-    private final HashMap<String, String> symbolToUniprot;
+    private final Map<String, Set<String>> geneMaps;
+    private final SortedSet<String> geneMapKeysSorted;
+    private final Map<String, String> symbolToUniprot;
 
     public GeneNameService() {
         symbolToUniprot = new HashMap<String, String>();
         sym2id = new HashMap<String, String>();
         id2sym = new HashMap<String, String>();
-        geneMaps = new HashMap<String, HashSet<String>>();
-        geneMapKeysSorted = new ArrayList<String>();
+
+        geneMaps = Collections.synchronizedMap(new HashMap<String, Set<String>>());
+        geneMapKeysSorted = Collections.synchronizedSortedSet(new TreeSet<String>());
     }
 
     public GeneValidation validate(String name) {
         GeneValidation geneValidation = new GeneValidation();
         geneValidation.setQuery(name);
-        HashSet<String> names = geneMaps.get(name.toUpperCase());
+        Set<String> names = geneMaps.get(name.toUpperCase());
         if(names != null) geneValidation.getMatches().addAll(names);
-
         return geneValidation;
     }
 
@@ -100,8 +100,6 @@ public class GeneNameService {
             }
             scanner.close();
 
-            Collections.sort(geneMapKeysSorted);
-
         } catch (IOException e) {
             log.error("Could not initialize the gene map: " + e.getLocalizedMessage());
         }
@@ -135,7 +133,7 @@ public class GeneNameService {
     }
 
     private void addToMap(String secondaryName, String primaryName) {
-        HashSet<String> strings = geneMaps.get(secondaryName);
+        Set<String> strings = geneMaps.get(secondaryName);
         if(strings == null) {
             strings = new HashSet<String>();
             geneMaps.put(secondaryName, strings);
@@ -153,7 +151,7 @@ public class GeneNameService {
 
         for (String key : geneMapKeysSorted) {
             if(key.startsWith(term)) {
-                HashSet<String> matches = geneMaps.get(key);
+                Set<String> matches = geneMaps.get(key);
                 assert matches != null;
 
                 for (String match : matches) {

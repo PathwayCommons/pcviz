@@ -41,14 +41,16 @@ var HomeView = Backbone.View.extend({
         $(this.el).html(this.template(this.model));
 
         var redirectForNewNetwork = function() {
-            window.location.hash = $("#query-type").val() + "/" + $("input[name='tagsinput']").val();
+            var input = $("input[name='tagsinput']").val();
+            if(input)
+                window.location.hash = $("#query-type").val() + "/" + input;
         };
 
         var loadNetworkTimer = 0;
-        var waitTime = 6000;
+        var waitTime = 5000;
 
         $("#tagsinput").tagsInput({
-            defaultText: "...",
+            defaultText: "",
             onAddTag: function() {
                 window.clearTimeout(loadNetworkTimer);
                 loadNetworkTimer = window.setTimeout(redirectForNewNetwork, waitTime);

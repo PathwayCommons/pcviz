@@ -55,7 +55,6 @@ public class MetaDataController
 	{
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Type", "application/json; charset=utf-8");
-
 		String data = pathwayCommonsService.getMetadata(datatype);
 		return new ResponseEntity<String>(data, headers, HttpStatus.OK);
 	}
