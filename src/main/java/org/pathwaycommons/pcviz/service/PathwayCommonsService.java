@@ -85,10 +85,11 @@ public class PathwayCommonsService {
     //TODO: pre-load all the metadata and never do it again
     @Cacheable("metadataCache")
     public String getMetadata(String datatype) {
+        String relUrl = "/metadata/" + datatype + ".json";
         try {
-            return client.get("/metadata/" + datatype, null, String.class);
+            return client.get(relUrl, null, String.class);
         }catch (CPathException e) {
-           log.error("Failed fetching /metadata/" + datatype, e);
+           log.error("Failed fetching " + relUrl, e);
            return null;
         }
     }
