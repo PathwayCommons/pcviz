@@ -29,11 +29,11 @@ i=1
 while [ $i -le $numOfIds ] ; do
     uniprotId=$(head -n $i ${TMPFILE}| tail -1)
 
-    if [ -e "$3/$uniprotId.json" ]; then
+    if [ -e "$2/$uniprotId.json" ]; then
       echo "skip existing $uniprotId"
     else
       echo "start: phantomjs uniprot_scraper.js $uniprotId"
-      phantomjs uniprot_scraper.js $uniprotId "$3" 2>&1 >> "$4"
+      phantomjs uniprot_scraper.js $uniprotId "$2" 2>&1 >> "$3"
     fi
 
     echo "processed: $i"
