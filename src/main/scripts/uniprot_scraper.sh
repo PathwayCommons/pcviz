@@ -11,7 +11,7 @@
 
 TMPFILE="/tmp/pcviz_uniprot_ids.txt"
 
-if ! [ -e "$TMPFILE" ]; then
+if ! [ -e "$TMPFILE" ] ; then
     echo "creating a list of UniProt IDs..."
     # extract UniProt accession numbers to the file
     phantomjs extract_uniprot.js "$1" "$TMPFILE"
@@ -29,7 +29,7 @@ i=1
 while [ $i -le $numOfIds ] ; do
     uniprotId=$(head -n $i ${TMPFILE}| tail -1)
 
-    if [ -e "$2/$uniprotId.json" ]; then
+    if [ -e "$2/$uniprotId.json" ] ; then
       echo "skip existing $uniprotId"
     else
       echo "start: phantomjs uniprot_scraper.js $uniprotId"
@@ -39,5 +39,7 @@ while [ $i -le $numOfIds ] ; do
     echo "processed: $i"
     let i=$i+1
 done
+
+#TODO: also get all the info from Biogene and iHope for each ID
 
 echo "all done!"

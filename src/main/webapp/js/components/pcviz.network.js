@@ -1,22 +1,3 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 var pcVizStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
@@ -58,25 +39,29 @@ var pcVizStyleSheet = cytoscape.stylesheet()
         .css({
             "line-color": "#9B59B6"
         })
-        .selector("edge[type='controls-degradation-of']")
+        .selector("edge[type='controls-phosphorylation-of']")
         .css({
-            "line-color": "#D35400"
+            "line-color": "#17ccd3"
         })
+    	.selector("edge[type='controls-transport-of']")
+    	.css({
+        	"line-color": "#d3b777"
+    	})
         .selector("edge[type='controls-expression-of']")
         .css({
-            "line-color": "#2ECC71" // emerald
+            "line-color": "#0ccc0d" // emerald
         })
-        .selector("edge[type='interacts-with']")
+        .selector("edge[type='chemical-affects']")
         .css({
-            "line-color": "#000000"
+            "line-color": "#ffd81b"
         })
         .selector("edge[type='in-complex-with']")
         .css({
-            "line-color": "#34495E"
+            "line-color": "#5e3e41"
         })
         .selector("edge[type='controls-state-change-of']")
         .css({
-            "line-color": "#2980B9"
+            "line-color": "#1450b9"
         })
         .selector(":selected")
         .css({
@@ -104,33 +89,24 @@ var pcVizStyleSheet = cytoscape.stylesheet()
             "width": 15,
             "height": 15
         }); // end of pcVizStyleSheet
-var edgeLengthArray = new Array(); // a map from edgeID to number
-var defaultEdgeLength = 10; // we will hop 0.15 of this amount each time, the larger the biger the radiuses
 
+var edgeTypes = [
+    "catalysis-precedes",
+    "controls-state-change-of",
+    "controls-expression-of",
+    "controls-phosphorylation-of",
+    // "in-complex-with", //too many edges (query bug or life is?..)
+    // "chemical-affects",
+    "controls-transport-of"
+];
 
 function getPcVizLayoutOptions( data ){
 	var numNodes = data.nodes.length;
-	var levelWidth = numNodes / 35;
-
-	// circles
-	// var pcVizLayoutOptions = {
-	// 	name: 'concentric',
-    //
-	// 	concentric: function( node ){
-	// 		return node.data('isseed') ? levelWidth : -node.data('rank');
-	// 	},
-    //
-	// 	levelWidth: function(nodes){ // the variation of concentric values in each level
-	// 		return levelWidth;
-	// 	}
-    //
-	// }; // end of pcVizLayoutOptions
 
 	// forces layout
 	var pcVizLayoutOptions = {
 		name: 'cose',
 		animate: true
-
 		// put more options here if you want to config the layout...
 		// http://js.cytoscape.org/#layouts/cose
 	}; // end of pcVizLayoutOptions
@@ -214,28 +190,28 @@ var NetworkView = Backbone.View.extend({
                 // on the other hand, let's also change graph type from neighb. to paths. if there are several genes.
                 if (networkType == "neighborhood" && names.split(",").length > 1)
                 {
-                    (new NotyView({
-                        template: "#noty-invalid-neighborhood-template",
-                        error: true,
-                        model: {}
-                    })).render();
+                    // (new NotyView({
+                    //     template: "#noty-invalid-neighborhood-template",
+                    //     error: true,
+                    //     model: {}
+                    // })).render();
 
                     $("#query-type").val("pathsbetween");
                     window.location.hash = "pathsbetween/" + names;
                     return this;
                 }
-                else if (networkType != "neighborhood" && names.split(",").length < 2)
+                else if (networkType != "neighborhood" && names.split(",").length == 1)
                 {
-                    (new NotyView({
-                        template: "#noty-invalid-graphtype-template",
-                        error: true,
-                        model: {}
-                    })).render();
+                    // (new NotyView({
+                    //     template: "#noty-invalid-graphtype-template",
+                    //     error: true,
+                    //     model: {}
+                    // })).render();
 
-                    // TODO: auto-switch to neighborhood? (let user do it, for now)
-                    // $("#query-type").val("neighborhood");
-                    // window.location.hash = "neighborhood/" + names;
-                    // return this;
+                    // auto-switch to neighborhood
+                    $("#query-type").val("neighborhood");
+                    window.location.hash = "neighborhood/" + names;
+                    return this;
                 }
 
 				window.setTimeout(function()
@@ -296,7 +272,6 @@ var NetworkView = Backbone.View.extend({
 				                    self.updateEdgeDetails(evt, edge);
 				                });
 
-
 				                // add click listener to core (for background clicks)
 				                cy.on('tap', function(evt) {
 				                    // if click on background, hide details
@@ -314,28 +289,11 @@ var NetworkView = Backbone.View.extend({
 				                    localStorage.setItem(node.id(), JSON.stringify(position));
 				                });
 				                var numberOfNodes = cy.nodes().length;
-                                // update the edgeLengthArray according to citation distribution
-                                calcEdgeDistribution(data, numberOfNodes);
-				                // make the canvas is size propotoinal to the square root of the number of nodes
-				                // so the zoom level should change accordingly
-				                // var w = cy.container().clientWidth;
-
-								// why?????
-                                // var width = Math.max(w , Math.ceil(Math.sqrt(numberOfNodes) * w/Math.sqrt(30)));
-                                // // 0.9 is multiplied to get rid of the overlap as before
-                                // var zoomLevel = 0.9 * (w / width);
-                                // cy.zoom(zoomLevel);
 
 				                // Run the ranker on this graph
 				                cy.rankNodes();
 
 				                (new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
-
-				                var edgeTypes = [
-				                    "catalysis-precedes",
-				                    "controls-state-change-of",
-				                    "controls-expression-of",
-				                ];
 
 				                _.each(edgeTypes, function(type)
 						{
@@ -360,15 +318,16 @@ var NetworkView = Backbone.View.extend({
 				            } // end of ready: function()
 				        }; // end of cyOptions
 
-						var startTime = Date.now();
-						// console.log('Initting...');
+						// var startTime = Date.now(); //for debugging
 
 						cy = cytoscape(cyOptions);
 
-						cy.ready(function(){
-							var endTime = Date.now();
-							// console.log('Init took %s ms', endTime - startTime);
-						});
+						// also debug -
+						// cy.ready(function(){
+						// 	var endTime = Date.now();
+						// 	console.log('Init took %s ms', endTime - startTime);
+						// });
+						// - end debug.
 
 				        (new NotyView({
 			        		template: "#noty-network-loaded-template",
@@ -377,7 +336,7 @@ var NetworkView = Backbone.View.extend({
 						        nodes: data.nodes.length,
 						        edges: data.edges ? data.edges.length : 0,
 						        type: networkType.capitalize(),
-						        timeout: 4000
+						        timeout: 5000
 						 }
 				        })).render();
 				} // end of function(data)
@@ -501,11 +460,6 @@ var EmbedNetworkView = Backbone.View.extend({
                         container.show();
 
                         var layoutOptions = getPcVizLayoutOptions( data );
-                        // if(data.nodes[0].position != undefined) {
-                        //     layoutOptions = { name: "preset" };
-                        // } else if(data.nodes.length == 1) { // If a singleton
-                        //     layoutOptions = { name: "random", fit: false };
-                        // }
 
                         var cyOptions = {
                             elements: data,
@@ -605,125 +559,3 @@ var EmbedNetworkView = Backbone.View.extend({
     } // end of render function
 
 }); // end of EmbedNetworkView = Backbone.View.extend
-
-/**
- * distribution of citation of edges is calculated here
- *
- * edges connected to seed nodes:
- * for each seed node
- * get the distribution of all edges connected to that seed node
- * place the 8 largest cited edges on the first radius (smallest edge length)
- * then the next 2^4 will go on the second radius,
- * next 2^5 on the third... so on
- *
- * for edges not connected to seed nodes
- * their length should be proportional to the radius size of the seed-edges
- * (edges connected to seed nodes)
- */
-function calcEdgeDistribution(data, numberOfNodes) // TODO: Refactor this as a cytoscape.js core plugin
-{
-	return; // TODO probably not used; don't need the expense (not using arbor)
-
-	// method for sorting numeric array
-	var c = function compareNumbers(a, b)
-	{
-	    return (b - a);
-	}
-	var edges = data.edges ? data.edges : []; // all edges
-	var nodes = data.nodes; // all nodes
-	var hopAverage = new Array(); // average citation of each hop radius
-	var hopCount = new Array(); // number of nodes on each hop radius
-	var nonSeedEdges = new Array(); // a map of edge ID to boolean
-	var citedDis; // distribution of citation for each seed node's edges
-	// first set all edges to nonseed
-	for (var j = 0 ; j < edges.length; j++)
-	{
-		nonSeedEdges[edges[j].data.id] = true;
-	}
-	// for each seed node
-	for (var i = 0 ; i < nodes.length; i++)
-	{
-		if(nodes[i].data.isseed)
-		{
-			// calculate the citation distribution
-			citedDis = new Array();
-			var nID = nodes[i].data.id;
-			for (var j = 0 ; j < edges.length; j++)
-			{
-				if (edges[j].data.target == nID ||
-				    edges[j].data.source == nID)
-				{
-					citedDis.push(parseInt(edges[j].data.cited, 10));
-				}
-			}
-			// sort it
-			citedDis.sort(c);
-			// now based on this distribution calculate the hops
-			// hop: radius from the seed node
-			for (var j = 0 ; j < edges.length; j++)
-			{
-				var e = edges[j].data;
-				if (edges[j].data.target == nID || edges[j].data.source == nID)
-				{
-					var k = 8; // from the 8-th element
-					var hop = 1;
-					while(k < citedDis.length &&
-					      e.cited < citedDis[k-1])
-					{
-						hop++;
-						k = k + Math.pow(2, hop + 2); // skip 2^(previous number of nodes)
-					}
-					// length will be hop radius away from the seed
-					var length = hop * 0.15 * defaultEdgeLength;
-					edgeLengthArray[e.id] = length;
-					// mark this edge as processed
-					nonSeedEdges[e.id] = false;
-
-					// here hop statistics are updated to later calculate non-seed edge length
-					// accordingly, hopAverage holds sums, not average till here, I will update it later
-					// if this hop level is new, define it
-					if(typeof hopAverage[hop -1] === 'undefined')
-					{
-						hopAverage[hop - 1] = e.cited;
-						hopCount[hop - 1] = 1;
-					}
-					// otherwise just add it up
-					else
-					{
-						hopAverage[hop - 1] += e.cited;
-						hopCount[hop - 1] += 1;
-					}
-
-				}
-			}
-		}
-	}
-	// hereon edge length of non-seed edges will be calculated
-	// edges not connected to seed nodes
-	// first normalize hopAverages
-	for (var i = 0; i < hopCount.length; i++)
-	{
-		hopAverage[i] /= hopCount[i];
-	}
-
-	var maxHop = hopAverage.length;
-	// so the edge length should be proportional to radiuses of seed nodes
-	for (var i = 0; i < edges.length; i++)
-	{
-		if (nonSeedEdges[edges[i].data.id])
-		{
-			var e = edges[i].data;
-			var hop = 0;
-			// hop till average hop is reached
-			while ( hop < maxHop &&
-				e.cited < hopAverage[hop])
-			{
-				hop++;
-			}
-			// assign length of this edge
-			var length = hop * 0.15 * defaultEdgeLength;
-			edgeLengthArray[e.id] = length;
-		}
-	}
-	// finished calculating edge lengths
-}

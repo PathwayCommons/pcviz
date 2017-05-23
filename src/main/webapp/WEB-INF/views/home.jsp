@@ -3,24 +3,7 @@
 <%@ page import="org.springframework.web.context.WebApplicationContext"%>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page import="java.util.Properties" %>
-<%--
-  ~ Copyright 2013 Memorial-Sloan Kettering Cancer Center.
-  ~
-  ~ This file is part of Pathway Commons' PCViz.
-  ~
-  ~ PCViz is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ PCViz is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesser General Public License
-  ~ along with PCViz. If not, see <http://www.gnu.org/licenses/>.
-  --%>
+
 <%
     WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
     Properties pcvizProps = (Properties) context.getBean("pcvizProps");
@@ -308,10 +291,43 @@
                                       <span class="itx-type-on-off label catalysis-precedes" data-itx-type="catalysis-precedes">consecutive catalysis <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
+                              <tr id="row-controls-phosphorylation-of">
+                                  <td>
+                                      <span id="controls-phosphorylation-of-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label controls-phosphorylation-of" data-itx-type="controls-phosphorylation-of">controls phosphorylation <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <%--small molecules are currently not supported by pcviz--%>
+                              <%--<tr id="row-chemical-affects">--%>
+                                  <%--<td>--%>
+                                      <%--<span id="chemical-affects-count">0</span>--%>
+                                  <%--</td>--%>
+                                  <%--<td>--%>
+                                      <%--<span class="itx-type-on-off label chemical-affects" data-itx-type="chemical-affects">chemical affects <span class="fui-cross-16"></span></span>--%>
+                                  <%--</td>--%>
+                              <%--</tr>--%>
+                              <tr id="row-controls-transport-of">
+                                  <td>
+                                      <span id="controls-transport-of-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label controls-transport-of" data-itx-type="controls-transport-of">controls transport <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
+                              <%--<tr id="row-in-complex-with">--%>
+                                  <%--<td>--%>
+                                      <%--<span id="in-complex-with-count">0</span>--%>
+                                  <%--</td>--%>
+                                  <%--<td>--%>
+                                      <%--<span class="itx-type-on-off label in-complex-with" data-itx-type="in-complex-with">in complex  <span class="fui-cross-16"></span></span>--%>
+                                  <%--</td>--%>
+                              <%--</tr>--%>
                           </table>
                       </div>
 
-                      <h4 class="demo-panel-title">Number of genes <small>(<span id="number-of-genes-info"></span>)</small></h4>
+                      <h4 class="demo-panel-title">Genes to show <small>(<span id="number-of-genes-info"></span>)</small></h4>
                       <table>
                           <tr>
                               <td class="minus-sign-container">
@@ -329,6 +345,7 @@
                               <td>
                                   <p class="help-slider-text palette palette-silver">
                                       Slide left to decrease the number of genes
+                                      (based on the number of co-citations)
                                   </p>
                               </td>
                               <td>
@@ -339,10 +356,10 @@
                       </table>
 
                       <%-- hide this; will chose type automatically based on the number of genes entered--%>
-                      <h4 class="demo-panel-title">Query type</h4>
-                      <select value="0" class="span3" tabindex="1" id="query-type" name="herolist">
-                          <option value="neighborhood">neighborhood (one gene)</option>
-                          <option selected="selected" value="pathsbetween">paths-between</option>
+                      <h4 hidden class="demo-panel-title">Query type</h4>
+                      <select hidden value="0" class="span3" tabindex="1" id="query-type" name="herolist">
+                          <option hidden value="neighborhood">neighborhood (one gene)</option>
+                          <option hidden selected="selected" value="pathsbetween">paths-between</option>
                           <%--<option value="commonstream">common-stream</option>--%>
                       </select>
 
@@ -352,7 +369,6 @@
                           <div class="tile">
                               <h3 class="tile-title">Cancer type of interest</h3>
                               <ul id="cancer-context-list">
-
                                   <!-- Cancer Studies -->
                               </ul>
                               <br>
@@ -505,21 +521,25 @@
       controls expression
   </script>
 
-  <script type="text/template" id="edge-type-text-in-complex-with-template">
-      in same complex
+  <%--<script type="text/template" id="edge-type-text-in-complex-with-template">--%>
+      <%--in same complex--%>
+  <%--</script>--%>
+
+  <script type="text/template" id="edge-type-text-controls-transport-of-template">
+      controls transport
   </script>
 
-  <script type="text/template" id="edge-type-text-interacts-with-template">
-      interacts
-  </script>
-
-  <script type="text/template" id="edge-type-text-controls-degradation-of-template">
-      controls degradation
+  <script type="text/template" id="edge-type-text-controls-phosphorylation-of-template">
+      controls phosphorylation
   </script>
 
   <script type="text/template" id="edge-type-text-catalysis-precedes-template">
       consecutive catalysis
   </script>
+
+  <%--<script type="text/template" id="edge-type-text-chemical-affects-template">--%>
+      <%--chemical affects--%>
+  <%--</script>--%>
 
   <script type="text/template" id="edge-type-example-template">
       <h5>Example Interaction</h5>
@@ -601,15 +621,20 @@
       <span class="gene source-gene">{{source}}</span> changes the state of <span class="gene target-gene">{{target}}</span>.
   </script>
 
+  <script type="text/template" id="edge-controls-transport-of-template">
+      <span class="gene source-gene">{{source}}</span> controls a reaction that changes the cellular location
+      of <span class="gene target-gene">{{target}}</span>.
+  </script>
+
   <script type="text/template" id="edge-catalysis-precedes-template">
       <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
       catalyze two conversions connected via a common molecule,
       <i>e.g.</i> the first entity produces a substrate that is consumed by the second entity.
   </script>
 
-  <script type="text/template" id="edge-controls-degradation-of-template">
+  <script type="text/template" id="edge-controls-phosphorylation-of-template">
       <span class="gene source-gene">{{source}}</span>
-      controls the degradation of
+      controls the phosphorylation of
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
@@ -619,16 +644,15 @@
       <span class="gene target-gene">{{target}}</span>.
   </script>
 
-  <script type="text/template" id="edge-interacts-with-template">
-      <span class="gene source-gene">{{source}}</span>
-      interacts with
-      <span class="gene target-gene">{{target}}</span>.
-  </script>
+  <%--<script type="text/template" id="edge-chemical-affects-template">--%>
+      <%--A small molecule <span class="gene source-gene">{{source}}</span>--%>
+      <%--has an effect on the state of protein <span class="gene target-gene">{{target}}</span>.--%>
+  <%--</script>--%>
 
-  <script type="text/template" id="edge-in-complex-with-template">
-      <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
-      are members of the  same complex.
-  </script>
+  <%--<script type="text/template" id="edge-in-complex-with-template">--%>
+      <%--<span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>--%>
+      <%--are members of the  same complex.--%>
+  <%--</script>--%>
 
   <script type="text/template" id="loading-small-template">
       <img src="images/loading.gif" alt="loading..." height="17" width="50">
@@ -672,16 +696,16 @@
   </script>
 
   <script type="text/template" id="noty-invalid-symbols-template">
-      Sorry! One or more gene symbols you have entered were not valid.
+      One or more gene symbols you have entered were not valid.
   </script>
 
-  <script type="text/template" id="noty-invalid-graphtype-template">
-      Maybe you want a single gene <b>NEIGHBORHOOD</b> query instead (check Settings)?
-  </script>
+  <%--<script type="text/template" id="noty-invalid-graphtype-template">--%>
+      <%--Auto-switched to <b>NEIGHBORHOOD</b> graph query.--%>
+  <%--</script>--%>
 
-  <script type="text/template" id="noty-invalid-neighborhood-template">
-      A Neighborhood query takes too long and returns too much for multiple genes. Let's do <b>pathsbetween</b> instead.
-  </script>
+  <%--<script type="text/template" id="noty-invalid-neighborhood-template">--%>
+      <%--Auto-switched to <b>PATHS-BETWEEN</b> graph query.--%>
+  <%--</script>--%>
 
   <script type="text/template" id="noty-semivalid-symbols-template">
       <b><small>{{query}}</small></b> is a synonym for <b><small>{{synonym}}</small></b>

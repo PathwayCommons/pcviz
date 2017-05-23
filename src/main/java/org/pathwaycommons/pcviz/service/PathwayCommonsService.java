@@ -20,10 +20,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -77,7 +76,11 @@ public class PathwayCommonsService {
                 new String[]{
                         "CONTROLS_STATE_CHANGE_OF",
                         "CONTROLS_EXPRESSION_OF",
-                        "CATALYSIS_PRECEDES"
+                        "CATALYSIS_PRECEDES",
+                        "CONTROLS_TRANSPORT_OF",
+                        "CONTROLS_PHOSPHORYLATION_OF",
+//                        "IN_COMPLEX_WITH",
+//                        "CHEMICAL_AFFECTS"
                 }
         );
     }
@@ -94,10 +97,10 @@ public class PathwayCommonsService {
         }
     }
 
-    private String readFile(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
-    }
+//    private String readFile(String path, Charset encoding) throws IOException {
+//        byte[] encoded = Files.readAllBytes(Paths.get(path));
+//        return new String(encoded, encoding);
+//    }
 
     @Cacheable("networkCache")
     public String createNetwork(GraphType type, Collection<String> genes)
@@ -106,14 +109,14 @@ public class PathwayCommonsService {
         if(genes.size() == 1) { // If it is a singleton
             String gene = genes.iterator().next();
             final String uniprotId = geneNameService.getUniprotId(gene);
-            String filePath = precalculatedFolder + File.separator + uniprotId + ".json";
-            File file = new File(filePath);
-            if(file.exists()) {
+            Path file = Paths.get(precalculatedFolder, uniprotId + ".json");
+            if(Files.exists(file)) {
                 log.debug("Found cache for " + gene + ": " + uniprotId + ".json");
                 try {
-                    return readFile(filePath, Charset.defaultCharset());
+//                    return readFile(filePath, Charset.defaultCharset());
+                    return new String(Files.readAllBytes(file));
                 } catch (IOException e) {
-                    log.error("Problem reading cached file: " + filePath + ". Falling back to normal method.");
+                    log.error("Problem reading cached file: " + file.toString() + "; falling back to web services.");
                 }
             }
         }
@@ -145,10 +148,12 @@ public class PathwayCommonsService {
                     int edgeCo = getCocitations(srcName, targetName);
                     int srcCo = getTotalCocitations(srcName);
                     int targetCo = getTotalCocitations(targetName);
-                    if (edgeCo < minNumberOfCoCitationsForEdges
+                    if (
+//                            type == GraphType.NEIGHBORHOOD && // apply co-citations filter only for n-hood queries
+                            (edgeCo < minNumberOfCoCitationsForEdges
                             || srcCo < minNumberOfCoCitationsForNodes
                             || targetCo < minNumberOfCoCitationsForNodes)
-                    {
+                    ){
                         continue;
                     }
 

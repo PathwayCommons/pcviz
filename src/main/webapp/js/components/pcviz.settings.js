@@ -1,22 +1,3 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 var SettingsView = Backbone.View.extend({
     render: function() {
         $('#rightMenuControls a').click(function (e) {
@@ -28,12 +9,12 @@ var SettingsView = Backbone.View.extend({
             $("#query-type").val(this.model.networkType);
         }
 
-        $("#query-type").dropkick({
-            change: function(value, label) {
-                var genes = $("input[name='tagsinput']").val();
-                window.location.hash = value + "/" + genes;
-            }
-        });
+        // $("#query-type").dropkick({
+        //     change: function(value, label) {
+        //         var genes = $("input[name='tagsinput']").val();
+        //         window.location.hash = value + "/" + genes;
+        //     }
+        // });
 
         $(".itx-type-on-off").click(function(evt) {
             var type = $(this).data("itx-type");
@@ -134,13 +115,23 @@ var NodesSliderView = Backbone.View.extend({
 
                 var val = ui.value;
 
-
                 // Then hide the low importance ones
                 var eles = cy.elements();
                 var hiddenNodes = cy.$("node[rank>=" + val + "][!isseed]");
                 var shownNodes = cy.nodes().not( hiddenNodes );
-                var shown = shownNodes.add( shownNodes.connectedEdges() );
-                var hidden = cy.elements().not( shown );
+                var shownEdges = shownNodes.connectedEdges();
+
+                //exclude edges of currently not-shown interaction types
+                _.each($("#graph-settings .itx-type-on-off"), function(btn) {
+                    var type = $(btn).data("itx-type");
+                    if ($(btn).hasClass("itx-removed")) {
+                        var edges = cy.$("edge[type='" + type + "']");
+                        shownEdges = shownEdges.not(edges);
+                    }
+                });
+
+                var shown = shownNodes.add( shownEdges );
+                var hidden = eles.not( shown );
 
                 eles.show();
                 hidden.hide();
@@ -156,10 +147,6 @@ var NodesSliderView = Backbone.View.extend({
                 value: maxVal,
                 orientation: "horizontal",
                 range: "min",
-
-                // slide: function(event, ui) {
-                //     (new NumberOfNodesView({ model: { numberOfNodes: ui.value }})).render();
-                // },
                 slide: update,
                 change: update
             });

@@ -138,27 +138,31 @@ footer {
 }
 
 .controls-state-change-of {
-    background-color: #2980B9 !important;
+    background-color: #1450b9 !important;
 }
 
 .in-complex-with {
-    background-color: #34495E !important;
+    background-color: #5e3e41 !important;
 }
 
-.interacts-with {
-    background: #000000 !important;
+.chemical-affects {
+    background-color: #ffd81b !important;
 }
 
 .controls-expression-of {
-    background-color: #2ECC71 !important;
+    background-color: #0ccc0d !important;
 }
 
-.controls-degradation-of {
-    background-color: #D35400 !important;
+.controls-phosphorylation-of {
+    background-color: #17ccd3 !important;
 }
 
 .catalysis-precedes {
     background-color: #9B59B6 !important;
+}
+
+.controls-transport-of {
+    background-color: #d3b777 !important;
 }
 
 .itx-removed {
