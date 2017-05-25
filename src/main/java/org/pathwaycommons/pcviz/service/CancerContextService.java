@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,7 +27,7 @@ public class CancerContextService {
 
     private final CBioPortalAccessor cBioPortalAccessor;
 
-    @Value("${cbioportal.cache.folder}")
+    @Value("${cache.folder}")
     private String cacheDir;
 
     @Autowired
@@ -33,13 +37,17 @@ public class CancerContextService {
     }
 
     @PostConstruct
-    void init() {
-        cBioPortalAccessor.setCacheDir(cacheDir);
+    void init() throws IOException {
+        Path dir = Paths.get(cacheDir, "cbioportal");
+        if(!Files.exists(dir))
+            Files.createDirectories(dir);
+
+        cBioPortalAccessor.setCacheDir(cacheDir + FileSystems.getDefault().getSeparator() + "cbioportal");
+
         try {
             cBioPortalAccessor.initializeStudies();
         } catch (IOException e) {
             log.error("Failed to init studies from cBioPOrtal", e);
-//            throw new RuntimeException("Failed to init studies from cBioPOrtal", e);
         }
     }
 

@@ -95,7 +95,7 @@ var edgeTypes = [
     "controls-state-change-of",
     "controls-expression-of",
     "controls-phosphorylation-of",
-    // "in-complex-with", //too many edges (query bug or life is?..)
+    "in-complex-with", //too many edges (query bug or life is?..)
     // "chemical-affects",
     "controls-transport-of"
 ];

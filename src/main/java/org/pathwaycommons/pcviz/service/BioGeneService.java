@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -15,32 +16,22 @@ import java.util.Scanner;
 @Service
 public class BioGeneService {
 
-    @Value("${biogene.url:http://cbio.mskcc.org/biogene/}")
+    @Value("${biogene.url}")
     public String bioGeneUrl;
 
-    @Value("${biogene.format:json}")
-    public String bioGeneFormat;
+    public final static String bioGeneFormat = "json";
 
-    @Value("${precalculated.folder}")
-    private String precalculatedFolder;
+    @Value("${cache.folder}")
+    private String cacheDir;
 
     public BioGeneService() {
     }
 
-    public String getBioGeneUrl() {
-        return bioGeneUrl;
-    }
-
-    public void setBioGeneUrl(String bioGeneUrl) {
-        this.bioGeneUrl = bioGeneUrl;
-    }
-
-    public String getBioGeneFormat() {
-        return bioGeneFormat;
-    }
-
-    public void setBioGeneFormat(String bioGeneFormat) {
-        this.bioGeneFormat = bioGeneFormat;
+    @PostConstruct
+    void init() throws IOException{
+        Path dir = Paths.get(cacheDir, "biogene");
+        if(!Files.exists(dir))
+            Files.createDirectories(dir);
     }
 
     /**
@@ -54,15 +45,15 @@ public class BioGeneService {
     @Cacheable("bioGeneCache")
     public String getData(String gene, String organism) throws IOException
     {
-        Path file = Paths.get(precalculatedFolder, gene + ".biogene.json");
+        Path file = Paths.get(cacheDir, "biogene", gene + ".json");
         if(Files.exists(file)) {
            return new String(Files.readAllBytes(file));
         }
 
         // continue if no cached data found (upgrade to java8 way later...) -
-        String url = (new StringBuilder()).append(getBioGeneUrl()).append("retrieve.do")
+        String url = (new StringBuilder()).append(bioGeneUrl).append("retrieve.do")
             .append("?query=").append(gene).append("&org=").append(organism)
-            .append("&format=").append(getBioGeneFormat()).toString();
+            .append("&format=").append(bioGeneFormat).toString();
         URL bioGene = new URL(url);
         URLConnection bioGeneCxn = bioGene.openConnection();
         Scanner scanner = new Scanner(bioGeneCxn.getInputStream());
@@ -74,7 +65,12 @@ public class BioGeneService {
         }
         scanner.close();
 
-        return sb.toString();
+        String data = sb.toString();
+
+        //save
+        Files.write(file, data.getBytes());
+
+        return data;
     }
 
 }

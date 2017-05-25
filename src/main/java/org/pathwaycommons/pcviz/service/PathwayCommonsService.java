@@ -6,6 +6,7 @@ import cpath.query.CPathGraphQuery;
 import cpath.service.GraphType;
 import cpath.service.OutputFormat;
 import flexjson.JSONSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.biopax.paxtools.pattern.miner.SIFEnum;
@@ -37,17 +38,17 @@ public class PathwayCommonsService {
     private GeneNameService geneNameService;
     private CocitationManager cocitMan;
 
-    @Value("${cocitation.min.edge}")
+    @Value("${cocitation.min.edge:0}")
     private Integer minNumberOfCoCitationsForEdges;
 
-    @Value("${cocitation.min.node}")
+    @Value("${cocitation.min.node:0}")
     private Integer minNumberOfCoCitationsForNodes;
 
     @Value("${pathwaycommons.url}")
     private volatile String pathwayCommonsUrl;
 
-    @Value("${precalculated.folder}")
-    private String precalculatedFolder;
+    @Value("${cache.folder}")
+    private String cacheDir;
 
     // Cache for co-citations.
     private final Map<String, Map<String, Integer>> cocitationMap;
@@ -68,7 +69,7 @@ public class PathwayCommonsService {
     }
 
     @PostConstruct
-    void init()
+    void init() throws IOException
     {
         client = CPathClient.newInstance(pathwayCommonsUrl);
         client.setName("PCViz-PC9");
@@ -79,59 +80,55 @@ public class PathwayCommonsService {
                         "CATALYSIS_PRECEDES",
                         "CONTROLS_TRANSPORT_OF",
                         "CONTROLS_PHOSPHORYLATION_OF",
-//                        "IN_COMPLEX_WITH",
+                        "IN_COMPLEX_WITH",
 //                        "CHEMICAL_AFFECTS"
                 }
         );
+
+        Path dir = Paths.get(cacheDir, "networks");
+        if(!Files.exists(dir))
+            Files.createDirectories(dir);
     }
 
-    //TODO: pre-load all the metadata and never do it again
     @Cacheable("metadataCache")
-    public String getMetadata(String datatype) {
-        String relUrl = "/metadata/" + datatype + ".json";
+    public String getMetadataDatasources() {
+        String relUrl = "metadata/datasources.json";
         try {
             return client.get(relUrl, null, String.class);
-        }catch (CPathException e) {
-           log.error("Failed fetching " + relUrl, e);
-           return null;
+        } catch (CPathException e) {
+            log.error("Failed fetching " + relUrl, e);
+            return null;
         }
     }
 
-//    private String readFile(String path, Charset encoding) throws IOException {
-//        byte[] encoded = Files.readAllBytes(Paths.get(path));
-//        return new String(encoded, encoding);
-//    }
-
     @Cacheable("networkCache")
-    public String createNetwork(GraphType type, Collection<String> genes)
+    public String createNetwork(GraphType type, Collection<String> genes) throws IOException
     {
-        /* Short-cut start! */
-        if(genes.size() == 1) { // If it is a singleton
-            String gene = genes.iterator().next();
-            final String uniprotId = geneNameService.getUniprotId(gene);
-            Path file = Paths.get(precalculatedFolder, uniprotId + ".json");
-            if(Files.exists(file)) {
-                log.debug("Found cache for " + gene + ": " + uniprotId + ".json");
-                try {
-//                    return readFile(filePath, Charset.defaultCharset());
-                    return new String(Files.readAllBytes(file));
-                } catch (IOException e) {
-                    log.error("Problem reading cached file: " + file.toString() + "; falling back to web services.");
-                }
-            }
+        /* Short-cut start */
+        Set<String> sortedIds = new TreeSet<>();
+        for(String gene : genes) {
+            String uniprotId = geneNameService.getUniprotId(gene);
+            sortedIds.add((uniprotId!=null)?uniprotId:gene);
+        }
+        final String cachedNetwork = StringUtils.join(sortedIds.iterator(),null)
+                .replaceAll("/|\\\\","_") + ".json";
+
+        final Path file = Paths.get(cacheDir, "networks", cachedNetwork);
+
+        if(Files.exists(file)) { //return cached data
+            log.debug("Found cached network: " + file.toString());
+            return new String(Files.readAllBytes(file));
         }
         /* Short-cut end */
 
         final CytoscapeJsGraph graph = new CytoscapeJsGraph();
         final HashSet<String> nodeNames = new HashSet<String>();
-
         try
         {
             String txt = graphQuery.kind(type).sources(genes).stringResult(OutputFormat.TXT);
             if (txt != null && !txt.trim().isEmpty()) {
                 Scanner scanner = new Scanner(txt);
                 String line = scanner.nextLine(); // skip title
-                log.debug(line);
                 while (scanner.hasNextLine())
                 {
                     line = scanner.nextLine();
@@ -170,7 +167,7 @@ public class PathwayCommonsService {
                 }
             }
         } catch (CPathException e) {
-            log.info("PC query error / no data; " + type.toString().toLowerCase() + ", source: " + genes + "; " + e);
+            log.warn("PC query error or no data; " + type.toString().toLowerCase() + ", source: " + genes + "; " + e);
         }
 
         if(nodeNames.isEmpty()) {
@@ -180,7 +177,12 @@ public class PathwayCommonsService {
             }
         }
 
-        return (new JSONSerializer()).exclude("*.class").deepSerialize(graph);
+        String network =  (new JSONSerializer()).exclude("*.class").deepSerialize(graph);
+
+        //cache it forever (until the folder is removed or cleaned)
+        Files.write(file, network.getBytes());
+
+        return network;
     }
 
     private void createNode(CytoscapeJsGraph graph, String nodeName, int totalCocitations, Collection<String> genes)

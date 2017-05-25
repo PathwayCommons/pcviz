@@ -5,10 +5,55 @@
 
 	<groupId>pathwaycommons</groupId>
 	<artifactId>pcviz</artifactId>
-	<packaging>war</packaging>
-	<version>2.2.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<version>2.3.0-SNAPSHOT</version>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.3.RELEASE</version>
+	</parent>
+
 	<name>Pathway Commons Network Visualizer</name>
-	<url>https://github.com/PathwayCommons/pcviz</url>
+
+	<url>https://github.com/PathwayCommons/${project.name}</url>
+
+	<organization>
+		<name>Pathway Commons</name>
+		<url>http://www.pathwaycommons.org</url>
+	</organization>
+
+	<mailingLists>
+		<mailingList>
+			<name>Pathway Commons Help</name>
+			<post>pathway-commons-help@googlegroups.com</post>
+		</mailingList>
+	</mailingLists>
+
+	<licenses>
+		<license>
+			<name>LGPL 3.0 license</name>
+			<url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git://github.com/PathwayCommons/${project.name}.git</connection>
+		<developerConnection>scm:git:git@github.com:PathwayCommons/${project.name}.git</developerConnection>
+		<url>https://github.com/PathwayCommons/${project.name}</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/PathwayCommons/${project.name}/issues</url>
+	</issueManagement>
+
+	<ciManagement>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/PathwayCommons/${project.name}</url>
+	</ciManagement>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -19,62 +64,22 @@
 		<cpath-client.version>7.0.0-SNAPSHOT</cpath-client.version>
 	</properties>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>apache-snapshots</id>
-			<name>Apache snapshots</name>
-			<url>https://repository.apache.org/content/repositories/snapshots/</url>
-			<snapshots><enabled>true</enabled></snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>${java.version}</source>
-						<target>${java.version}</target>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
-				<!-- Can run the exec-jar as: java -Xmx8g -jar target/pcviz.jar -httpPort=8080 -->
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.3-SNAPSHOT</version>
-				<!-- this is for making an executable jar with the tomcat built-in -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>create-exec-war</id>
 						<goals>
-							<goal>exec-war-only</goal>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
 						</goals>
-						<phase>package</phase>
-						<configuration>
-							<path>/pcviz</path>
-							<enableNaming>false</enableNaming>
-							<attachArtifactClassifier>exec-war</attachArtifactClassifier>
-							<attachArtifactClassifierType>jar</attachArtifactClassifierType>
-							<!-- An HTTP access log pattern ('combined', modified just to get actual client IP)
-							to match the Logstash 2.1x built-in %{COMBINEDAPACHELOG} Grok pattern -->
-							<accessLogValveFormat>%{X-Forwarded-For}i %l %u %t "%r" %s %b "%{Referer}i" "%{User-Agent}i"</accessLogValveFormat>
-							<finalName>pcviz.jar</finalName>
-						</configuration>
 					</execution>
 				</executions>
-				<!-- this is to debug run as: tomcat:run -->
-				<configuration>
-					<url>http://localhost:8080/manager</url>
-					<server>localhost</server>
-					<path>/pcviz</path>
-					<systemProperties>
-						<JAVA_OPTS>-Xms256m -Xmx8g -XX:MaxPermSize=256m</JAVA_OPTS>
-					</systemProperties>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -88,6 +93,43 @@
 	</repositories>
 
 	<dependencies>
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.data</groupId>-->
+			<!--<artifactId>spring-data-mongodb</artifactId>-->
+			<!--<version>1.10.3.RELEASE</version>-->
+		<!--</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-starter-actuator</artifactId>-->
+		<!--</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.biopax.paxtools</groupId>
 			<artifactId>pattern</artifactId>
@@ -104,102 +146,9 @@
 			<version>${cpath-client.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-
-		<!-- Spring dependencies -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>net.sf.flexjson</groupId>
 			<artifactId>flexjson</artifactId>
 			<version>2.1</version>
-		</dependency>
-
-        <!-- ehcache -->
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-
-        <!-- AOP dependency -->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2</version>
-        </dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-catalina</artifactId>
-			<version>7.0.77</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

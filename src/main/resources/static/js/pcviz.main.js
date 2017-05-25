@@ -1,22 +1,3 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 !function ($) {
     // This is for the moustache-like templates
     // prevents collisions with JSP tags
@@ -98,16 +79,16 @@
         Backbone.history.start();
     });
 
-    // Load metada
-    $.getJSON("metadata/datasources", function(metadata) {
-        var metaDataMap = {};
-        _.each(metadata, function(aMeta) {
-            metaDataMap[aMeta.id] = aMeta;
-            _.each(aMeta.name, function(aName) {
-                metaDataMap[aName] = aMeta;
+    // Load the metadata about PC data sources
+    $.getJSON("metadata/datasources", function(datasources) {
+        var dataSourcesMap = {};
+        _.each(datasources, function(ds) {
+            dataSourcesMap[ds.id] = ds;
+            _.each(ds.name, function(aName) {
+                dataSourcesMap[aName] = ds;
             });
         });
-        window.metadata = metaDataMap;
+        window.metadata = dataSourcesMap;
     });
 
 }(window.jQuery);

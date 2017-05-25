@@ -1,22 +1,3 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of the Pathway Commons' PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.controller;
 
 import cpath.service.GraphType;
@@ -29,8 +10,10 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.beans.PropertyEditorSupport;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Controller
 @RequestMapping("/graph")
@@ -38,14 +21,6 @@ public class NetworkController
 {
     @Autowired
     private PathwayCommonsService pathwayCommonsService;
-
-    public PathwayCommonsService getPathwayCommonsService() {
-        return pathwayCommonsService;
-    }
-
-    public void setPathwayCommonsService(PathwayCommonsService pathwayCommonsService) {
-        this.pathwayCommonsService = pathwayCommonsService;
-    }
 
     /**
      * This configures the web request parameters binding, i.e.,
@@ -61,23 +36,20 @@ public class NetworkController
         binder.registerCustomEditor(GraphType.class, new GraphTypeEditor());
     }
 
-    @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST}, headers = "Accept=application/json")
+    @RequestMapping(value = "{type}/{genes}", method = {RequestMethod.GET, RequestMethod.POST},
+            headers = "Accept=application/json")
     public ResponseEntity<String> getEntityInJson(@PathVariable GraphType type, @PathVariable String genes)
+            throws IOException
     {
-        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN || type == GraphType.COMMONSTREAM)) {
-            return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
-        }
+//        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
+//            return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
+//        }
 
         // otherwise, do the job -
-        HashSet<String> geneSet = new HashSet<String>();
+        Set<String> geneSet = new TreeSet<String>();
         geneSet.addAll(Arrays.asList(genes.split("\\s*,\\s*")));
 
-        String networkJson = "";
-        try {
-            networkJson = pathwayCommonsService.createNetwork(type, geneSet);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        String networkJson = pathwayCommonsService.createNetwork(type, geneSet);
 
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(networkJson);
     }

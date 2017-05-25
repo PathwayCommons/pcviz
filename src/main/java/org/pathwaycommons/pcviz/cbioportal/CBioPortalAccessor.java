@@ -4,9 +4,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pathwaycommons.pcviz.service.GeneNameService;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 /**
@@ -38,8 +44,6 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 	private Map<String, Set<String>> notFoundMap;
 
 	static String portalURL = "http://www.cbioportal.org/public-portal/webservice.do?";
-
-//	protected CNVerifier cnVerifier;
 
 	private CancerStudy currentCancerStudy;
 	private CaseList currentCaseList;
@@ -198,7 +202,7 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 
 		if (data.length != caseList.getCases().length)
 		{
-			System.err.println("Data length and caselist length " +
+			log.error("Data length and caselist length " +
 				"do not match. Data: " + data.length + "  " + "caselist: " +
 				caseList.getCases().length + "\nTime to delete the cache!");
 			return null;
@@ -394,10 +398,6 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		}
 
 		memorize(symbol, alterationPack);
-//		alterationPack.complete();
-
-//		if (cnVerifier != null)
-//			cnVerifier.verify(alterationPack);
 
 		if (alterationPack.getSize() != currentCaseList.getCases().length)
 		{
@@ -669,67 +669,51 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		return studies;
 	}
 
-	public void cacheData(String[] data, String symbol, GeneticProfile geneticProfile,
-						  CaseList caseList)
+	public void cacheData(String[] data, String symbol, GeneticProfile geneticProfile, CaseList caseList)
+			throws IOException
 	{
-		String dir = cacheDir + File.separator + geneticProfile.getId() + File.separator +
-				caseList.getId() + File.separator;
-
-		File f = new File(dir);
-		if (!f.exists()) f.mkdirs();
-
-		String casefile = dir + "cases.txt";
-		if (!(new File(casefile).exists()))
-		{
-			try
-			{
-				BufferedWriter writer = new BufferedWriter(new FileWriter(casefile));
-				StringBuilder sb = new StringBuilder();
-				for (String aCase : caseList.getCases())
-				{
-					sb.append(aCase).append("\t");
-				}
-				writer.write(sb.toString().trim());
-				writer.close();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+		Path dir = Paths.get(cacheDir, geneticProfile.getId(), caseList.getId());
+		if(!Files.exists(dir)) {
+			Files.createDirectories(dir);
 		}
 
-		String url = dir  + symbol;
-		try
+		Path casefile = Paths.get(dir.toString(),"cases.txt");
+		if (!Files.exists(casefile))
 		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(url));
-
-			for (int i = 0; i < data.length; i++)
+			BufferedWriter writer = Files.newBufferedWriter(casefile);
+			StringBuilder sb = new StringBuilder();
+			for (String aCase : caseList.getCases())
 			{
-				writer.write(data[i]);
-				if (i < data.length - 1) writer.write(DELIMITER);
+				sb.append(aCase).append("\t");
 			}
-
+			writer.write(sb.toString().trim());
 			writer.close();
 		}
-		catch (IOException e)
+
+		Path url = Paths.get(dir.toString(),symbol);
+		BufferedWriter writer = Files.newBufferedWriter(url);
+
+		for (int i = 0; i < data.length; i++)
 		{
-			log.error("Cannot cache data for " + symbol, e);
+			writer.write(data[i]);
+			if (i < data.length - 1) writer.write(DELIMITER);
 		}
+
+		writer.close();
 	}
 
 	public String[] readDataInCache(String symbol, GeneticProfile geneticProfile, CaseList caseList)
 	{
-		String url = cacheDir + File.separator + geneticProfile.getId() + File.separator +
-				caseList.getId() + File.separator + symbol;
+		Path url = Paths.get(cacheDir, geneticProfile.getId(), caseList.getId(), symbol);
 
-		if (new File(url).exists())
+		if (Files.exists(url))
 		{
 			try
 			{
 				if (!validatedCaseLists.contains(caseList))
 					checkCaseListValidity(geneticProfile, caseList);
 
-				BufferedReader reader = new BufferedReader(new FileReader(url));
+				BufferedReader reader = Files.newBufferedReader(url);
 				String line = reader.readLine();
 				reader.close();
 				return line.split(DELIMITER);
@@ -744,28 +728,26 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 
 	private void checkCaseListValidity(GeneticProfile geneticProfile, CaseList caseList) throws IOException
 	{
-		String file = cacheDir + File.separator + geneticProfile.getId() + File.separator +
-				caseList.getId() + File.separator + "cases.txt";
+		Path file = Paths.get(cacheDir, geneticProfile.getId(),
+				caseList.getId(), "cases.txt");
 
-		if (new File(file).exists())
+		if (Files.exists(file))
 		{
-			Scanner sc = new Scanner(new File(file));
+			Scanner sc = new Scanner(Files.newInputStream(file));
 			String[] token = sc.nextLine().split("\t");
-
+			sc.close();
 			String[] cases = caseList.getCases();
 
 			if (cases.length != token.length)
 			{
-				System.err.println("CaseList in a different length! Previous: " + token.length +
-						", new: " + cases.length);
+				log.error("CaseList in a different length! Previous: " + token.length + ", new: " + cases.length);
 			}
 			else
 			{
 				for (int i = 0; i < cases.length; i++)
 				{
-					if (!cases[i].equals(token[i])) System.err.println(
-							"Caselist mismatch at pos " + i + "! prev: " + token[i] + ", new:" +
-									cases[i]);
+					if (!cases[i].equals(token[i]))
+						log.error("Caselist mismatch at pos " + i + "! prev: " + token[i] + ", new:" + cases[i]);
 				}
 			}
 		}
@@ -783,14 +765,13 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		String key = geneticProfile.getId() + caseList.getId();
 		notFoundMap.put(key, new HashSet<String>());
 
-		String url = cacheDir + File.separator + geneticProfile.getId() + File.separator +
-				caseList.getId() + File.separator + NOT_FOUND_FILENAME;
+		Path url = Paths.get(cacheDir, geneticProfile.getId(), caseList.getId(), NOT_FOUND_FILENAME);
 
-		if (new File(url).exists())
+		if (Files.exists(url))
 		{
 			try
 			{
-				BufferedReader reader = new BufferedReader(new FileReader(url));
+				BufferedReader reader = Files.newBufferedReader(url);
 				for (String line = reader.readLine(); line != null; line = reader.readLine())
 				{
 					if (!line.isEmpty()) notFoundMap.get(key).add(line);
@@ -805,38 +786,30 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 	}
 
 	protected void addToNotFound(String symbol, GeneticProfile geneticProfile, CaseList caseList)
+			throws IOException
 	{
 		String key = geneticProfile.getId() + caseList.getId();
 		notFoundMap.get(key).add(symbol);
 
-		String url = cacheDir + File.separator + geneticProfile.getId() + File.separator +
-				caseList.getId() + File.separator + NOT_FOUND_FILENAME;
+		Path dir = Paths.get(cacheDir, geneticProfile.getId(), caseList.getId());
+		if(!Files.exists(dir)) {
+			Files.createDirectories(dir);
+		}
 
-		if (new File(url).exists())
+		Path url = Paths.get(cacheDir, geneticProfile.getId(),
+				caseList.getId(), NOT_FOUND_FILENAME);
+
+		if (Files.exists(url))
 		{
-			try
-			{
-				BufferedWriter writer = new BufferedWriter(new FileWriter(url, true));
-				writer.write("\n" + symbol);
-				writer.close();
-			}
-			catch (IOException e)
-			{
-				log.error("Cannot append to not-found file", e);
-			}
+			BufferedWriter writer = Files.newBufferedWriter(url, StandardOpenOption.APPEND);
+			writer.write("\n" + symbol);
+			writer.close();
 		}
 		else
 		{
-			try
-			{
-				BufferedWriter writer = new BufferedWriter(new FileWriter(url));
-				writer.write(symbol);
-				writer.close();
-			}
-			catch (IOException e)
-			{
-				log.error("Cannot create not-found file", e);
-			}
+			BufferedWriter writer = Files.newBufferedWriter(url);
+			writer.write(symbol);
+			writer.close();
 		}
 	}
 

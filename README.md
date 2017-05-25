@@ -5,53 +5,60 @@
 
 [![PCViz](./pcviz-screenshot.png)](http://www.pathwaycommons.org/pcviz/)
 
-# Deploy
-Clone the repository and in the main directory, use the following command to copy/edit the configuration file:
+# Use
+Clone the repository and change (cd) in there. 
+
+Copy and edit the configuration file:
 ```
-	cp -f src/main/resources/spring/pcviz.properties.example src/main/resources/spring/pcviz.properties
+cp -f src/main/resources/application.properties.example src/main/resources/application.properties
 ```
 The property `hgnc.location` should point to a valid HGNC output that contains the official gene symbols and their synonyms.
 This file can be downloaded as follows:
 ```
-	wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit" 
+wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit" 
 ```
-The property `ncbigene.location` should point to a valid NCBI (Entrez) Gene output that contains the official gene symbols and IDs.
-This file can be downloaded as follows:
+The property `ncbigene.location` should point to a valid NCBI (Entrez) Gene output that contains 
+the official gene symbols and IDs. This file can be downloaded as follows:
 ```
-	wget -O /tmp/ncbigene.txt "http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit" 
-```
-
-Make sure all other properties reflect the options you wanted to set and then use the following command to start the application within a test Tomcat instance:
-```
-	mvn clean install tomcat7:run
-```
-or, the following command starts the stand-alone pcviz.jar application (Tomcat is there embedded):
-```
-	java -Xmx16g -jar target/pcviz.jar -httpPort=8080
-```
-and then point your browser to [http://localhost:8080/pcviz/](http://localhost:8080/pcviz/).
-
-If you would like to use your own Tomcat installation for the installation, then you can also deploy the file as follows:
-```
-	mvn clean install
-	cp -f target/target/pcviz-VERSION.war /path/to/tomcat/webapps/pcviz.war
+wget -O /tmp/ncbigene.txt "http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit" 
 ```
 
-# Populating cache using UniProt IDs
+Make sure all other properties reflect the options you wanted to set. 
+
+Now, build the java application with maven using the following command:
+
+```
+mvn clean package
+```
+
+The following command starts the application:
+```
+java -Xmx16g -jar target/pcviz*.war
+```
+or
+```
+mvn spring-boot:run
+```
+
+and then point your browser to [http://localhost:8080/](http://localhost:8080/).
+
+
+# Pre-populate cache (optional)
 To serve networks better, PCViz can utilize cached network data.
 The data folder for the cache files is set within the properties file using the
 
 To prepare those caches, you need to
 
-1. Clean up your files from `precalculted.folder`
+1. Clean up your `cache.folder`
 2. Deploy a dummy PCViz with empty caches
 3. Edit `uniprot_scraper.js` to point to the non-cached version of PCViz (if it is different than the production one)
-4. Make sure `phantomjs` is installed and run `uniprot_scraper.sh` with these arguments: `bash uniprot_scraper.sh /path/to/hgnc.txt /tmp/uniprotids.txt /path/to/cache/folder /path/to/log.txt`
-6. Optionally remove all PNGs from the output directory (as we don't make use of them for now)
-7. Move all JSONs in the folder over to your `precalculated.folder`
-8. Restart/re-deploy PCViz with this cache folder populated
+4. Make sure `phantomjs` is installed and run `uniprot_scraper.sh` with these arguments: 
+`bash uniprot_scraper.sh /path/to/hgnc.txt /path/to/cache log.txt`
+5. Move all the JSONs over to your `cache.folder/uniprot/` directory
+6. Restart/re-deploy PCViz with this cache folder populated
 
-It is a good idea to clean up other cache folders (such as portal and co-citations) once in a while, but it is not required unless the formatting changes for those files/services. 
+It is a good idea to clean up other cache folders (such as portal and co-citations) once in a while, 
+but it is not required unless the formatting changes for those files/services. 
 Only the pre-calculated network cache requires pre-processing.
 
 # License

@@ -1,15 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ page import="org.springframework.web.context.WebApplicationContext"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@ page import="java.util.Properties" %>
 
-<%
-    WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
-    Properties pcvizProps = (Properties) context.getBean("pcvizProps");
-    String pc2Url = pcvizProps.getProperty("pathwaycommons.url");
-    String pcvizUrl = pcvizProps.getProperty("pcviz.url");
-%>
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
@@ -202,9 +193,9 @@
                               <div class="network-controls">
                                   <a class="btn" id="download-png" href="#">Image (PNG)</a>
                                   <a class="btn" id="download-sif-quick" href="#">Network (SIF)</a>
-                                  <a class="btn" id="download-sif" data-pcurl="<%=pc2Url%>"
+                                  <a class="btn" id="download-sif" data-pcurl="${pcUrl}"
                                      href="#">Larger Network (SIF)</a>
-                                  <a class="btn" id="download-biopax" data-pcurl="<%=pc2Url%>"
+                                  <a class="btn" id="download-biopax" data-pcurl="${pcUrl}"
                                      href="#">Network (BioPAX)</a>
                               </div>
                           </div>
@@ -316,14 +307,14 @@
                                       <span class="itx-type-on-off label controls-transport-of" data-itx-type="controls-transport-of">controls transport <span class="fui-cross-16"></span></span>
                                   </td>
                               </tr>
-                              <%--<tr id="row-in-complex-with">--%>
-                                  <%--<td>--%>
-                                      <%--<span id="in-complex-with-count">0</span>--%>
-                                  <%--</td>--%>
-                                  <%--<td>--%>
-                                      <%--<span class="itx-type-on-off label in-complex-with" data-itx-type="in-complex-with">in complex  <span class="fui-cross-16"></span></span>--%>
-                                  <%--</td>--%>
-                              <%--</tr>--%>
+                              <tr id="row-in-complex-with">
+                                  <td>
+                                      <span id="in-complex-with-count">0</span>
+                                  </td>
+                                  <td>
+                                      <span class="itx-type-on-off label in-complex-with" data-itx-type="in-complex-with">in complex  <span class="fui-cross-16"></span></span>
+                                  </td>
+                              </tr>
                           </table>
                       </div>
 
@@ -406,7 +397,7 @@
 
   <script type="text/template" id="embed-code-template">
       <iframe width="{{width}}" height="{{height}}"
-            src="<%=pcvizUrl%>#embed/{{networkType}}/{{genes}}"
+            src="${pcvizUrl}#embed/{{networkType}}/{{genes}}"
             scrolling="no" frameborder="0" seamless="seamless">
       </iframe>
   </script>
@@ -430,10 +421,10 @@
           <div id="pcviz-footerline">
               <p class="pull-right">
                   <a class="btn" id="embed-explore-button" target="_blank"
-                     href="<%=pcvizUrl%>#{{networkType}}/{{genes}}"
+                     href="${pcvizUrl}\#{{networkType}}/{{genes}}"
                      title="explore this network in PCViz"><i class="icon-share"></i></a>
               </p>
-              <h4 class="pcviz-embed-logo" data-url="<%=pcvizUrl%>">
+              <h4 class="pcviz-embed-logo" data-url="${pcvizUrl}">
                   PCViz
                   <small>Pathway Commons Network Visualizer</small>
               </h4>
@@ -521,9 +512,9 @@
       controls expression
   </script>
 
-  <%--<script type="text/template" id="edge-type-text-in-complex-with-template">--%>
-      <%--in same complex--%>
-  <%--</script>--%>
+  <script type="text/template" id="edge-type-text-in-complex-with-template">
+      in same complex
+  </script>
 
   <script type="text/template" id="edge-type-text-controls-transport-of-template">
       controls transport
@@ -595,7 +586,7 @@
               <tr>
                   <td colspan="2">
                       <a class="btn btn-primary btn-block download-detailed {{type}}" target="_blank"
-                         href="<%=pc2Url%>graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
+                         href="${pcUrl}graph?source={{source}}&target={{target}}&kind=PATHSFROMTO">
                           <i class="icon-download-alt"></i>
                           Download detailed process (BioPAX)
                       </a>
@@ -649,10 +640,10 @@
       <%--has an effect on the state of protein <span class="gene target-gene">{{target}}</span>.--%>
   <%--</script>--%>
 
-  <%--<script type="text/template" id="edge-in-complex-with-template">--%>
-      <%--<span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>--%>
-      <%--are members of the  same complex.--%>
-  <%--</script>--%>
+  <script type="text/template" id="edge-in-complex-with-template">
+      <span class="gene source-gene">{{source}}</span> and <span class="gene target-gene">{{target}}</span>
+      are members of the  same complex.
+  </script>
 
   <script type="text/template" id="loading-small-template">
       <img src="images/loading.gif" alt="loading..." height="17" width="50">

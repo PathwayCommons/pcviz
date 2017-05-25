@@ -40,14 +40,13 @@ public class CocitationManager
 	public CocitationManager() {
 	}
 
-	public String getResourceDir() {
-		return resourceDir;
-	}
+	@Value("${cache.folder}")
+	public void setResourceDir(String cacheDir) throws IOException {
+		Path dir = Paths.get(cacheDir,"cocitations");
+		if (!Files.exists(dir))
+			Files.createDirectories(dir);
 
-	@Value("${cocitation.cache.folder}")
-	public void setResourceDir(String resourceDir) {
-		this.resourceDir = resourceDir;
-		createResourceDir();
+		resourceDir = dir.toString();
 	}
 
 	public IHOPSpider getIhopSpider() {
@@ -57,10 +56,6 @@ public class CocitationManager
 	@Autowired
 	public void setIhopSpider(IHOPSpider ihopSpider) {
 		this.ihopSpider = ihopSpider;
-	}
-
-	public long getShelfLife() {
-		return shelfLife;
 	}
 
 	/**
@@ -76,19 +71,6 @@ public class CocitationManager
 	}
 
 	/*
-	 * Creates the resource directory if not exists.
-	 */
-	private void createResourceDir()
-	{
-		Path dir = Paths.get(getResourceDir());
-		if (!Files.exists(dir)) {
-			try { Files.createDirectory(dir);} catch (IOException e){
-				throw new RuntimeException("Failed creating the resource dir: " + dir.getFileName(), e);
-			}
-		}
-	}
-
-	/*
 	 * Refreshes cache with the given co-citations of the given gene.
 	 * @param symbol symbol of the gene of interest
 	 * @param map co-citations
@@ -98,11 +80,9 @@ public class CocitationManager
 	{
 		try
 		{
-			Path f = Paths.get(getResourceDir(), symbol);
+			Path f = Paths.get(resourceDir, symbol);
 			BufferedWriter writer = Files.newBufferedWriter(f, StandardOpenOption.CREATE);
-
 			writer.write("" + System.currentTimeMillis());
-
 			for (String s : map.keySet())
 			{
 				writer.write("\n" + s + "\t" + map.get(s));
@@ -170,10 +150,9 @@ public class CocitationManager
 		Map<String, Integer> map;
 		map = new HashMap<String, Integer>();
 
-		BufferedReader reader = Files.newBufferedReader(Paths.get(getResourceDir(), symbol));
+		BufferedReader reader = Files.newBufferedReader(Paths.get(resourceDir, symbol));
 		// skip timestamp
 		reader.readLine();
-
 		for (String line = reader.readLine(); line != null; line = reader.readLine())
 		{
 			String[] token = line.split("\t");
@@ -208,7 +187,7 @@ public class CocitationManager
 	 */
 	protected boolean cacheExists(String symbol)
 	{
-		return Files.exists(Paths.get(getResourceDir(), symbol));
+		return Files.exists(Paths.get(resourceDir, symbol));
 	}
 
 	/**
@@ -222,7 +201,7 @@ public class CocitationManager
 
 		try
 		{
-			BufferedReader reader = Files.newBufferedReader(Paths.get(getResourceDir(), symbol));
+			BufferedReader reader = Files.newBufferedReader(Paths.get(resourceDir, symbol));
 			String line = reader.readLine();
 			reader.close();
 			return Long.parseLong(line);
@@ -240,7 +219,7 @@ public class CocitationManager
 	 */
 	protected void clearCache()
 	{
-		Path dir = Paths.get(getResourceDir());
+		Path dir = Paths.get(resourceDir);
 		if(Files.exists(dir)) {
 			try {
 				DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir);
@@ -251,15 +230,5 @@ public class CocitationManager
 				log.error("Failed cleaning up the cache dir: " + e);
 			}
 		}
-	}
-
-	/**
-	 * For each gene symbol, get and pre-calculate cocitations,
-	 * and save to output file.
-	 * @param args input file (lists HGNC Symbols), output directory (path, e.g., data/cocitations)
-	 */
-	public static void main(String... args) {
-		//TODO implement; run from a script for all gene names as part of initial pcviz release
-
 	}
 }

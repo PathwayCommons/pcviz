@@ -22,21 +22,13 @@ public class IHOPSpider
 
 	private final RestTemplate restTemplate;
 
-	@Value("${ihop.url:http://www.ihop-net.org/UniPub/iHOP/}")
+	@Value("${ihop.url}")
     private String iHopURL;
 
     public IHOPSpider() {
-    	iHopURL = DEFAULT_URL; //for using w/o a Spring context
+    	iHopURL = DEFAULT_URL; //for using without a Spring context
 		restTemplate = new RestTemplate();
     }
-
-	public String getiHopURL() {
-		return iHopURL;
-	}
-
-	public void setiHopURL(String iHopURL) {
-		this.iHopURL = iHopURL;
-	}
 
     /**
 	 * Gets the co-citation data from the iHOP server.
