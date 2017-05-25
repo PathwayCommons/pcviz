@@ -28,3 +28,10 @@ ncbigene.location=file:data/ncbigene.txt
 # PCViz self URL (for the link in the iframe to embed into other sites)
 pcviz.url=http://www.pathwaycommons.org/pcviz/
 
+# optionally, change the http port
+server.port=8080
+
+# do not change
+spring.mvc.view.prefix: /
+spring.mvc.view.suffix: .jsp
+
