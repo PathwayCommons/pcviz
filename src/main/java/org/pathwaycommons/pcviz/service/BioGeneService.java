@@ -1,63 +1,37 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
 
 @Service
 public class BioGeneService {
 
-    @Value("${biogene.url:http://cbio.mskcc.org/biogene/}")
+    @Value("${biogene.url}")
     public String bioGeneUrl;
 
-    @Value("${biogene.format:json}")
-    public String bioGeneFormat;
+    public final static String bioGeneFormat = "json";
 
-    /**
-     * Default Constructor.
-     */
+    @Value("${cache.folder}")
+    private String cacheDir;
+
     public BioGeneService() {
     }
 
-    public String getBioGeneUrl() {
-        return bioGeneUrl;
-    }
-
-    public void setBioGeneUrl(String bioGeneUrl) {
-        this.bioGeneUrl = bioGeneUrl;
-    }
-
-    public String getBioGeneFormat() {
-        return bioGeneFormat;
-    }
-
-    public void setBioGeneFormat(String bioGeneFormat) {
-        this.bioGeneFormat = bioGeneFormat;
+    @PostConstruct
+    void init() throws IOException{
+        Path dir = Paths.get(cacheDir, "biogene");
+        if(!Files.exists(dir))
+            Files.createDirectories(dir);
     }
 
     /**
@@ -71,33 +45,32 @@ public class BioGeneService {
     @Cacheable("bioGeneCache")
     public String getData(String gene, String organism) throws IOException
     {
-        StringBuilder urlBuilder = new StringBuilder();
-
-        urlBuilder.append(getBioGeneUrl());
-        urlBuilder.append("retrieve.do");
-        urlBuilder.append("?query=").append(gene);
-        urlBuilder.append("&org=").append(organism);
-        urlBuilder.append("&format=").append(getBioGeneFormat());
-
-        String url = urlBuilder.toString();
-
-        URL bioGene = new URL(url);
-        URLConnection bioGeneCxn = bioGene.openConnection();
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(bioGeneCxn.getInputStream()));
-
-        String line;
-        StringBuilder sb = new StringBuilder();
-
-        // Read all
-        while((line = in.readLine()) != null)
-        {
-            sb.append(line);
+        Path file = Paths.get(cacheDir, "biogene", gene + ".json");
+        if(Files.exists(file)) {
+           return new String(Files.readAllBytes(file));
         }
 
-        in.close();
+        // continue if no cached data found (upgrade to java8 way later...) -
+        String url = (new StringBuilder()).append(bioGeneUrl).append("retrieve.do")
+            .append("?query=").append(gene).append("&org=").append(organism)
+            .append("&format=").append(bioGeneFormat).toString();
+        URL bioGene = new URL(url);
+        URLConnection bioGeneCxn = bioGene.openConnection();
+        Scanner scanner = new Scanner(bioGeneCxn.getInputStream());
+        StringBuilder sb = new StringBuilder();
+        // Read all
+        while(scanner.hasNextLine())
+        {
+            sb.append(scanner.nextLine());
+        }
+        scanner.close();
 
-        return sb.toString();
+        String data = sb.toString();
+
+        //save
+        Files.write(file, data.getBytes());
+
+        return data;
     }
 
 }

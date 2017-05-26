@@ -116,17 +116,14 @@ function saveGraph(page, queryString, outputDir)
 	var graphJson = page.evaluate(function() {
 		if (window.cy)
 		{
-			//return JSON.stringify(window.cy.elements().jsons());
 			return JSON.stringify(window.cy.json().elements);
 		}
-
 		return null;
 	});
 
 	if (graphJson)
 	{
-		page.render(outputDir + "/" + queryString + ".png");
-
+		// page.render(outputDir + "/" + queryString + ".png"); //don't need images
 		try {
 			fs.write(outputDir + "/" + queryString + ".json", graphJson, 'w');
 		} catch(e) {

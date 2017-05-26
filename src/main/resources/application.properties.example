@@ -1,0 +1,37 @@
+# Pathway commons
+pathwaycommons.url=http://www.pathwaycommons.org/pc2/
+
+# Pre-calculated networks and gene info
+cache.folder=data/cached
+
+# BioGene
+biogene.url=http://cbio.mskcc.org/biogene/
+
+# iHop
+ihop.url=http://www.ihop-net.org/UniPub/iHOP/
+
+# Cocitation manager
+cocitation.shelflife=30
+
+# If the number of co-citations is below is this number, don't show it
+cocitation.min.edge=1
+cocitation.min.node=20
+
+# mapping util
+#http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit
+hgnc.location=file:data/hgnc.txt
+autoCompleteResult.limit=10
+
+#http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit
+ncbigene.location=file:data/ncbigene.txt
+
+# PCViz self URL (for the link in the iframe to embed into other sites)
+pcviz.url=http://www.pathwaycommons.org/pcviz/
+
+# optionally, change the http port
+server.port=8080
+
+# do not change
+spring.mvc.view.prefix: /
+spring.mvc.view.suffix: .jsp
+

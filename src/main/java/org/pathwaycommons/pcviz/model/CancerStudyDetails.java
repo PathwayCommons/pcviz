@@ -19,7 +19,7 @@
 
 package org.pathwaycommons.pcviz.model;
 
-import org.cbio.causality.data.portal.CancerStudy;
+import org.pathwaycommons.pcviz.cbioportal.CancerStudy;
 
 public class CancerStudyDetails {
     private CancerStudy cancerStudy;

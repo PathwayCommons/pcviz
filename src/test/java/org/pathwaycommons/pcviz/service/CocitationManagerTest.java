@@ -3,8 +3,9 @@ package org.pathwaycommons.pcviz.service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 
@@ -13,9 +14,8 @@ import static org.junit.Assert.*;
 /**
  * @author Ozgun Babur
  */
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:spring/testContext.xml")
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CocitationManagerTest
 {
 
@@ -52,6 +52,8 @@ public class CocitationManagerTest
 		man.getCocitations(gene);
 		long stamp2 = man.getCacheTimestamp(gene);
 
-		assertFalse(stamp1 == stamp2);
+//		assertFalse(stamp1 == stamp2);
+		// from now, cache never expires!
+		assertTrue(stamp1 == stamp2);
 	}
 }

@@ -1,22 +1,3 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.service;
 
 import org.apache.commons.logging.Log;
@@ -25,12 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Ozgun Babur
+ * @Igor Rodchenkov (upgraded)
  */
 @Service
 public class CocitationManager
@@ -52,22 +37,16 @@ public class CocitationManager
      */
     private IHOPSpider ihopSpider;
 
-
-
-	/**
-	 * Default Constructor.
-	 */
 	public CocitationManager() {
 	}
 
-	public String getResourceDir() {
-		return resourceDir;
-	}
+	@Value("${cache.folder}")
+	public void setResourceDir(String cacheDir) throws IOException {
+		Path dir = Paths.get(cacheDir,"cocitations");
+		if (!Files.exists(dir))
+			Files.createDirectories(dir);
 
-	@Value("${cocitation.cache.folder}")
-	public void setResourceDir(String resourceDir) {
-		this.resourceDir = resourceDir;
-		createResourceDir();
+		resourceDir = dir.toString();
 	}
 
 	public IHOPSpider getIhopSpider() {
@@ -79,13 +58,10 @@ public class CocitationManager
 		this.ihopSpider = ihopSpider;
 	}
 
-	public long getShelfLife() {
-		return shelfLife;
-	}
-
 	/**
 	 * Sets the shelf life of cached co-citations using the pcviz properties.
 	 * @param days shelf life in days
+	 * @deprecated have no effect anymore (cache never expires)
 	 */
 	@Value("${cocitation.shelflife:30}")
 	public void setShelfLife(Long days)
@@ -94,20 +70,7 @@ public class CocitationManager
 		this.shelfLife = days * 1000 * 60 * 60 * 24;
 	}
 
-	/**
-	 * Creates the resource directory if not exists.
-	 */
-	private void createResourceDir()
-	{
-		File file = new File(getResourceDir());
-
-		if (!file.exists())
-		{
-			file.mkdirs();
-		}
-	}
-
-	/**
+	/*
 	 * Refreshes cache with the given co-citations of the given gene.
 	 * @param symbol symbol of the gene of interest
 	 * @param map co-citations
@@ -115,14 +78,11 @@ public class CocitationManager
 	 */
 	private boolean cacheCocitations(String symbol, Map<String, Integer> map)
 	{
-		BufferedWriter writer;
-
 		try
 		{
-			writer = new BufferedWriter(new FileWriter(getResourceDir() + File.separator + symbol));
-
+			Path f = Paths.get(resourceDir, symbol);
+			BufferedWriter writer = Files.newBufferedWriter(f, StandardOpenOption.CREATE);
 			writer.write("" + System.currentTimeMillis());
-
 			for (String s : map.keySet())
 			{
 				writer.write("\n" + s + "\t" + map.get(s));
@@ -151,12 +111,12 @@ public class CocitationManager
 			{
 				Map<String, Integer> map = null;
 
-				long stamp = getCacheTimestamp(symbol);
-
-				if (System.currentTimeMillis() - stamp > getShelfLife())
-				{
-					map = spiderAndCache(symbol);
-				}
+				//TODO: as iHope is old, not updated anymore, make cocitations cache never expires
+//				long stamp = getCacheTimestamp(symbol);
+//				if (System.currentTimeMillis() - stamp > getShelfLife())
+//				{
+//					map = spiderAndCache(symbol);
+//				}
 
 				if (map == null)
 				{
@@ -189,17 +149,17 @@ public class CocitationManager
 	{
 		Map<String, Integer> map;
 		map = new HashMap<String, Integer>();
-		BufferedReader reader = new BufferedReader(new FileReader(getCachePath(symbol)));
 
+		BufferedReader reader = Files.newBufferedReader(Paths.get(resourceDir, symbol));
 		// skip timestamp
 		reader.readLine();
-
 		for (String line = reader.readLine(); line != null; line = reader.readLine())
 		{
 			String[] token = line.split("\t");
 			map.put(token[0], Integer.parseInt(token[1]));
 		}
 		reader.close();
+
 		return map;
 	}
 
@@ -227,7 +187,7 @@ public class CocitationManager
 	 */
 	protected boolean cacheExists(String symbol)
 	{
-		return new File(getCachePath(symbol)).exists();
+		return Files.exists(Paths.get(resourceDir, symbol));
 	}
 
 	/**
@@ -241,7 +201,7 @@ public class CocitationManager
 
 		try
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(getCachePath(symbol)));
+			BufferedReader reader = Files.newBufferedReader(Paths.get(resourceDir, symbol));
 			String line = reader.readLine();
 			reader.close();
 			return Long.parseLong(line);
@@ -254,27 +214,20 @@ public class CocitationManager
 	}
 
 	/**
-	 * Gets the path of the cache for the given gene.
-	 * @param symbol gene symbol
-	 * @return path for the cache
-	 */
-	private String getCachePath(String symbol)
-	{
-		return getResourceDir() + File.separator + symbol;
-	}
-
-	/**
-	 * Clears all cached co-citation data.
+	 * Clears all cached co-citation data
+	 * (but not the directory and sub-dirs).
 	 */
 	protected void clearCache()
 	{
-		File dir = new File(getResourceDir());
-
-		if (dir.exists())
-		{
-			for (File file : dir.listFiles())
-			{
-				file.delete();
+		Path dir = Paths.get(resourceDir);
+		if(Files.exists(dir)) {
+			try {
+				DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir);
+				for(Path f : dirStream) {
+					Files.delete(f);
+				}
+			} catch (IOException e) {
+				log.error("Failed cleaning up the cache dir: " + e);
 			}
 		}
 	}

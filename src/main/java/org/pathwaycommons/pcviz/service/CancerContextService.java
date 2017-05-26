@@ -1,38 +1,22 @@
-/*
- * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
- *
- * This file is part of PCViz.
- *
- * PCViz is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * PCViz is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.pathwaycommons.pcviz.service;
 
 import flexjson.JSONSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cbio.causality.data.portal.*;
-import org.cbio.causality.model.Alteration;
-import org.cbio.causality.model.AlterationPack;
 import org.pathwaycommons.pcviz.model.CancerStudyDetails;
 import org.pathwaycommons.pcviz.model.PropertyKey;
+import org.pathwaycommons.pcviz.cbioportal.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,38 +25,36 @@ public class CancerContextService {
 
     private static final Log log = LogFactory.getLog(CancerContextService.class);
 
-    private CBioPortalAccessor cBioPortalAccessor;
+    private final CBioPortalAccessor cBioPortalAccessor;
 
-    private String dataCacheFolder;
-
-    @Value("${cbioportal.cache.folder}")
-    public void setDataCacheFolder(String dataCacheFolder) {
-        this.dataCacheFolder = dataCacheFolder;
-    }
-
-    public String getDataCacheFolder() {
-        return dataCacheFolder;
-    }
-
-    public CBioPortalAccessor getcBioPortalAccessor() {
-        return cBioPortalAccessor;
-    }
-
-    /**
-     * Default Constructor.
-     */
-    public CancerContextService() {
-    }
+    @Value("${cache.folder}")
+    private String cacheDir;
 
     @Autowired
-    public void setcBioPortalAccessor(CBioPortalAccessor cBioPortalAccessor) {
-        this.cBioPortalAccessor = cBioPortalAccessor;
+    public CancerContextService(GeneNameService geneNameService) {
+        cBioPortalAccessor = new CBioPortalAccessor();
+        cBioPortalAccessor.setGeneNameService(geneNameService);
+    }
+
+    @PostConstruct
+    void init() throws IOException {
+        Path dir = Paths.get(cacheDir, "cbioportal");
+        if(!Files.exists(dir))
+            Files.createDirectories(dir);
+
+        cBioPortalAccessor.setCacheDir(cacheDir + FileSystems.getDefault().getSeparator() + "cbioportal");
+
+        try {
+            cBioPortalAccessor.initializeStudies();
+        } catch (IOException e) {
+            log.error("Failed to init studies from cBioPOrtal", e);
+        }
     }
 
     @Cacheable("cancerContextStudiesCache")
     public String listAvailableCancers() throws IOException {
         JSONSerializer jsonSerializer = new JSONSerializer().exclude("*.class");
-        return jsonSerializer.deepSerialize(getcBioPortalAccessor().getCancerStudies());
+        return jsonSerializer.deepSerialize(cBioPortalAccessor.getCancerStudies());
     }
 
     @Cacheable("cancerContextDetailsCache")
@@ -80,18 +62,17 @@ public class CancerContextService {
         CancerStudyDetails cancerStudyDetails = new CancerStudyDetails();
 
         // Get/set cancer study
-        CBioPortalAccessor portal = getcBioPortalAccessor();
-        CancerStudy cancerStudyById = portal.getCancerStudyById(study);
-        portal.setCurrentCancerStudy(cancerStudyById);
+        CancerStudy cancerStudyById = cBioPortalAccessor.getCancerStudyById(study);
+        cBioPortalAccessor.setCurrentCancerStudy(cancerStudyById);
         cancerStudyDetails.setCancerStudy(cancerStudyById);
 
         // Now use the biggest case set as default
-        CaseList caseListById = portal.getCaseListById(study + "_all");
+        CaseList caseListById = cBioPortalAccessor.getCaseListById(study + "_all");
         if(cancerStudyById != null) {
             if(caseListById.getCases()!=null)
                 cancerStudyDetails.setNumberOfCases(caseListById.getCases().length);
             // Now find out if there is profiles
-            for (GeneticProfile geneticProfile : portal.getGeneticProfilesForCurrentStudy()) {
+            for (GeneticProfile geneticProfile : cBioPortalAccessor.getGeneticProfilesForCurrentStudy()) {
                 if (isCNA(geneticProfile)) cancerStudyDetails.setHasCNA(true);
                 if (isExtendedMutation(geneticProfile)) cancerStudyDetails.setHasMutation(true);
                 if (isZscores(geneticProfile)) cancerStudyDetails.setHasExpression(true);
@@ -120,15 +101,13 @@ public class CancerContextService {
     public HashMap<String, HashMap<String, Double>> loadContext(String studyId, String profiles, String genes) throws IOException {
         HashMap<String, HashMap<String, Double>> context = new HashMap<String, HashMap<String, Double>>();
 
-        CBioPortalAccessor.setCacheDir(getDataCacheFolder());
-        CBioPortalAccessor portal = getcBioPortalAccessor();
-        CancerStudy cancerStudyById = portal.getCancerStudyById(studyId);
-        portal.setCurrentCancerStudy(cancerStudyById);
-        CaseList caseListById = portal.getCaseListById(studyId + "_all");
-        portal.setCurrentCaseList(caseListById);
+        CancerStudy cancerStudyById = cBioPortalAccessor.getCancerStudyById(studyId);
+        cBioPortalAccessor.setCurrentCancerStudy(cancerStudyById);
+        CaseList caseListById = cBioPortalAccessor.getCaseListById(studyId + "_all");
+        cBioPortalAccessor.setCurrentCaseList(caseListById);
 
         ArrayList<GeneticProfile> geneticProfiles = new ArrayList<GeneticProfile>();
-        for (GeneticProfile geneticProfile : portal.getGeneticProfilesForCurrentStudy()) {
+        for (GeneticProfile geneticProfile : cBioPortalAccessor.getGeneticProfilesForCurrentStudy()) {
             if(profiles.contains("cna") && isCNA(geneticProfile)) {
                 geneticProfiles.add(geneticProfile);
 
@@ -142,11 +121,11 @@ public class CancerContextService {
                 geneticProfiles.add(geneticProfile);
             }
         }
-        portal.setCurrentGeneticProfiles(geneticProfiles);
+        cBioPortalAccessor.setCurrentGeneticProfiles(geneticProfiles);
 
         for (String gene : genes.split(",")) {
             try {
-                AlterationPack alterations = portal.getAlterations(gene);
+                AlterationPack alterations = cBioPortalAccessor.getAlterations(gene);
                 if (alterations != null) {
                     alterations.complete(Alteration.ANY);
                     double altered = alterations.calcAlteredRatio(Alteration.ANY);
