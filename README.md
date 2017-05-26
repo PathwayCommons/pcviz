@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/PathwayCommons/pcviz.svg?branch=pcviz-boot)](https://travis-ci.org/PathwayCommons/pcviz)
+[![Build Status](https://travis-ci.org/PathwayCommons/pcviz.svg?branch=master)](https://travis-ci.org/PathwayCommons/pcviz)
 
 # About
 [Pathway Commons](http://www.pathwaycommons.org) Simple Network Visualizer, PCViz in short.
