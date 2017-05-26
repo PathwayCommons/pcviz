@@ -318,7 +318,8 @@
                           </table>
                       </div>
 
-                      <h4 class="demo-panel-title">Genes to show <small>(<span id="number-of-genes-info"></span>)</small></h4>
+                      <h4 class="demo-panel-title">Show less/more genes
+                          <small><span hidden id="number-of-genes-info"></span></small></h4>
                       <table>
                           <tr>
                               <td class="minus-sign-container">
@@ -335,8 +336,7 @@
                               <td></td>
                               <td>
                                   <p class="help-slider-text palette palette-silver">
-                                      Slide left to decrease the number of genes
-                                      (based on the number of co-citations)
+                                      Slide left/right to decrease/increase the number of genes
                                   </p>
                               </td>
                               <td>

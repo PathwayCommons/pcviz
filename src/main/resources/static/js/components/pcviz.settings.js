@@ -23,6 +23,12 @@ var SettingsView = Backbone.View.extend({
             if(!$(this).hasClass("itx-removed")) {
                 edges.hide();
 
+                //also hide shown nodes that have hidden edges only:
+                var hiddenEdges = cy.edges().filter(function (i, e) {return e.hidden();});
+                var nodesToHide = cy.nodes().filter(function (i, n) {return !n.hidden();})
+                    .filter(function (i, n) {return n.connectedEdges().not(hiddenEdges).length == 0;});
+                nodesToHide.hide();
+
                 $(this).find("span")
                     .removeClass("fui-cross-16")
                     .addClass("fui-plus-16");
@@ -38,6 +44,12 @@ var SettingsView = Backbone.View.extend({
             } else {
                 edges.show();
 
+                //also show hidden nodes that now have shown edges:
+                var hiddenEdges = cy.edges().filter(function (i, e) {return e.hidden();});
+                var nodesToShow = cy.nodes().filter(function (i, n) {return n.hidden();})
+                    .filter(function (i, n) {return n.connectedEdges().not(hiddenEdges).length > 0;});
+                nodesToShow.show();
+
                 $(this).find("span")
                     .removeClass("fui-plus-16")
                     .addClass("fui-cross-16");
@@ -52,6 +64,8 @@ var SettingsView = Backbone.View.extend({
             }
 
             $(this).toggleClass("itx-removed");
+
+            $("#increase-button").click(); //refreshing is required
         });
 
 
@@ -124,10 +138,15 @@ var NodesSliderView = Backbone.View.extend({
                 //exclude edges of currently not-shown interaction types
                 _.each($("#graph-settings .itx-type-on-off"), function(btn) {
                     var type = $(btn).data("itx-type");
+                    var edges = cy.$("edge[type='" + type + "']");
                     if ($(btn).hasClass("itx-removed")) {
-                        var edges = cy.$("edge[type='" + type + "']");
                         shownEdges = shownEdges.not(edges);
                     }
+                });
+
+                //further filter out nodes having all their edges hidden
+                shownNodes = shownNodes.filter(function (i, node) {
+                    return node.connectedEdges().intersection(shownEdges).length > 0;
                 });
 
                 var shown = shownNodes.add( shownEdges );
@@ -153,7 +172,6 @@ var NodesSliderView = Backbone.View.extend({
 
             $("#decrease-button").click(function(e) {
                 e.preventDefault();
-
                 var oldVal = selfSlider.slider("option", "value");
                 var newVal = Math.max(oldVal-1, minVal);
                 selfSlider.slider({value: newVal});
@@ -161,7 +179,6 @@ var NodesSliderView = Backbone.View.extend({
 
             $("#increase-button").click(function(e) {
                 e.preventDefault();
-
                 var oldVal = selfSlider.slider("option", "value");
                 var newVal = Math.min(oldVal+1, maxVal);
                 selfSlider.slider({value: newVal});
