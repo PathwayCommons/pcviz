@@ -223,100 +223,93 @@ var NetworkView = Backbone.View.extend({
                 // log this event on google analytics
                 ga('send', 'event', 'main', networkType, geneValidations.getPrimaryNames());
 
-				$.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
-				    function(data)
-				    {
-				        networkLoading.hide();
-				        container.html("");
-				        container.show();
-				        $(self.detailsInfo).show();
-				        controlsContainer.show();
-				        $(self.tooSlowMessage).hide();
+                $.getJSON("graph/" + networkType + "/" + geneValidations.getPrimaryNames(),
+                    function(data)
+                    {
+                        networkLoading.hide();
+                        container.html("");
+                        container.show();
+                        $(self.detailsInfo).show();
+                        controlsContainer.show();
+                        $(self.tooSlowMessage).hide();
 
                         var layoutOptions = getPcVizLayoutOptions( data );
 
-				        var cyOptions = {
-							container: container,
-				            elements: data,
-				            style: self.cyStyle,
-				            showOverlay: false,
+                        var cyOptions = {
+                            container: container,
+                            elements: data,
+                            style: self.cyStyle,
+                            showOverlay: false,
                             layout: layoutOptions,
                             minZoom: 0.01,
-				            maxZoom: 16,
+                            maxZoom: 16,
 
-				            ready: function()
-				            {
-				                window.cy = this; // for debugging
+                            ready: function()
+                            {
+                                window.cy = this; // for debugging
 
-				                // We don't need this, so better disable
-				                cy.boxSelectionEnabled(false);
+                                // We don't need this, so better disable
+                                cy.boxSelectionEnabled(false);
 
-				                // add pan zoom control panel
-				                cy.panzoom({
-									// icon class names
-									sliderHandleIcon: 'icon-minus',
-									zoomInIcon: 'icon-plus',
-									zoomOutIcon: 'icon-minus',
-									resetIcon: 'icon-resize-full'
-								});
+                                // add pan zoom control panel
+                                cy.panzoom({
+                                    // icon class names
+                                    sliderHandleIcon: 'icon-minus',
+                                    zoomInIcon: 'icon-plus',
+                                    zoomOutIcon: 'icon-minus',
+                                    resetIcon: 'icon-resize-full'
+                                });
 
-				                // we are gonna use 'tap' to handle events for multiple devices
-				                // add click listener on nodes
-				                cy.on('tap', 'node', function(evt){
-				                    var node = this;
-				                    self.updateNodeDetails(evt, node);
-				                });
+                                // we are gonna use 'tap' to handle events for multiple devices
+                                // add click listener on nodes
+                                cy.on('tap', 'node', function(evt){
+                                    var node = this;
+                                    self.updateNodeDetails(evt, node);
+                                });
 
-				                cy.on('tap', 'edge', function(evt){
-				                    var edge = this;
-				                    self.updateEdgeDetails(evt, edge);
-				                });
+                                cy.on('tap', 'edge', function(evt){
+                                    var edge = this;
+                                    self.updateEdgeDetails(evt, edge);
+                                });
 
-				                // add click listener to core (for background clicks)
-				                cy.on('tap', function(evt) {
-				                    // if click on background, hide details
-				                    if(evt.cyTarget === cy)
-				                    {
-				                        $(self.detailsContent).hide();
-				                        $(self.detailsInfo).show();
-				                    }
-				                });
+                                // add click listener to core (for background clicks)
+                                cy.on('tap', function(evt) {
+                                    // if click on background, hide details
+                                    if(evt.cyTarget === cy)
+                                    {
+                                        $(self.detailsContent).hide();
+                                        $(self.detailsInfo).show();
+                                    }
+                                });
 
-				                // When a node is moved, saved its new location
-				                cy.on('free', 'node', function(evt) {
-				                    var node = this;
-				                    var position = node.position();
-				                    localStorage.setItem(node.id(), JSON.stringify(position));
-				                });
-				                var numberOfNodes = cy.nodes().length;
+                                // When a node is moved, saved its new location
+                                cy.on('free', 'node', function(evt) {
+                                    var node = this;
+                                    var position = node.position();
+                                    localStorage.setItem(node.id(), JSON.stringify(position));
+                                });
 
-				                // Run the ranker on this graph
-				                cy.rankNodes();
+                                // Run the ranker on this graph
+                                cy.rankNodes();
 
-				                (new NumberOfNodesView({ model: { numberOfNodes: numberOfNodes }})).render();
+                                (new NumberOfNodesView({ model: { numberOfNodes: cy.nodes().length }})).render();
 
-				                _.each(edgeTypes, function(type)
-						{
-							var numOfEdges = cy.$("edge[type='" + type + "']").length;
-							if(numOfEdges > 0)
-							{
-								$("#" + type + "-count").text(numOfEdges);
-							}
-							else
-							{
-								$("#row-" + type).hide();
-							}
-						});
+                                _.each(edgeTypes, function(type)
+								{
+                                    var numOfEdges = cy.$("edge[type='" + type + "']").length;
+                                    if(numOfEdges > 0)
+                                    {
+                                        $("#" + type + "-count").text(numOfEdges);
+                                    }
+                                    else
+                                    {
+                                        $("#row-" + type).hide();
+                                    }
+                                });
 
-						(new NodesSliderView({
-							model:
-							{
-						                min: cy.nodes("[?isseed]").length,
-						                max: numberOfNodes
-							}
-						})).render();
-				            } // end of ready: function()
-				        }; // end of cyOptions
+                                (new NodesSliderView()).render();
+                            } // end of ready: function()
+                        }; // end of cyOptions
 
 						// var startTime = Date.now(); //for debugging
 

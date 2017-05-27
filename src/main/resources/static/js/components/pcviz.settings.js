@@ -16,19 +16,25 @@ var SettingsView = Backbone.View.extend({
         //     }
         // });
 
-        $(".itx-type-on-off").click(function(evt) {
+        $(".itx-type-on-off").click(function(evt)
+        {
+            $(this).prop("disabled",true);
+            $(this).toggleClass("itx-removed");
+
             var type = $(this).data("itx-type");
             var edges = cy.$("edge[type='" + type + "']");
 
-            if(!$(this).hasClass("itx-removed")) {
+            if($(this).hasClass("itx-removed")) //just been set to hide all the edges of given type
+            {
                 edges.hide();
 
-                //also hide shown nodes that have hidden edges only:
-                var hiddenEdges = cy.edges().filter(function (i, e) {return e.hidden();});
-                var nodesToHide = cy.nodes().filter(function (i, n) {return !n.hidden();})
-                    .filter(function (i, n) {return n.connectedEdges().not(hiddenEdges).length == 0;});
-                nodesToHide.hide();
+                //also hide nodes that now seem to be disconnected (once/if all edges get hidden)
+                // cy.nodes("[!isseed]").filter(function (i, node) {
+                //     return !node.hidden() &&
+                //         (node.connectedEdges().filter(function (i, edge) {return !edge.hidden();}).length == 0);
+                // }).hide();
 
+                //also hide shown nodes that have hidden edges only:
                 $(this).find("span")
                     .removeClass("fui-cross-16")
                     .addClass("fui-plus-16");
@@ -40,15 +46,10 @@ var SettingsView = Backbone.View.extend({
                         numOfEdges: edges.length
                     }
                 })).render();
-
-            } else {
+            }
+            else
+            {
                 edges.show();
-
-                //also show hidden nodes that now have shown edges:
-                var hiddenEdges = cy.edges().filter(function (i, e) {return e.hidden();});
-                var nodesToShow = cy.nodes().filter(function (i, n) {return n.hidden();})
-                    .filter(function (i, n) {return n.connectedEdges().not(hiddenEdges).length > 0;});
-                nodesToShow.show();
 
                 $(this).find("span")
                     .removeClass("fui-plus-16")
@@ -63,9 +64,11 @@ var SettingsView = Backbone.View.extend({
                 })).render();
             }
 
-            $(this).toggleClass("itx-removed");
+            //bother the slider with the same value - refresh?
+            var sli = $("#slider-nodes");
+            sli.slider("value", sli.slider("value"));
 
-            $("#increase-button").click(); //refreshing is required
+            $(this).prop("disabled",false);
         });
 
 
@@ -78,6 +81,7 @@ var SettingsView = Backbone.View.extend({
         return this;
     }
 });
+
 
 var BlinkDetailsTabView = Backbone.View.extend({
     el: "#menu-graph-details",
@@ -114,16 +118,14 @@ var FilteringNodesView = Backbone.View.extend({
 var NodesSliderView = Backbone.View.extend({
     el: ".ui-slider",
     render: function() {
-        var model = this.model;
-
         this.$el.each(function() {
             var selfSlider = $(this);
-            var minVal = model.min;
-            var maxVal = model.max;
+            var minVal = cy.nodes("[?isseed]").length;
+            var maxVal = cy.nodes().length;
 
-            var update = _.throttle( function(event, ui) {
+            var update = _.throttle( function(event, ui)
+            {
                 $("#slider-help-row").fadeOut();
-
                 selfSlider.slider("disable");
                 (new FilteringNodesView()).render();
 
@@ -131,35 +133,26 @@ var NodesSliderView = Backbone.View.extend({
 
                 // Then hide the low importance ones
                 var eles = cy.elements();
-                var hiddenNodes = cy.$("node[rank>=" + val + "][!isseed]");
-                var shownNodes = cy.nodes().not( hiddenNodes );
-                var shownEdges = shownNodes.connectedEdges();
-
-                //exclude edges of currently not-shown interaction types
-                _.each($("#graph-settings .itx-type-on-off"), function(btn) {
-                    var type = $(btn).data("itx-type");
-                    var edges = cy.$("edge[type='" + type + "']");
-                    if ($(btn).hasClass("itx-removed")) {
-                        shownEdges = shownEdges.not(edges);
-                    }
+                var hideNodes = cy.$("node[rank>=" + val + "][!isseed]");
+                var hideEdges = cy.edges().filter(function (i, edge)
+                {
+                    return $(".itx-type-on-off." + edge.data().type).hasClass("itx-removed");
                 });
-
-                //further filter out nodes having all their edges hidden
-                shownNodes = shownNodes.filter(function (i, node) {
-                    return node.connectedEdges().intersection(shownEdges).length > 0;
-                });
-
-                var shown = shownNodes.add( shownEdges );
-                var hidden = eles.not( shown );
 
                 eles.show();
-                hidden.hide();
+                hideNodes.add(hideEdges).hide();
+
+                //hide dangling nodes (those where all edges are currently hidden)
+                var dangNodes = cy.nodes().not(hideNodes).filter(function (i, node)
+                {
+                    return node.connectedEdges().filter(function (i, edge) {return !edge.hidden();}).length == 0;
+                });
+                dangNodes.hide();
 
                 (new NumberOfNodesView({ model: { numberOfNodes: val }})).render();
                 selfSlider.slider("enable");
             }, 1000/30 );
 
-            // TODO: Get all these dynamic range values from the Ranker itself
             $(this).slider({
                 min: minVal,
                 max: maxVal,
@@ -174,18 +167,19 @@ var NodesSliderView = Backbone.View.extend({
                 e.preventDefault();
                 var oldVal = selfSlider.slider("option", "value");
                 var newVal = Math.max(oldVal-1, minVal);
-                selfSlider.slider({value: newVal});
+                selfSlider.slider("option", "value", newVal);
             });
 
             $("#increase-button").click(function(e) {
                 e.preventDefault();
                 var oldVal = selfSlider.slider("option", "value");
                 var newVal = Math.min(oldVal+1, maxVal);
-                selfSlider.slider({value: newVal});
+                selfSlider.slider("option", "value", newVal);
             });
 
         });
 
         return this;
     }
+
 });

@@ -18,13 +18,13 @@ $(document).ready(function() {
     //$("#tagsinput").tagsInput();
 
     // Init jQuery UI slider
-    $("#slider").slider({
-        min: 1,
-        max: 5,
-        value: 2,
-        orientation: "horizontal",
-        range: "min"
-    });
+    // $("#slider-nodes").slider({
+    //     min: 1,
+    //     max: 5,
+    //     value: 2,
+    //     orientation: "horizontal",
+    //     range: "min"
+    // });
 
     // JS input/textarea placeholder
     $("input, textarea").placeholder();
