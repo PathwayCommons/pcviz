@@ -33,7 +33,7 @@ mvn clean package
 
 The following command starts the application:
 ```
-java -Xmx16g -jar target/pcviz*.war
+java -Xmx16g -jar target/pcviz*.jar
 ```
 or
 ```
