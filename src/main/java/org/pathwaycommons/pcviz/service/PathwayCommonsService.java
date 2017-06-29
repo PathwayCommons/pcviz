@@ -9,6 +9,7 @@ import flexjson.JSONSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.biopax.paxtools.controller.ModelUtils;
 import org.biopax.paxtools.pattern.miner.SIFEnum;
 import org.biopax.paxtools.pattern.miner.SIFType;
 import org.pathwaycommons.pcviz.model.CytoscapeJsEdge;
@@ -110,8 +111,9 @@ public class PathwayCommonsService {
             String uniprotId = geneNameService.getUniprotId(gene);
             sortedIds.add((uniprotId!=null)?uniprotId:gene);
         }
-        final String cachedNetwork = StringUtils.join(sortedIds.iterator(),null)
-                .replaceAll("/|\\\\","_") + ".json";
+        final String cachedNetwork = ModelUtils.md5hex(
+               StringUtils.join(sortedIds.iterator(),null)
+            ).replaceAll("/|\\\\","_") + "." + type.toString().toLowerCase() + ".json";
 
         final Path file = Paths.get(cacheDir, "networks", cachedNetwork);
 
@@ -125,7 +127,8 @@ public class PathwayCommonsService {
         final HashSet<String> nodeNames = new HashSet<String>();
         try
         {
-            String txt = graphQuery.kind(type).sources(genes).stringResult(OutputFormat.TXT);
+            String txt = graphQuery.kind(type).sources(genes)
+                    .stringResult(OutputFormat.EXTENDED_BINARY_SIF);
             if (txt != null && !txt.trim().isEmpty()) {
                 Scanner scanner = new Scanner(txt);
                 String line = scanner.nextLine(); // skip title
