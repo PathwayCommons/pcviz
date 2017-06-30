@@ -41,16 +41,9 @@ public class NetworkController
     public ResponseEntity<String> getEntityInJson(@PathVariable GraphType type, @PathVariable String genes)
             throws IOException
     {
-//        if(!(type == GraphType.NEIGHBORHOOD || type == GraphType.PATHSBETWEEN)) {
-//            return ResponseEntity.badRequest().body("Unsupported (yet) graph query type: " + type.toString());
-//        }
-
-        // otherwise, do the job -
         Set<String> geneSet = new TreeSet<String>();
         geneSet.addAll(Arrays.asList(genes.split("\\s*,\\s*")));
-
         String networkJson = pathwayCommonsService.createNetwork(type, geneSet);
-
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON_UTF8).body(networkJson);
     }
 

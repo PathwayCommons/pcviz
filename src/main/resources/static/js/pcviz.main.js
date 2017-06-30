@@ -64,6 +64,7 @@
             return input
                 .replace(new RegExp("<", "g"), "")
                 .replace(new RegExp(">", "g"), "")
+                .replace(new RegExp("\\s+", "g"), ",")
                 .toUpperCase();
         },
 
