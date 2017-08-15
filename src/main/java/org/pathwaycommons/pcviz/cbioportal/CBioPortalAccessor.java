@@ -662,8 +662,11 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 		String urlStr = "getCancerStudies";
 		for (String[] result : queryAndParseURL(urlStr))
 		{
-			assert result.length == 3;
-			CancerStudy cancerStudy = new CancerStudy(result[0], result[1], result[2]);
+//			assert result.length == 3;
+			String sid = result[0];
+			String sname = (result.length>1) ? result[1] : null;
+			String sdsc = (result.length>2) ? result[2] : null;
+			CancerStudy cancerStudy = new CancerStudy(sid,sname,sdsc);
 			studies.add(cancerStudy);
 		}
 		return studies;

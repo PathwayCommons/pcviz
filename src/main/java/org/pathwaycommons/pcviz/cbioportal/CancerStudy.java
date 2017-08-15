@@ -7,8 +7,8 @@ public class CancerStudy {
 
     public CancerStudy(String studyId, String name, String description) {
         this.studyId = studyId;
-        this.name = name;
-        this.description = description;
+        this.name = (name != null) ? name : studyId;
+        this.description = (description!=null)?description:studyId;
     }
 
     public String getDescription() {
