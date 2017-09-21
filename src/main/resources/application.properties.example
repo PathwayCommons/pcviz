@@ -32,6 +32,6 @@ pcviz.url=http://www.pathwaycommons.org/pcviz/
 server.port=8080
 
 # do not change
-spring.mvc.view.prefix: /
-spring.mvc.view.suffix: .jsp
+spring.mvc.view.prefix=/
+spring.mvc.view.suffix=.jsp
 
