@@ -54,7 +54,7 @@ To prepare those caches, you need to
 3. Edit `uniprot_scraper.js` to point to the non-cached version of PCViz (if it is different than the production one)
 4. Make sure `phantomjs` is installed and run `uniprot_scraper.sh` with these arguments: 
 `bash uniprot_scraper.sh /path/to/hgnc.txt /path/to/cache log.txt`
-5. Move all the JSONs over to your `cache.folder/uniprot/` directory
+5. Move all the JSONs over to your `cache.folder/networks/` directory
 6. Restart/re-deploy PCViz with this cache folder populated
 
 It is a good idea to clean up other cache folders (such as portal and co-citations) once in a while, 
