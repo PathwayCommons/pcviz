@@ -120,9 +120,6 @@
                                   <a href="http://www.biopax.org/paxtools">BioPAX / Paxtools</a>
                               </li>
                               <li>
-                                  <a href="http://www.ihop-net.org/">iHOP</a>
-                              </li>
-                              <li>
                                   <a href="https://github.com/PathwayCommons/pcviz/">Code</a>
                               </li>
 

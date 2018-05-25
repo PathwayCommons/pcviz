@@ -47,6 +47,8 @@ and then point your browser to [http://localhost:8080/](http://localhost:8080/).
 To serve networks better, PCViz can utilize cached network data.
 The data folder for the cache files is set within the properties file using the
 
+*TODO:* it won't cache co-citations due to iHope service is discontinued (we're still looking for other options)
+
 To prepare those caches, you need to
 
 1. Clean up your `cache.folder`
@@ -60,17 +62,3 @@ To prepare those caches, you need to
 It is a good idea to clean up other cache folders (such as portal and co-citations) once in a while, 
 but it is not required unless the formatting changes for those files/services. 
 Only the pre-calculated network cache requires pre-processing.
-
-# License
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.

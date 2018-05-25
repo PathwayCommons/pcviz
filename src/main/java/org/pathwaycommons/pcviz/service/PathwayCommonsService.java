@@ -51,7 +51,7 @@ public class PathwayCommonsService {
     @Value("${cache.folder}")
     private String cacheDir;
 
-    // Cache for co-citations.
+    // in-memory cache for co-citations.
     private final Map<String, Map<String, Integer>> cocitationMap;
 
     @Autowired
@@ -64,9 +64,8 @@ public class PathwayCommonsService {
         this.cocitMan = cocitMan;
     }
 
-
     public PathwayCommonsService() {
-        cocitationMap = new HashMap<String, Map<String, Integer>>();
+        cocitationMap = new HashMap();
     }
 
     @PostConstruct
@@ -124,10 +123,9 @@ public class PathwayCommonsService {
 
         final CytoscapeJsGraph graph = new CytoscapeJsGraph();
         final HashSet<String> nodeNames = new HashSet<String>();
-        try
-        {
+        try {
             String txt = graphQuery.kind(type).sources(genes)
-                .direction(CPathClient.Direction.BOTHSTREAM) //undirected is the default but useless as we excluded interacts-with pattern - PPIs
+                .direction(CPathClient.Direction.BOTHSTREAM)//undirected was the default but useless as we excluded interacts-with pattern
                     .stringResult(OutputFormat.TXT);
             if (txt != null && !txt.trim().isEmpty()) {
                 Scanner scanner = new Scanner(txt);
@@ -135,7 +133,6 @@ public class PathwayCommonsService {
                 while (scanner.hasNextLine())
                 {
                     line = scanner.nextLine();
-
                     if(line.trim().isEmpty())
                         break; // done - skip the next section (nodes descr.) of PC extended SIF format
 
@@ -148,12 +145,10 @@ public class PathwayCommonsService {
                     int edgeCo = getCocitations(srcName, targetName);
                     int srcCo = getTotalCocitations(srcName);
                     int targetCo = getTotalCocitations(targetName);
-                    if (
-//                            type == GraphType.NEIGHBORHOOD && // apply co-citations filter only for n-hood queries
-                            (edgeCo < minNumberOfCoCitationsForEdges
-                            || srcCo < minNumberOfCoCitationsForNodes
-                            || targetCo < minNumberOfCoCitationsForNodes)
-                    ){
+                    if (edgeCo < minNumberOfCoCitationsForEdges
+                        || srcCo < minNumberOfCoCitationsForNodes
+                        || targetCo < minNumberOfCoCitationsForNodes)
+                    {
                         continue;
                     }
 
@@ -220,7 +215,7 @@ public class PathwayCommonsService {
     }
 
     /**
-     * Gets co-citations of the given gene. Uses local cache if accessed in this run.
+     * Gets co-citations of the given gene. Uses local cache if it exists.
      *
      * @param gene gene symbol
      * @return co-citations

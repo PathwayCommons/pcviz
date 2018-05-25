@@ -40,6 +40,6 @@ while [ $i -le $numOfIds ] ; do
     let i=$i+1
 done
 
-#TODO: also get all the info from Biogene and iHope for each ID
+#TODO: also get all the co-citations and info from BioGene for each ID
 
 echo "all done!"
