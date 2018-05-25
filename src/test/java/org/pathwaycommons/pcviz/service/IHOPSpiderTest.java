@@ -1,5 +1,6 @@
 package org.pathwaycommons.pcviz.service;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.Map;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@Ignore("iHope service is down these days")
 public class IHOPSpiderTest
 {
 	@Autowired
@@ -23,7 +25,7 @@ public class IHOPSpiderTest
 	@Test
 	public void spiderTest()
 	{
-        Map<String,Integer> map = ihopSpider.parseCocitations("KRAS");
+		Map<String,Integer> map = ihopSpider.parseCocitations("KRAS");
 		assertFalse(map.isEmpty());
 		map = ihopSpider.parseCocitations("CDK1");
 		assertFalse(map.isEmpty());

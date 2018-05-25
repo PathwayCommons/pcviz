@@ -73,7 +73,7 @@ public class PathwayCommonsService {
     void init() throws IOException
     {
         client = CPathClient.newInstance(pathwayCommonsUrl);
-        client.setName("PCViz-PC9");
+        client.setName("PCViz10");
         graphQuery = client.createGraphQuery().patterns(
                 new String[]{
                         "CONTROLS_STATE_CHANGE_OF",
@@ -81,8 +81,7 @@ public class PathwayCommonsService {
                         "CATALYSIS_PRECEDES",
                         "CONTROLS_TRANSPORT_OF",
                         "CONTROLS_PHOSPHORYLATION_OF",
-                        "IN_COMPLEX_WITH",
-//                        "CHEMICAL_AFFECTS"
+                        "IN_COMPLEX_WITH"
                 }
         );
 
@@ -128,7 +127,8 @@ public class PathwayCommonsService {
         try
         {
             String txt = graphQuery.kind(type).sources(genes)
-                    .stringResult(OutputFormat.EXTENDED_BINARY_SIF);
+                .direction(CPathClient.Direction.BOTHSTREAM) //undirected is the default but useless as we excluded interacts-with pattern - PPIs
+                    .stringResult(OutputFormat.TXT);
             if (txt != null && !txt.trim().isEmpty()) {
                 Scanner scanner = new Scanner(txt);
                 String line = scanner.nextLine(); // skip title
@@ -245,10 +245,7 @@ public class PathwayCommonsService {
     private int getCocitations(String gene1, String gene2)
     {
         Map<String, Integer> map = getCocitationMap(gene1);
-        if (map != null && map.containsKey(gene2))
-        {
-            return map.get(gene2);
-        } else return 0;
+        return (map.containsKey(gene2)) ? map.get(gene2) : 0;
     }
 
     /**
@@ -261,8 +258,6 @@ public class PathwayCommonsService {
     private int getTotalCocitations(String gene)
     {
         Map<String, Integer> map = getCocitationMap(gene);
-        if (map == null) return 0;
-
         int cnt = 0;
         for (Integer i : map.values())
         {

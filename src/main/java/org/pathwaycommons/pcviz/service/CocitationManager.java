@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,37 +106,21 @@ public class CocitationManager
 	 */
 	public Map<String, Integer> getCocitations(String symbol)
 	{
+		Map<String, Integer> map = Collections.emptyMap();
+
 		try
 		{
-			if (cacheExists(symbol))
-			{
-				Map<String, Integer> map = null;
-
-				//TODO: as iHope is old, not updated anymore, make cocitations cache never expires
-//				long stamp = getCacheTimestamp(symbol);
-//				if (System.currentTimeMillis() - stamp > getShelfLife())
-//				{
-//					map = spiderAndCache(symbol);
-//				}
-
-				if (map == null)
-				{
-					map = readCache(symbol);
-				}
-
-				return map;
+			if(cacheExists(symbol)) {
+				//TODO: as iHope is old and down, we gotta built a permanent co-citations cache
+				map = readCache(symbol);
+			} else {
+				map = spiderAndCache(symbol); //empty map is ihop is unavailable
 			}
-			else
-			{
-				return spiderAndCache(symbol);
-			}
+		} catch (IOException e) {
+			log.error("Failed reading co-citations from cache for " + symbol + "; " + e);
+		}
 
-		}
-		catch (IOException e)
-		{
-			log.error("Error while reading co-citation cache for symbol " + symbol + ".", e);
-			return null;
-		}
+		return map;
 	}
 
 	/**
@@ -147,8 +132,7 @@ public class CocitationManager
 	 */
 	private Map<String, Integer> readCache(String symbol) throws IOException
 	{
-		Map<String, Integer> map;
-		map = new HashMap<String, Integer>();
+		Map<String, Integer> map = new HashMap<String, Integer>();
 
 		BufferedReader reader = Files.newBufferedReader(Paths.get(resourceDir, symbol));
 		// skip timestamp
@@ -170,11 +154,8 @@ public class CocitationManager
 	 */
 	private Map<String, Integer> spiderAndCache(String symbol)
 	{
-		Map<String, Integer> map;
-		map = getIhopSpider().parseCocitations(symbol);
-
-		if (map != null)
-		{
+		Map<String, Integer> map = getIhopSpider().parseCocitations(symbol);
+		if (!map.isEmpty()) {
 			cacheCocitations(symbol, map);
 		}
 		return map;

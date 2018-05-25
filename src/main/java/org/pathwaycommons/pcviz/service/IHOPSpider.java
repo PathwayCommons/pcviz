@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
@@ -17,20 +18,19 @@ import java.util.*;
 @Service
 public class IHOPSpider
 {
+	private static final String DEFAULT_URL = "http://www.ihop-net.org/UniPub/iHOP/";
 	private static final Log log = LogFactory.getLog(IHOPSpider.class);
-	public static final String DEFAULT_URL = "http://www.ihop-net.org/UniPub/iHOP/";
-
 	private final RestTemplate restTemplate;
 
 	@Value("${ihop.url}")
-    private String iHopURL;
+  private String iHopURL;
 
-    public IHOPSpider() {
-    	iHopURL = DEFAULT_URL; //for using without a Spring context
+	public IHOPSpider() {
+		iHopURL = DEFAULT_URL; //for using without a Spring context
 		restTemplate = new RestTemplate();
-    }
+	}
 
-    /**
+	/**
 	 * Gets the co-citation data from the iHOP server.
 	 *
 	 * @param symbol symbol of the gene of interest
@@ -38,22 +38,27 @@ public class IHOPSpider
 	 */
 	public Map<String, Integer> parseCocitations(String symbol)
 	{
+		Map<String, Integer> ret = Collections.emptyMap();
+
 		try {
 			// Find internal ID
 			String result = restTemplate.getForObject(getGeneSearchURL(symbol), String.class);
 			String ID = getInternalID(result, symbol);
 			if (ID == null) {
 				log.debug("Cannot find internal ID of " + symbol);
-				return null;
 			} else {
 				result = restTemplate.getForObject(getGenePageURL(ID), String.class);
-				Map<String, Integer> map = parseCocitationsByID(result);
-				return map;
+				ret = parseCocitationsByID(result);
 			}
-		} catch (Exception e) {
-			log.warn("Cannot parse co-citations for " + symbol, e);
-            return null;
 		}
+		catch (ResourceAccessException e) {
+			log.error("Cannot assess iHop; " + e);
+		}
+		catch (Exception e) {
+			log.error("Cannot parse co-citations for " + symbol + " - " + e);
+		}
+
+		return ret;
 	}
 
 	/**
