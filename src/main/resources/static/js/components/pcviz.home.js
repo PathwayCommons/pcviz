@@ -136,7 +136,7 @@ var HomeView = Backbone.View.extend({
             for(var i=0; i < t.length; i++) {
                 url += "source=" + t[i] + "&";
             }
-            url += "kind=" + kind + "&format=BINARY_SIF";
+            url += "kind=" + kind + "&format=SIF";
 
             window.open(url, "_blank");
         });

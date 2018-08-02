@@ -134,7 +134,7 @@ public class PathwayCommonsService {
                 {
                     line = scanner.nextLine();
                     if(line.trim().isEmpty())
-                        break; // done - skip the next section (nodes descr.) of PC extended SIF format
+                        break; // done - skip the next section (nodes descr.) of PC extended SIF (TXT) format
 
                     //split; empty tokens that result from '\t\t' and after the last tab are also included:
                     String[] sif = line.split("\t",-1);
