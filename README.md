@@ -15,7 +15,7 @@ cp -f src/main/resources/application.properties.example src/main/resources/appli
 The property `hgnc.location` should point to a valid HGNC output that contains the official gene symbols and their synonyms.
 This file can be downloaded as follows:
 ```
-wget -O /tmp/hgnc.txt "http://www.genenames.org/cgi-bin/hgnc_downloads?col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit" 
+wget -O /tmp/hgnc.txt "https://www.genenames.org/cgi-bin/download/custom??col=gd_app_sym&col=gd_aliases&col=md_prot_id&status=Approved&status_opt=2&where=&order_by=gd_hgnc_id&format=text&limit=&hgnc_dbtag=on&submit=submit"
 ```
 The property `ncbigene.location` should point to a valid NCBI (Entrez) Gene output that contains 
 the official gene symbols and IDs. This file can be downloaded as follows:
