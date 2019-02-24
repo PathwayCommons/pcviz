@@ -20,7 +20,7 @@ wget -O /tmp/hgnc.txt "https://www.genenames.org/cgi-bin/download/custom?col=gd_
 The property `ncbigene.location` should point to a valid NCBI (Entrez) Gene output that contains 
 the official gene symbols and IDs. This file can be downloaded as follows:
 ```
-wget -O /tmp/ncbigene.txt "http://www.genenames.org/cgi-bin/download?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit" 
+wget -O /tmp/ncbigene.txt "https://www.genenames.org/cgi-bin/download/custom?col=gd_app_sym&col=gd_pub_eg_id&status=Approved&status_opt=2&where=&order_by=gd_app_sym_sort&format=text&limit=&hgnc_dbtag=on&submit=submit"
 ```
 
 Make sure all other properties reflect the options you wanted to set. 
