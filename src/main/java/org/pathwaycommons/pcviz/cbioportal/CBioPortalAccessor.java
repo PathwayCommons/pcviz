@@ -43,7 +43,7 @@ public class CBioPortalAccessor extends AlterationProviderAdaptor
 
 	private Map<String, Set<String>> notFoundMap;
 
-	static String portalURL = "http://www.cbioportal.org/public-portal/webservice.do?";
+	static String portalURL = "https://www.cbioportal.org/webservice.do?";
 
 	private CancerStudy currentCancerStudy;
 	private CaseList currentCaseList;
